@@ -4,6 +4,7 @@
     'name': 'GES Partner',
     'version': '17.0.1.0.0',
     'category': 'Extra Tools',
+    'module_type': 'official',
     'summary': """This module allows users to validate or approve contacts """,
     'description': """By this module, you can grant access to users to validate
                       or approve partners. Then you will be able to select only
