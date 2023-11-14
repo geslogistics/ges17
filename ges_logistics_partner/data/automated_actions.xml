@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        
+        <record model="base.automation" id="res_partner_application_late_review">
+            <field name="name">Late Reviews (Automated)</field>
+            <field name="model_id" ref="model_res_partner_application"/>
+            <field name="trigger">on_time</field>
+            <field name="filter_domain">['|',('state','=','active'),('state','=','expired')]</field>
+            <field name="trg_date_id" ref="ges_logistics_partner.field_res_partner_application__review_date"/>
+            <field name="trg_date_range">0</field>
+            <field name="trg_date_range_type">hour</field>
+            <field name="state">code</field>
+            <field name="code">record['is_late_review'] = 1</field>
+        </record>
+        
+        <record model="base.automation" id="res_partner_application_expire">
+            <field name="name">Expired Applications (Automated)</field>
+            <field name="model_id" ref="model_res_partner_application"/>
+            <field name="trigger">on_time</field>
+            <field name="filter_domain">[('state','=','active')]</field>
+            <field name="trg_date_id" ref="ges_logistics_partner.field_res_partner_application__expiry_date"/>
+            <field name="trg_date_range">0</field>
+            <field name="trg_date_range_type">hour</field>
+            <field name="state">code</field>
+            <field name="code">
+record['state'] = 'expired'
+datas = {'user_id': env.user.id, 'action':'expired'}
+record['user_action_ids'] = [(0, 0, datas)] 
+            </field>
+        </record>
+
+    </data>
+</odoo>

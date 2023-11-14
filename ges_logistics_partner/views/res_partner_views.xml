@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Add new field customer supplier and new buttons in res partner-->
+<odoo>
+
+    <record id="view_partner_form_inherit_partner_application" model="ir.ui.view">
+        <field name="name">
+            res.partner.view.form.inherit.customer.partner.application
+        </field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <t groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                    <field name="is_locked" invisible="0"/>
+                </t>
+            </xpath>
+            <xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="after">
+                <t groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                    <field name="team_id"/>
+                </t>
+            </xpath>
+            <xpath expr="//field[@name='company_type']" position="attributes">
+                <t groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                    <attribute name="readonly">1</attribute>
+                </t>
+            </xpath>
+
+
+            
+
+            <xpath expr="//notebook/page[last()]" position="after">
+                
+                <page string="Applications" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                    <group>
+                        <group string="KYC">
+                            <field name="current_kyc_id" readonly="1"/>
+                            <field name="current_kyc_state"/>
+                            <field name="current_kyc_expiry_date"/>
+                            <field name="current_kyc_review_date"/>
+                        </group>
+                        <group string="CRM">
+                            <field name="current_crm_id" readonly="1"/>
+                            <field name="current_crm_state"/>
+                            <field name="current_crm_expiry_date"/>
+                            <field name="current_crm_review_date"/>
+                        </group>
+                        <group string="VRM">
+                            <field name="current_vrm_id" readonly="1"/>
+                            <field name="current_vrm_state"/>
+                            <field name="current_vrm_expiry_date"/>
+                            <field name="current_vrm_review_date"/>
+                        </group>
+                        <group string="Customer Credit">
+                            <field name="current_customer_credit_id" readonly="1"/>
+                            <field name="current_customer_credit_state"/>
+                            <field name="current_customer_credit_expiry_date"/>
+                            <field name="current_customer_credit_review_date"/>
+                        </group>
+                        <group string="Vendor Credit">
+                            <field name="current_vendor_credit_id" readonly="1"/>
+                            <field name="current_vendor_credit_state"/>
+                            <field name="current_vendor_credit_expiry_date"/>
+                            <field name="current_vendor_credit_review_date"/>
+                        </group>
+                        <group string="Customer Strategy">
+                            <field name="current_customer_strategy_id" readonly="1"/>
+                            <field name="current_customer_strategy_state"/>
+                            <field name="current_customer_strategy_expiry_date"/>
+                            <field name="current_customer_strategy_review_date"/>
+                        </group>
+                        <group string="Vendor Strategy">
+                            <field name="current_vendor_strategy_id" readonly="1"/>
+                            <field name="current_vendor_strategy_state"/>
+                            <field name="current_vendor_strategy_expiry_date"/>
+                            <field name="current_vendor_strategy_review_date"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            
+        </field>
+    </record>
+    <record id="res_partner_kanban_view" model="ir.ui.view">
+        <field name="name">
+            res.partner.view.kanban.inherit.partner.application
+        </field>
+        <field name="model">res.partner</field>
+        <field name="priority">999</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('o_kanban_record_bottom')]" position="attributes">
+                <t groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                    <attribute name="style">align-items: flex-end;</attribute>
+                </t>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="attributes">
+                <t groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                    <attribute name="style">flex-wrap: wrap;</attribute>
+                </t>
+            </xpath>
+            <!--
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
+                <t groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                    <span t-if="record.current_kyc_id.value" class="me-1">
+                        <field name="current_kyc_id" invisible="1"/>
+                        <field name="current_kyc_state" invisible="1"/>
+                        <field name="current_kyc_expiry_date" invisible="1"/>
+                        <field name="current_kyc_late_review" invisible="1"/>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_kyc_state.value != 'Active' and record.current_kyc_state.value != 'Expired'" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="KYC N/A" title="KYC N/A" />
+                            <span>KYC</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" attrs="{'invisible': [('current_kyc_late_review', '=', False)]}" style="color:orange !important">
+                            <i class="fa fa-fw fa-exclamation-circle" role="img" aria-label="KYC Late" title="KYC Late" />
+                            <span>KYC</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_kyc_state.value == 'Active'" attrs="{'invisible': [('current_kyc_late_review', '=', True)]}" style="color:green !important">
+                            <i class="fa fa-fw fa-check-circle" role="img" aria-label="KYC Active" title="KYC Active" />
+                            <span>KYC</span>
+                        </span>
+                        <span class="badge rounded-pill" t-if="record.current_kyc_state.value == 'Expired'" style="color:red !important">
+                            <i class="fa fa-fw fa-times-circle" role="img" aria-label="KYC Expired" title="KYC Expired" />
+                            <span>KYC</span>
+                        </span>
+                    </span>
+                    <span t-if="record.current_kyc_id.value == ''" class="me-1">
+                        <span class="badge rounded-pill badge-success" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="KYC N/A" title="KYC N/A" />
+                            <span>KYC</span>
+                        </span>
+                    </span>
+
+                    <span t-if="record.current_crm_id.value" class="me-1">
+                        <field name="current_crm_id" invisible="1"/>
+                        <field name="current_crm_state" invisible="1"/>
+                        <field name="current_crm_expiry_date" invisible="1"/>
+                        <field name="current_crm_late_review" invisible="1"/>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_crm_state.value != 'Active' and record.current_crm_state.value != 'Expired'" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="CRM N/A" title="CRM N/A" />
+                            <span>CRM</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" attrs="{'invisible': [('current_crm_late_review', '=', False)]}" style="color:orange !important">
+                            <i class="fa fa-fw fa-exclamation-circle" role="img" aria-label="CRM Late" title="CRM Late"/>
+                            <span>CRM</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_crm_state.value == 'Active'" attrs="{'invisible': [('current_crm_late_review', '=', True)]}" style="color:green !important">
+                            <i class="fa fa-fw fa-check-circle" role="img" aria-label="CRM Active" title="CRM Active" />
+                            <span>CRM</span>
+                        </span>
+                        <span class="badge rounded-pill" t-if="record.current_crm_state.value == 'Expired'" style="color:red !important">
+                            <i class="fa fa-fw fa-times-circle" role="img" aria-label="CRM Expired" title="CRM Expired" />
+                            <span>CRM</span>
+                        </span>
+                    </span>
+                    <span t-if="record.current_crm_id.value == ''" class="me-1">
+                        <span class="badge rounded-pill badge-success" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="CRM N/A" title="CRM N/A" />
+                            <span>CRM</span>
+                        </span>
+                    </span>
+
+                    <span t-if="record.current_customer_credit_id.value" class="me-1">
+                        <field name="current_customer_credit_id" invisible="1"/>
+                        <field name="current_customer_credit_state" invisible="1"/>
+                        <field name="current_customer_credit_expiry_date" invisible="1"/>
+                        <field name="current_customer_credit_late_review" invisible="1"/>
+                        
+                        <span class="badge rounded-pill badge-success" t-if="record.current_customer_credit_state.value != 'Active' and record.current_customer_credit_state.value != 'Expired'" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="Customer Credit N/A" title="Customer Credit N/A" />
+                            <span>CC</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" attrs="{'invisible': [('current_customer_credit_late_review', '=', False)]}" style="color:orange !important">
+                            <i class="fa fa-fw fa-exclamation-circle" role="img" aria-label="Customer Credit Late" title="Customer Credit Late" />
+                            <span>CC</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_customer_credit_state.value == 'Active'" attrs="{'invisible': [('current_customer_credit_late_review', '=', True)]}" style="color:green !important">
+                            <i class="fa fa-fw fa-check-circle" role="img" aria-label="Customer Credit Active" title="Customer Credit Active" />
+                            <span>CC</span>
+                        </span>
+                        <span class="badge rounded-pill" t-if="record.current_customer_credit_state.value == 'Expired'" style="color:red !important">
+                            <i class="fa fa-fw fa-times-circle" role="img" aria-label="Customer Credit Expired" title="Customer Credit Expired" />
+                            <span>CC</span>
+                        </span>
+                    </span>
+                    <span t-if="record.current_customer_credit_id.value == ''" class="me-1">
+                        <span class="badge rounded-pill badge-success" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="Customer Credit N/A" title="Customer Credit N/A" />
+                            <span>CC</span>
+                        </span>
+                    </span>
+
+                    <span t-if="record.current_customer_strategy_id.value" class="me-1">
+                        <field name="current_customer_strategy_id" invisible="1"/>
+                        <field name="current_customer_strategy_state" invisible="1"/>
+                        <field name="current_customer_strategy_expiry_date" invisible="1"/>
+                        <field name="current_customer_strategy_late_review" invisible="1"/>
+                        
+                        <span class="badge rounded-pill badge-success" t-if="record.current_customer_strategy_state.value != 'Active' and record.current_customer_strategy_state.value != 'Expired'" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="Customer Strategy N/A" title="Customer Strategy N/A" />
+                            <span>CS</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" attrs="{'invisible': [('current_customer_strategy_late_review', '=', False)]}" style="color:orange !important">
+                            <i class="fa fa-fw fa-exclamation-circle" role="img" aria-label="Customer Strategy Late" title="Customer Strategy Late" />
+                            <span>CS</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_customer_strategy_state.value == 'Active'" attrs="{'invisible': [('current_customer_strategy_late_review', '=', True)]}" style="color:green !important">
+                            <i class="fa fa-fw fa-check-circle" role="img" aria-label="Customer Strategy Active" title="Customer Strategy Active" />
+                            <span>CS</span>
+                        </span>
+                        <span class="badge rounded-pill" t-if="record.current_customer_strategy_state.value == 'Expired'" style="color:red !important">
+                            <i class="fa fa-fw fa-times-circle" role="img" aria-label="Customer Strategy Expired" title="Customer Strategy Expired" />
+                            <span>CS</span>
+                        </span>
+                    </span>
+                    <span t-if="record.current_customer_strategy_id.value == ''" class="me-1">
+                        <span class="badge rounded-pill badge-success" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="Customer Strategy N/A" title="Customer Strategy N/A" />
+                            <span>CS</span>
+                        </span>
+                    </span>
+
+                    <span t-if="record.current_vrm_id.value" class="me-1">
+                        <field name="current_vrm_id" invisible="1"/>
+                        <field name="current_vrm_state" invisible="1"/>
+                        <field name="current_vrm_expiry_date" invisible="1"/>
+                        <field name="current_vrm_late_review" invisible="1"/>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_vrm_state.value != 'Active' and record.current_vrm_state.value != 'Expired'" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="VRM N/A" title="VRM N/A" />
+                            <span>VRM</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" attrs="{'invisible': [('current_vrm_late_review', '=', False)]}" style="color:orange !important">
+                            <i class="fa fa-fw fa-exclamation-circle" role="img" aria-label="VRM Late" title="VRM Late" />
+                            <span>VRM</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_vrm_state.value == 'Active'" attrs="{'invisible': [('current_vrm_late_review', '=', True)]}" style="color:green !important">
+                            <i class="fa fa-fw fa-check-circle" role="img" aria-label="VRM Active" title="VRM Active" />
+                            <span>VRM</span>
+                        </span>
+                        <span class="badge rounded-pill" t-if="record.current_vrm_state.value == 'Expired'" style="color:red !important">
+                            <i class="fa fa-fw fa-times-circle" role="img" aria-label="VRM Expired" title="VRM Expired" />
+                            <span>VRM</span>
+                        </span>
+                    </span>
+                    <span t-if="record.current_vrm_id.value == ''" class="me-1">
+                        <span class="badge rounded-pill badge-success" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="VRM N/A" title="VRM N/A" />
+                            <span>VRM</span>
+                        </span>
+                    </span>
+
+                    <span t-if="record.current_vendor_credit_id.value" class="me-1">
+                        <field name="current_vendor_credit_id" invisible="1"/>
+                        <field name="current_vendor_credit_state" invisible="1"/>
+                        <field name="current_vendor_credit_expiry_date" invisible="1"/>
+                        <field name="current_vendor_credit_late_review" invisible="1"/>
+                        
+                        <span class="badge rounded-pill badge-success" t-if="record.current_vendor_credit_state.value != 'Active' and record.current_vendor_credit_state.value != 'Expired'" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="Vendor Credit N/A" title="Vendor Credit N/A" />
+                            <span>VC</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" attrs="{'invisible': [('current_vendor_credit_late_review', '=', False)]}" style="color:orange !important">
+                            <i class="fa fa-fw fa-exclamation-circle" role="img" aria-label="Vendor Credit Late" title="Vendor Credit Late" />
+                            <span>VC</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_vendor_credit_state.value == 'Active'" attrs="{'invisible': [('current_vendor_credit_late_review', '=', True)]}" style="color:green !important">
+                            <i class="fa fa-fw fa-check-circle" role="img" aria-label="Vendor Credit Active" title="Vendor Credit Active" />
+                            <span>VC</span>
+                        </span>
+                        <span class="badge rounded-pill" t-if="record.current_vendor_credit_state.value == 'Expired'" style="color:red !important">
+                            <i class="fa fa-fw fa-times-circle" role="img" aria-label="Vendor Credit Expired" title="Vendor Credit Expired" />
+                            <span>VC</span>
+                        </span>
+                    </span>
+                    <span t-if="record.current_vendor_credit_id.value == ''" class="me-1">
+                        <span class="badge rounded-pill badge-success" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="Vendor Credit N/A" title="Vendor Credit N/A" />
+                            <span>VC</span>
+                        </span>
+                    </span>
+
+                    <span t-if="record.current_vendor_strategy_id.value" class="me-1">
+                        <field name="current_vendor_strategy_id" invisible="1"/>
+                        <field name="current_vendor_strategy_state" invisible="1"/>
+                        <field name="current_vendor_strategy_expiry_date" invisible="1"/>
+                        <field name="current_vendor_strategy_late_review" invisible="1"/>
+                        
+                        <span class="badge rounded-pill badge-success" t-if="record.current_vendor_strategy_state.value != 'Active' and record.current_vendor_strategy_state.value != 'Expired'" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="Vendor Strategy N/A" title="Vendor Strategy N/A" />
+                            <span>VS</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" attrs="{'invisible': [('current_vendor_strategy_late_review', '=', False)]}" style="color:orange !important">
+                            <i class="fa fa-fw fa-exclamation-circle" role="img" aria-label="Vendor Strategy Late" title="Vendor Strategy Late" />
+                            <span>VS</span>
+                        </span>
+                        <span class="badge rounded-pill badge-success" t-if="record.current_vendor_strategy_state.value == 'Active'" attrs="{'invisible': [('current_vendor_strategy_late_review', '=', True)]}" style="color:green !important">
+                            <i class="fa fa-fw fa-check-circle" role="img" aria-label="Vendor Strategy Active" title="Vendor Strategy Active" />
+                            <span>VS</span>
+                        </span>
+                        <span class="badge rounded-pill" t-if="record.current_vendor_strategy_state.value == 'Expired'" style="color:red !important">
+                            <i class="fa fa-fw fa-times-circle" role="img" aria-label="Vendor Strategy Expired" title="Vendor Strategy Expired" />
+                            <span>VS</span>
+                        </span>
+                    </span>
+                    <span t-if="record.current_vendor_strategy_id.value == ''" class="me-1">
+                        <span class="badge rounded-pill badge-success" style="color: #C0C0C0 !important">
+                            <i class="fa fa-fw fa-circle-o" role="img" aria-label="Vendor Strategy N/A" title="Vendor Strategy N/A" />
+                            <span>VS</span>
+                        </span>
+                    </span>
+                </t>
+            </xpath>
+            -->
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
+                <t groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                    <div style="width: 100%">
+                        <field name="active_application_ids" widget="many2many_tags" options="{'color_field': 'color'}" context="{'show_type': 1}"/>
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_partner_search_application_inherited" model="ir.ui.view">
+        <field name="name">
+            res.partner.view.search.inherit.application
+        </field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/group" position="inside">
+                <filter string="KYC" name="active_kyc" domain="[('current_kyc_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <separator groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <filter string="Active Customer" name="active_customer" domain="[('current_kyc_id','!=',False),('current_crm_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <filter string="CRM" name="active_crm" domain="[('current_crm_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <filter string="Customer Credit" name="active_customer_credit" domain="[('current_customer_credit_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <filter string="Customer Strategy" name="active_customer_strategy" domain="[('current_customer_strategy_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <separator groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <filter string="Active Vendor" name="active_vendor" domain="[('current_kyc_id','!=',False),('current_vrm_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <filter string="VRM" name="active_vrm" domain="[('current_vrm_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <filter string="Vendor Credit" name="active_vendor_credit" domain="[('current_vendor_credit_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+                <filter string="Vendor Strategy" name="active_vendor_strategy" domain="[('current_vendor_strategy_id','!=',False)]" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_tree_partner_application_inherited" model="ir.ui.view">
+        <field name="name">res.partner.view.tree.inherit.partner.application</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="priority">17</field>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="active_application_ids" optional="show" widget="many2many_tags" options="{'color_field': 'color'}" context="{'show_type': 1}" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    
+</odoo>
