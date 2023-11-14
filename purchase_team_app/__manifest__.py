@@ -3,7 +3,7 @@
 {
     "name" : "Odoo Purchase Team Allocation",
     "author": "Edge Technologies",
-    "version" : "16.0.1.0",
+    "version" : "17.0.1.0",
     "live_test_url":'https://youtu.be/H3cwPVEGO20',
     "images":["static/description/main_screenshot.png"],
     'summary': 'App purchase team purchase analysis team analysis for team in purchase report purchase team analysis purchase team reports team allocation in purchase purchase indent purchase user allocation purchase team report specific team for purchase order',
