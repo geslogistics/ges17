@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        
+        <!--
         <record model="base.automation" id="res_partner_application_late_review">
             <field name="name">Late Reviews (Automated)</field>
             <field name="model_id" ref="model_res_partner_application"/>
@@ -29,6 +29,6 @@ datas = {'user_id': env.user.id, 'action':'expired'}
 record['user_action_ids'] = [(0, 0, datas)] 
             </field>
         </record>
-
+        -->
     </data>
 </odoo>

@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-
+purchase_team,purchase_team,model_purchase_team,,1,1,1,1
 access_res_partner_application_admin,access.res.partner.application.admin,model_res_partner_application,group_partner_application_admin,1,1,1,1
 access_res_partner_application_user_all_docs,access.res.partner.application.user,model_res_partner_application,group_partner_application_user_all_docs,1,1,1,0
 access_res_partner_application_user_team_docs,access.res.partner.application.user,model_res_partner_application,group_partner_application_user_team_docs,1,1,1,0

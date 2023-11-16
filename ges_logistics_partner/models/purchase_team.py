@@ -15,7 +15,7 @@ class PurchaseTeam(models.Model):
 	team_member_ids = fields.One2many('res.users', 'purchase_team_id', string="Team Members")
 	active = fields.Boolean(default=True, help="If the active field is set to false, it will allow you to hide the Purchase Team without removing it.")
 
-	"""
+	
 	def _track_subtype(self, init_values):
 		self.ensure_one()
 		if 'state' in init_values and self.state == 'purchase':
@@ -25,7 +25,7 @@ class PurchaseTeam(models.Model):
 		elif 'state' in init_values and self.state == 'done':
 			return 'purchase_team_app.mt_rfq_new_done'
 		return super(PurchaseTeam, self)._track_subtype(init_values)
-	"""
+
 
 class PurchaseReport(models.Model):
 	_inherit = 'purchase.report'
@@ -59,7 +59,6 @@ class PurchaseReport(models.Model):
 					(sum(l.product_qty * l.price_unit / COALESCE(po.currency_rate, 1.0))/NULLIF(sum(l.product_qty/line_uom.factor*product_uom.factor),0.0))::decimal(16,2) as price_average,
 					partner.country_id as country_id,
 					partner.commercial_partner_id as commercial_partner_id,
-					analytic_account.id as account_analytic_id,
 					sum(p.weight * l.product_qty/line_uom.factor*product_uom.factor) as weight,
 					sum(p.volume * l.product_qty/line_uom.factor*product_uom.factor) as volume,
 					sum(l.price_subtotal / COALESCE(po.currency_rate, 1.0))::decimal(16,2) as untaxed_total,
@@ -83,7 +82,6 @@ class PurchaseReport(models.Model):
 						left join product_template t on (p.product_tmpl_id=t.id)
 				left join uom_uom line_uom on (line_uom.id=l.product_uom)
 				left join uom_uom product_uom on (product_uom.id=t.uom_id)
-				left join account_analytic_account analytic_account on (l.account_analytic_id = analytic_account.id)
 				left join currency_rate cr on (cr.currency_id = po.currency_id and
 					cr.company_id = po.company_id and
 					cr.date_start <= coalesce(po.date_order, now()) and
@@ -119,7 +117,6 @@ class PurchaseReport(models.Model):
 				product_uom.factor,
 				partner.country_id,
 				partner.commercial_partner_id,
-				analytic_account.id,
 				po.id
 		"""
 		return group_by_str

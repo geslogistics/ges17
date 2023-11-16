@@ -1,54 +1,105 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
-
+import json
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
-    """
-    #current kyc fields
+
+    #application inherits
     
-    kyc_company_type = fields.Selection(string='Company Type', selection=[('company', 'Company'),('person', 'Individual')], store=True, related="current_kyc_id.company_type")
-    kyc_legal_name = fields.Char(string='English Official Name', store=True, related="current_kyc_id.legal_name")
-    kyc_arabic_name = fields.Char(string='Arabic Name', store=True, related="current_kyc_id.arabic_name")
-    kyc_trade_name = fields.Char(string='Trading Name', store=True, related="current_kyc_id.trade_name")
-
-    kyc_category_id = fields.Many2many('res.partner.category', 'partner_tags_kyc_application', 'application_partner_id' ,'application_category_id', string='Tags', store=True, related="current_kyc_id.category_id")
-    kyc_street = fields.Char(string="Street", store=True, related="current_kyc_id.street")
-    kyc_street2 = fields.Char(string="Street 2", store=True, related="current_kyc_id.street2")
-    kyc_zip = fields.Char(string="Zip", store=True, related="current_kyc_id.zip")
-    kyc_city = fields.Char(string="City", store=True, related="current_kyc_id.city")
-    kyc_state_id = fields.Many2one("res.country.state", string='State', ondelete='restrict', domain="[('country_id', '=?', country_id)]", store=True, related="current_kyc_id.state_id")
-    kyc_country_id = fields.Many2one('res.country', string='Country', ondelete='restrict', store=True, related="current_kyc_id.country_id")
-
-    kyc_email = fields.Char(string="Email", store=True, related="current_kyc_id.email")
-    kyc_phone = fields.Char(string="Phone", store=True, related="current_kyc_id.phone")
-    kyc_mobile = fields.Char(string="Mobile", store=True, related="current_kyc_id.mobile")
-    kyc_website = fields.Char(string="Website", store=True, related="current_kyc_id.website")
-    kyc_company_registry = fields.Char(string="Official ID", store=True, related="current_kyc_id.company_registry")
-    kyc_vat = fields.Char(string='Tax ID', store=True, related="current_kyc_id.vat")
-    kyc_ref = fields.Char(string='Reference', store=True, related="current_kyc_id.ref")
-
-
-    ## KYC - Companies
-    kyc_legal_type = fields.Selection([('establishment','Establishment'),('joint_liability','Joint Liability Company'),('limited_partnership','Limited Partnership Company'),('simple_joint','Simple Joint Stock Company'),('closed_joint','Closed Joint Stock Company'),('public','Public Joint Stock Company'),('llc','Limited Liability Company'),('one_llc','One Person Limited Liability Company')], string="Legal Type", store=True, related="current_kyc_id.legal_type")
-    kyc_industry_id = fields.Many2one('res.partner.industry', string="Industry", store=True, related="current_kyc_id.industry_id")
-    kyc_paidup_capital = fields.Monetary("Paid-up Capital", store=True, related="current_kyc_id.paidup_capital")
-    kyc_ownership_structure = fields.Html("Ownership Structure", store=True, related="current_kyc_id.ownership_structure")
-    kyc_management_structure = fields.Html("Management Structure", store=True, related="current_kyc_id.management_structure")
-    kyc_year_founded = fields.Integer("Year Founded", store=True, related="current_kyc_id.year_founded")
-    
-
-    ## KYC - Individuals
-    kyc_function = fields.Char("Job Position", store=True, related="current_kyc_id.function")
-    kyc_title = fields.Many2one('res.partner.title', string="Title", store=True, related="current_kyc_id.title")
-
-    """
-
     application_ids = fields.One2many('res.partner.application','partner_id', string="Applications")
     active_application_ids = fields.Many2many('res.partner.application', 'partner_tags_active_application', 'application_partner_id' ,'application_category_id', string='Active Applications')
 
     is_locked = fields.Boolean(string="Locked", tracking=True, compute_sudo=True, compute="_lock_partner")
+
+    domain_pricelist_id = fields.Char(
+       compute="_compute_pricelist_id_domain",
+       compute_sudo=True,
+       readonly=True,
+       store=False,
+    )
+
+    @api.onchange('current_crm_id.customer_pricelist_ids')
+    @api.depends('current_crm_id.customer_pricelist_ids')
+    def _compute_pricelist_id_domain(self):
+        for record in self:
+            current_pricelist_ids = record.current_crm_id.customer_pricelist_ids.ids
+            if current_pricelist_ids:
+                record.domain_pricelist_id = json.dumps(
+                [('id','in',current_pricelist_ids), ('company_id', 'in', (False, record.company_id.id))]
+                )
+            else:
+                record.domain_pricelist_id = json.dumps(
+                [('company_id', 'in', (False, record.company_id.id))]
+                )
+                
+    domain_payment_term_id = fields.Char(
+       compute="_compute_payment_term_id_domain",
+       compute_sudo=True,
+       readonly=True,
+       store=False,
+    )
+
+    @api.onchange('current_customer_credit_id.customer_payment_term_ids')
+    @api.depends('current_customer_credit_id.customer_payment_term_ids')
+    def _compute_payment_term_id_domain(self):
+        for record in self:
+            cash_days = 0
+            current_payment_term_ids = record.current_customer_credit_id.customer_payment_term_ids.ids
+            non_cash_payment_term_line_ids = self.env['account.payment.term.line'].search(['|',('nb_days','>',cash_days),('delay_type','!=','days_after')]).payment_id.ids
+            
+            if current_payment_term_ids:
+                record.domain_payment_term_id = json.dumps(
+                ['|',('id','in',current_payment_term_ids),('id','not in',non_cash_payment_term_line_ids)]
+                )
+            else:
+                record.domain_payment_term_id = json.dumps(
+                [('id','not in',non_cash_payment_term_line_ids), ('company_id', 'in', (False, record.company_id.id))]
+                )
+
+    domain_vendor_currency_id = fields.Char(
+       compute="_compute_vendor_currency_id_domain",
+       compute_sudo=True,
+       readonly=True,
+       store=False,
+    )
+
+    @api.onchange('current_vrm_id.vendor_currency_ids')
+    @api.depends('current_vrm_id.vendor_currency_ids')
+    def _compute_vendor_currency_id_domain(self):
+        for record in self:
+            current_vendor_currency_ids = record.current_vrm_id.vendor_currency_ids.ids
+            if current_vendor_currency_ids:
+                record.domain_vendor_currency_id = json.dumps(
+                [('id','in',current_vendor_currency_ids)]
+                )
+            else:
+                record.domain_vendor_currency_id = []
+                
+    domain_vendor_payment_term_id = fields.Char(
+       compute="_compute_vendor_payment_term_id_domain",
+       compute_sudo=True,
+       readonly=True,
+       store=False,
+    )
+
+    @api.onchange('current_vendor_credit_id.vendor_payment_term_ids')
+    @api.depends('current_vendor_credit_id.vendor_payment_term_ids')
+    def _compute_vendor_payment_term_id_domain(self):
+        for record in self:
+            cash_days = 0
+            current_payment_term_ids = record.current_vendor_credit_id.vendor_payment_term_ids.ids
+            non_cash_payment_term_line_ids = self.env['account.payment.term.line'].search(['|',('nb_days','>',cash_days),('delay_type','!=','days_after')]).payment_id.ids
+            
+            if current_payment_term_ids:
+                record.domain_vendor_payment_term_id = json.dumps(
+                ['|',('id','in',current_payment_term_ids),('id','not in',non_cash_payment_term_line_ids)]
+                )
+            else:
+                record.domain_vendor_payment_term_id = json.dumps(
+                [('id','not in',non_cash_payment_term_line_ids), ('company_id', 'in', (False, record.company_id.id))]
+                )
 
     @api.depends('current_kyc_id','current_crm_id','current_customer_credit_id','current_customer_strategy_id','current_vrm_id','current_vendor_credit_id','current_vendor_strategy_id')
     def _lock_partner(self):
@@ -57,6 +108,57 @@ class ResPartner(models.Model):
                 record.is_locked = True
             else:
                 record.is_locked = False
+    
+    def write(self, vals):
+
+        #kyc fields update
+        if (vals.get('current_kyc_id') or self.current_kyc_id) and self._context.get('through_partner_application') != True:
+            list_of_fields = [
+                'company_type',
+                'name',
+                'category_id',
+                'street',
+                'street2',
+                'zip',
+                'city',
+                'state_id',
+                'country_id',
+                'email',
+                'phone',
+                'mobile',
+                'website',
+                'company_registry',
+                'vat',
+                'ref',
+                'industry_id',
+                'function',
+                'title',
+                ]
+            if any(x in list_of_fields for x in vals.keys()):
+                raise UserError("File is locked. Changes must be through KYC Applications")
+
+        #crm fields update
+        if (vals.get('current_crm_id') or self.current_crm_id) and self._context.get('through_partner_application') != True:
+            list_of_fields = [
+                'user_id',
+                'team_id',
+                ]
+            if any(x in list_of_fields for x in vals.keys()):
+                raise UserError("File is locked. Changes must be through CRM Applications")
+
+        #vrm fields update
+        if (vals.get('current_vrm_id') or self.current_vrm_id) and self._context.get('through_partner_application') != True:
+            list_of_fields = [
+                'buyer_id',
+                'purchase_partner_team_id',
+                ]
+            if any(x in list_of_fields for x in vals.keys()):
+                raise UserError("File is locked. Changes must be through VRM Applications")
+        
+        
+        return super(ResPartner, self).write(vals)
+
+    
     """
     @api.depends('current_kyc_id','current_crm_id','current_customer_credit_id','current_customer_strategy_id','current_vrm_id','current_vendor_credit_id','current_vendor_strategy_id')
     def _get_active_applications(self):
@@ -213,3 +315,16 @@ class ResPartner(models.Model):
                         _("Only Manager can perform that move!"))
         return super().write(values)
     """
+
+    #purchase teams inherits
+
+    purchase_partner_team_id = fields.Many2one('purchase.team', string="Purchase Team")
+
+
+
+class ResUser(models.Model):
+    _inherit = 'res.users'
+
+    #application inherits
+    
+    purchase_team_id = fields.Many2one('purchase.team', string="Purchase Team")

@@ -35,10 +35,10 @@ class ResPartnerApplication(models.Model):
 
         if self.env.user.has_group('ges_logistics_partner.group_partner_application_user_team_docs'):
             #raise UserError("team")
-            return {'domain':{'partner_id':"['|','|','|',('team_id', '=', current_sale_team_id),('purchase_team_id', '=', current_purchase_team_id),('user_id', '=', current_user_id),('purchase_user_id', '=', current_user_id)]"}}
+            return {'domain':{'partner_id':"['|','|','|',('team_id', '=', current_sale_team_id),('purchase_partner_team_id', '=', current_purchase_team_id),('user_id', '=', current_user_id),('buyer_id', '=', current_user_id)]"}}
             
 
-    partner_id = fields.Many2one("res.partner", string="Partner", domain="['|',('user_id', '=', current_user_id),('purchase_user_id', '=', current_user_id)]")
+    partner_id = fields.Many2one("res.partner", string="Partner", domain="['|',('user_id', '=', current_user_id),('buyer_id', '=', current_user_id)]")
 
     is_late_review = fields.Boolean(string="Late Review", default=False)
 
@@ -144,8 +144,6 @@ class ResPartnerApplication(models.Model):
 
     ## COMMON KYC FIELDS
     company_type = fields.Selection(string='Company Type', selection=[('company', 'Company'),('person', 'Individual')], default="company")
-    #is_customer = fields.Boolean("Is Customer")
-    #is_vendor = fields.Boolean("Is Vendor")
     legal_name = fields.Char(string='English Official Name')
     arabic_name = fields.Char(string='Arabic Official Name')
     trade_name = fields.Char(string='Trading Name', translate=True, help="if different from Legal Entity Name")
@@ -157,8 +155,6 @@ class ResPartnerApplication(models.Model):
     city = fields.Char()
     state_id = fields.Many2one("res.country.state", string='State', ondelete='restrict', domain="[('country_id', '=?', country_id)]")
     country_id = fields.Many2one('res.country', string='Country', ondelete='restrict')
-    #l10n_sa_edi_building_number = fields.Char(string="Building Number")
-    #l10n_sa_edi_plot_identification = fields.Char("Plot Identification")
 
     email = fields.Char()
     phone = fields.Char(unaccent=False)
@@ -181,6 +177,13 @@ class ResPartnerApplication(models.Model):
     ## KYC - Individuals
     function = fields.Char("Job Position")
     title = fields.Many2one('res.partner.title', string="Title")
+
+    @api.onchange('company_type')
+    @api.depends('company_type')
+    def clear_individual_fields(self):
+        if self.company_type == 'company':
+            self.function = False
+            self.title = False
 
     
     #### CUSTOMER FIELDS
@@ -247,8 +250,8 @@ class ResPartnerApplication(models.Model):
     #### VENDOR FIELDS
 
     # Vendor VRM Fields
-    purchase_user_id = fields.Many2one('res.users', string='Purchase Manager')
-    purchase_team_id = fields.Many2one('purchase.team', string='Purchase Team', related="purchase_user_id.purchase_team_id")
+    buyer_id = fields.Many2one('res.users', string='Purchase Manager')
+    purchase_team_id = fields.Many2one('purchase.team', string='Purchase Team', related="buyer_id.purchase_team_id")
     vendor_class = fields.Selection([('general','General Vendor'),('key','Key Vendor'),('strategic','Strategic Vendor')], string="Vendor Class", default="general", tracking=True)
     vendor_segment = fields.Selection([('gov','Government/Semi-Government'),('large','Large Corporates'),('sme','Small & Medium Enterprises'),('retail','Retail')], default="retail", string="Vendor Segment", tracking=True)
     vendor_currency_ids = fields.Many2many('res.currency', 'currencies_application', 'currency_id', 'application_id', string="Vendor Currencies", help="This currency will be used, instead of the default one, for purchases from the current partner")
@@ -414,7 +417,7 @@ class ResPartnerApplication(models.Model):
     #### VENDOR FIELDS
 
     # Vendor VRM Fields
-    previous_purchase_user_id = fields.Many2one('res.users', string='Purchase Manager', related="current_vrm_id.purchase_user_id")
+    previous_buyer_id = fields.Many2one('res.users', string='Purchase Manager', related="current_vrm_id.buyer_id")
     previous_purchase_team_id = fields.Many2one('purchase.team', string='Purchase Team', related="current_vrm_id.purchase_team_id")
     previous_vendor_class = fields.Selection([('general','General Vendor'),('key','Key Vendor'),('strategic','Strategic Vendor')], string="Vendor Class", related="current_vrm_id.vendor_class")
     previous_vendor_segment = fields.Selection([('gov','Government/Semi-Government'),('large','Large Corporates'),('sme','Small & Medium Enterprises'),('retail','Retail')], string="Vendor Segment", related="current_vrm_id.vendor_segment")
@@ -538,7 +541,6 @@ class ResPartnerApplication(models.Model):
 
     def _copy_previous_crm_segmentation_info(self):
         self.user_id = self.previous_user_id.id
-        self.team_id = self.previous_team_id.id
         self.customer_class = self.previous_customer_class
         self.customer_segment = self.previous_customer_segment
         self.customer_pricelist_ids = self.previous_customer_pricelist_ids.ids
@@ -596,8 +598,7 @@ class ResPartnerApplication(models.Model):
         self.project_ids = self.previous_project_ids.ids
     
     def _copy_previous_vrm_segmentation_info(self):
-        self.purchase_user_id = self.previous_purchase_user_id.id
-        self.purchase_team_id = self.previous_purchase_team_id.id
+        self.buyer_id = self.previous_buyer_id.id
         self.vendor_class = self.previous_vendor_class
         self.vendor_segment = self.previous_vendor_segment
         self.vendor_currency_ids = self.previous_vendor_currency_ids.ids
@@ -911,6 +912,39 @@ class ResPartnerApplication(models.Model):
             #update partner.active_application_ids
             record.partner_id.active_application_ids = [(4, record.id)]
             record.partner_id.active_application_ids = [(3, current_active_application.id)]
+
+            #update partner fields
+            partner_rec = record.with_context(through_partner_application=True)
+            
+            if record.application_type == "kyc":                
+                partner_rec.partner_id.company_type = record.company_type
+                partner_rec.partner_id.name = record.legal_name
+                partner_rec.partner_id.category_id = record.category_id.ids
+                partner_rec.partner_id.street = record.street
+                partner_rec.partner_id.street2 = record.street2
+                partner_rec.partner_id.zip = record.zip
+                partner_rec.partner_id.city = record.city
+                partner_rec.partner_id.state_id = record.state_id.id
+                partner_rec.partner_id.country_id = record.country_id.id
+                partner_rec.partner_id.email = record.email
+                partner_rec.partner_id.phone = record.phone
+                partner_rec.partner_id.mobile = record.mobile
+                partner_rec.partner_id.website = record.website
+                partner_rec.partner_id.company_registry = record.company_registry
+                partner_rec.partner_id.vat = record.vat
+                partner_rec.partner_id.ref = record.ref
+                partner_rec.partner_id.industry_id = record.industry_id.id
+                partner_rec.partner_id.function = record.function
+                partner_rec.partner_id.title = record.title
+
+            if record.application_type == "crm":
+                partner_rec.partner_id.user_id = record.user_id.id
+                partner_rec.partner_id.team_id = record.team_id.id
+
+            if record.application_type == "vrm":
+                partner_rec.partner_id.buyer_id = record.buyer_id.id
+                partner_rec.partner_id.purchase_partner_team_id = record.purchase_team_id.id
+
 
     def action_cancel(self):
         for record in self:
