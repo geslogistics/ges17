@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sale_order_form_inherit_partner_application" model="ir.ui.view">
+        <field name="name">
+            sale.order.inherit.partner.application
+        </field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <field name="current_user_id" invisible="1"/>
+                <field name="is_pa_user" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+            <xpath expr="//field[@name='pricelist_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+            <xpath expr="//field[@name='team_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="pa_partner_id" widget="res_partner_many2one" options="{'no_quick_create': True, 'no_create': True}" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" placeholder="Type to find a customer..." readonly="state in ['cancel', 'sale']" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='pricelist_id']" position="after">
+                <field name="pa_domain_pricelist_id" invisible="1"/>
+                <field name="pa_pricelist_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" readonly="state in ['cancel', 'sale']" domain="pa_domain_pricelist_id" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="pa_domain_payment_term_id" invisible="1"/>
+                <field name="pa_payment_term_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" readonly="state in ['cancel', 'sale']" domain="pa_domain_payment_term_id" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="pa_user_id" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='team_id']" position="after">
+                <field name="pa_team_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False"/>
+            </xpath>
+            <group name="sales_person" position="after">
+                <group string="Purchase Team" invisible="is_pa_user == False">
+                    <field name="buyer_id" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                    <field name="purchase_team_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                </group>
+            </group>
+        </field>
+    </record>
+
+    
+    
+</odoo>
