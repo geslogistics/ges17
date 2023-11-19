@@ -24,21 +24,16 @@ class ResPartnerApplication(models.Model):
     current_sale_team_id = fields.Many2one('crm.team', string='Sales Team', related="current_user_id.sale_team_id")
     current_purchase_team_id = fields.Many2one('purchase.team', string='Purchase Team', related="current_user_id.purchase_team_id")
 
-    @api.depends('current_user_id')
-    @api.onchange('current_user_id')
-    def _update_partner_id_domain(self):
-
+    def _domain_partner_id(self):
         if self.env.user.has_group('ges_logistics_partner.group_partner_application_user_all_docs'):
-            #raise UserError("all")
-            return {'domain':{'partner_id':"[(1, '=', 1)]"}}
-            
+            return "[(1, '=', 1)]"
 
         if self.env.user.has_group('ges_logistics_partner.group_partner_application_user_team_docs'):
-            #raise UserError("team")
-            return {'domain':{'partner_id':"['|','|','|',('team_id', '=', current_sale_team_id),('purchase_partner_team_id', '=', current_purchase_team_id),('user_id', '=', current_user_id),('buyer_id', '=', current_user_id)]"}}
-            
+            return "['|','|','|','&',('team_id', '=', current_sale_team_id),('team_id', '!=', False),'&',('purchase_partner_team_id', '=', current_purchase_team_id),('purchase_partner_team_id', '!=', False),'&',('user_id', '=', current_user_id),('user_id', '!=', False),'&',('buyer_id', '=', current_user_id),('buyer_id', '!=', False)]"
 
-    partner_id = fields.Many2one("res.partner", string="Partner", domain="['|',('user_id', '=', current_user_id),('buyer_id', '=', current_user_id)]")
+        return "['|',('user_id', '=', current_user_id),('buyer_id', '=', current_user_id)]"
+            
+    partner_id = fields.Many2one("res.partner", string="Partner", domain=lambda self: self._domain_partner_id())
 
     is_late_review = fields.Boolean(string="Late Review", default=False)
 

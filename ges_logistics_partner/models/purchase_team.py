@@ -19,11 +19,11 @@ class PurchaseTeam(models.Model):
 	def _track_subtype(self, init_values):
 		self.ensure_one()
 		if 'state' in init_values and self.state == 'purchase':
-			return 'purchase_team_app.mt_rfq_new_confirmed'
+			return 'ges_logistics_partner.mt_rfq_new_confirmed'
 		elif 'state' in init_values and self.state == 'to approve':
-			return 'purchase_team_app.mt_rfq_new_confirmed'
+			return 'ges_logistics_partner.mt_rfq_new_confirmed'
 		elif 'state' in init_values and self.state == 'done':
-			return 'purchase_team_app.mt_rfq_new_done'
+			return 'ges_logistics_partner.mt_rfq_new_done'
 		return super(PurchaseTeam, self)._track_subtype(init_values)
 
 

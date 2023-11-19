@@ -8,7 +8,7 @@
         <field name="inherit_id" ref="purchase.view_partner_property_form"/>
         <field name="arch" type="xml">
             <field name="buyer_id" position="after">
-                <field name="purchase_partner_team_id" groups='ges_logistics_partner.group_purchase_team'/>
+                <field name="purchase_partner_team_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
             </field>
         </field>
     </record>
@@ -36,38 +36,62 @@
         <field name="priority">9999</field>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
+                <field name="current_user_id" invisible="1"/>
+                <field name="is_pa_user" invisible="1"/>
                 <field name="is_locked" invisible="1"/>
-                <field name="domain_pricelist_id" invisible="1"/>
-                <field name="domain_payment_term_id" invisible="1"/>
-                <field name="domain_vendor_currency_id" invisible="1"/>
-                <field name="domain_vendor_payment_term_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
             </xpath>
             <xpath expr="//field[@name='team_id']" position="attributes">
-                <attribute name="readonly">0</attribute>
-                <attribute name="invisible">0</attribute>
-            </xpath>
-            <xpath expr="//field[@name='company_type']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="invisible">is_pa_user</attribute>
             </xpath>
             <xpath expr="//field[@name='property_product_pricelist']" position="attributes">
-                <attribute name="domain">domain_pricelist_id</attribute>
+                <attribute name="invisible">is_pa_user</attribute>
             </xpath>
             <xpath expr="//field[@name='property_payment_term_id']" position="attributes">
-                <attribute name="domain">domain_payment_term_id</attribute>
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+            <xpath expr="//field[@name='buyer_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
             </xpath>
             <xpath expr="//field[@name='property_purchase_currency_id']" position="attributes">
-                <attribute name="domain">domain_vendor_currency_id</attribute>
+                <attribute name="invisible">is_pa_user</attribute>
             </xpath>
             <xpath expr="//field[@name='property_supplier_payment_term_id']" position="attributes">
-                <attribute name="domain">domain_vendor_payment_term_id</attribute>
+                <attribute name="invisible">is_pa_user</attribute>
             </xpath>
-
-
-            
+   
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="pa_user_id" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='team_id']" position="after">
+                <field name="pa_team_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='property_product_pricelist']" position="after">
+                <field name="pa_domain_property_product_pricelist" invisible="1"/>
+                <field name="pa_property_product_pricelist" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" domain="pa_domain_property_product_pricelist" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='property_payment_term_id']" position="after">
+                <field name="pa_domain_property_payment_term_id" invisible="1"/>
+                <field name="pa_property_payment_term_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" domain="pa_domain_property_payment_term_id" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='buyer_id']" position="after">
+                <field name="pa_buyer_id"  widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False"/>
+                <field name="purchase_partner_team_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='property_purchase_currency_id']" position="after">
+                <field name="pa_domain_property_purchase_currency_id" invisible="1"/>
+                <field name="pa_property_purchase_currency_id" force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" domain="pa_domain_property_purchase_currency_id" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='property_supplier_payment_term_id']" position="after">
+                <field name="pa_domain_property_supplier_payment_term_id" invisible="1"/>
+                <field name="pa_property_supplier_payment_term_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" domain="pa_domain_property_supplier_payment_term_id" invisible="is_pa_user == False"/>
+            </xpath>
 
             <xpath expr="//notebook/page[last()]" position="after">
                 
-                <page string="Applications" groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
+                <page string="Applications" invisible="is_pa_user == False">
                     <group>
                         <group string="KYC">
                             <field name="current_kyc_id" readonly="1"/>
@@ -117,6 +141,7 @@
             
         </field>
     </record>
+
     <record id="res_partner_kanban_view" model="ir.ui.view">
         <field name="name">
             res.partner.view.kanban.inherit.partner.application
@@ -351,6 +376,7 @@
                 <t groups="ges_logistics_partner.group_partner_application_admin, ges_logistics_partner.group_partner_application_user_own_docs, ges_logistics_partner.group_partner_application_user_team_docs, ges_logistics_partner.group_partner_application_user_all_docs">
                     <div style="width: 100%">
                         <field name="active_application_ids" widget="many2many_tags" options="{'color_field': 'color'}" context="{'show_type': 1}"/>
+                        <field name="current_kyc_id" widget="many2many_tags" context="{'show_type': 1}"/>
                     </div>
                 </t>
             </xpath>

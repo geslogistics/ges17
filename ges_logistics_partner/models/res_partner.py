@@ -5,6 +5,41 @@ import json
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
+    
+    #check user
+    current_user_id = fields.Many2one('res.users', default=lambda self: self.env.user, store=False)
+    is_pa_user = fields.Boolean(string="Is PA User", compute="_compute_is_pa_user", store=False)
+    
+    @api.onchange('current_user_id')
+    @api.depends('current_user_id')
+    def _compute_is_pa_user(self):
+        self.is_pa_user = self.env.user.has_group('ges_logistics_partner.group_partner_application_admin') or self.env.user.has_group('ges_logistics_partner.group_partner_application_user_all_docs') or self.env.user.has_group('ges_logistics_partner.group_partner_application_user_team_docs') or self.env.user.has_group('ges_logistics_partner.group_partner_application_user_own_docs')
+    
+
+    # teams inherits
+    pa_user_id = fields.Many2one(
+        'res.users',
+        string="Salesperson",
+        default=lambda self: self.env.user.id,
+        )
+
+    pa_team_id = fields.Many2one(
+        'crm.team',
+        string="Sales Team",
+        related="pa_user_id.sale_team_id"
+        )
+
+    pa_buyer_id = fields.Many2one(
+        'res.users', 
+        string="Buyer", 
+        default=lambda self: self.env.user.id,
+        )
+    
+    purchase_partner_team_id = fields.Many2one(
+        'purchase.team',
+        string="Purchase Team",
+        related="pa_buyer_id.purchase_team_id"
+        )
 
     #application inherits
     
@@ -13,93 +48,154 @@ class ResPartner(models.Model):
 
     is_locked = fields.Boolean(string="Locked", tracking=True, compute_sudo=True, compute="_lock_partner")
 
-    domain_pricelist_id = fields.Char(
-       compute="_compute_pricelist_id_domain",
-       compute_sudo=True,
+    pa_property_product_pricelist = fields.Many2one(
+        'product.pricelist',
+        string="Pricelist",
+        store=True,
+        ondelete='restrict',
+        )
+    
+    pa_domain_property_product_pricelist = fields.Char(
+        compute="_compute_pa_property_product_pricelist_domain",
+        readonly=True,
+        store=False,
+        )
+
+    pa_property_payment_term_id = fields.Many2one(
+        'account.payment.term',
+        string="Payment Terms",
+        store=True,
+        ondelete='restrict',
+        )
+                
+    pa_domain_property_payment_term_id = fields.Char(
+       compute="_compute_pa_property_payment_term_id_domain",
        readonly=True,
        store=False,
-    )
+       )
+
+    pa_property_purchase_currency_id = fields.Many2one(
+        'res.currency',
+        string="Currency",
+        store=True,
+        ondelete='restrict',
+        )
+    
+    pa_domain_property_purchase_currency_id = fields.Char(
+        compute="_compute_pa_property_purchase_currency_id_domain",
+        readonly=True,
+        store=False,
+        )
+
+    pa_property_supplier_payment_term_id = fields.Many2one(
+        'account.payment.term',
+        string="Payment Terms",
+        store=True,
+        ondelete='restrict',
+        )
+                
+    pa_domain_property_supplier_payment_term_id = fields.Char(
+       compute="_compute_pa_property_supplier_payment_term_id_domain",
+       readonly=True,
+       store=False,
+       )
 
     @api.onchange('current_crm_id.customer_pricelist_ids')
     @api.depends('current_crm_id.customer_pricelist_ids')
-    def _compute_pricelist_id_domain(self):
-        for record in self:
-            current_pricelist_ids = record.current_crm_id.customer_pricelist_ids.ids
-            if current_pricelist_ids:
-                record.domain_pricelist_id = json.dumps(
-                [('id','in',current_pricelist_ids), ('company_id', 'in', (False, record.company_id.id))]
+    def _compute_pa_property_product_pricelist_domain(self):
+        for record in self.sudo():
+            current_pa_pricelist_ids = record.current_crm_id.customer_pricelist_ids.ids
+            if current_pa_pricelist_ids:
+                record.pa_domain_property_product_pricelist = json.dumps(
+                [('id','in',current_pa_pricelist_ids), ('company_id', 'in', (False, record.company_id.id))]
                 )
             else:
-                record.domain_pricelist_id = json.dumps(
+                record.pa_domain_property_product_pricelist = json.dumps(
                 [('company_id', 'in', (False, record.company_id.id))]
                 )
-                
-    domain_payment_term_id = fields.Char(
-       compute="_compute_payment_term_id_domain",
-       compute_sudo=True,
-       readonly=True,
-       store=False,
-    )
 
     @api.onchange('current_customer_credit_id.customer_payment_term_ids')
     @api.depends('current_customer_credit_id.customer_payment_term_ids')
-    def _compute_payment_term_id_domain(self):
-        for record in self:
+    def _compute_pa_property_payment_term_id_domain(self):
+        for record in self.sudo():
             cash_days = 0
-            current_payment_term_ids = record.current_customer_credit_id.customer_payment_term_ids.ids
+            current_pa_payment_term_ids = record.current_customer_credit_id.customer_payment_term_ids.ids
             non_cash_payment_term_line_ids = self.env['account.payment.term.line'].search(['|',('nb_days','>',cash_days),('delay_type','!=','days_after')]).payment_id.ids
             
-            if current_payment_term_ids:
-                record.domain_payment_term_id = json.dumps(
-                ['|',('id','in',current_payment_term_ids),('id','not in',non_cash_payment_term_line_ids)]
+            if current_pa_payment_term_ids:
+                record.pa_domain_property_payment_term_id = json.dumps(
+                ['|',('id','in',current_pa_payment_term_ids),('id','not in',non_cash_payment_term_line_ids)]
                 )
             else:
-                record.domain_payment_term_id = json.dumps(
+                record.pa_domain_property_payment_term_id = json.dumps(
                 [('id','not in',non_cash_payment_term_line_ids), ('company_id', 'in', (False, record.company_id.id))]
                 )
-
-    domain_vendor_currency_id = fields.Char(
-       compute="_compute_vendor_currency_id_domain",
-       compute_sudo=True,
-       readonly=True,
-       store=False,
-    )
 
     @api.onchange('current_vrm_id.vendor_currency_ids')
     @api.depends('current_vrm_id.vendor_currency_ids')
-    def _compute_vendor_currency_id_domain(self):
-        for record in self:
-            current_vendor_currency_ids = record.current_vrm_id.vendor_currency_ids.ids
-            if current_vendor_currency_ids:
-                record.domain_vendor_currency_id = json.dumps(
-                [('id','in',current_vendor_currency_ids)]
+    def _compute_pa_property_purchase_currency_id_domain(self):
+        for record in self.sudo():
+            current_pa_currency_ids = record.current_vrm_id.vendor_currency_ids.ids
+            if current_pa_currency_ids:
+                record.pa_domain_property_purchase_currency_id = json.dumps(
+                [('id','in',current_pa_currency_ids)]
                 )
             else:
-                record.domain_vendor_currency_id = []
-                
-    domain_vendor_payment_term_id = fields.Char(
-       compute="_compute_vendor_payment_term_id_domain",
-       compute_sudo=True,
-       readonly=True,
-       store=False,
-    )
+                record.pa_domain_property_purchase_currency_id = []
 
     @api.onchange('current_vendor_credit_id.vendor_payment_term_ids')
     @api.depends('current_vendor_credit_id.vendor_payment_term_ids')
-    def _compute_vendor_payment_term_id_domain(self):
-        for record in self:
+    def _compute_pa_property_supplier_payment_term_id_domain(self):
+        for record in self.sudo():
             cash_days = 0
-            current_payment_term_ids = record.current_vendor_credit_id.vendor_payment_term_ids.ids
+            current_pa_payment_term_ids = record.current_vendor_credit_id.vendor_payment_term_ids.ids
             non_cash_payment_term_line_ids = self.env['account.payment.term.line'].search(['|',('nb_days','>',cash_days),('delay_type','!=','days_after')]).payment_id.ids
             
-            if current_payment_term_ids:
-                record.domain_vendor_payment_term_id = json.dumps(
-                ['|',('id','in',current_payment_term_ids),('id','not in',non_cash_payment_term_line_ids)]
+            if current_pa_payment_term_ids:
+                record.pa_domain_property_supplier_payment_term_id = json.dumps(
+                ['|',('id','in',current_pa_payment_term_ids),('id','not in',non_cash_payment_term_line_ids)]
                 )
             else:
-                record.domain_vendor_payment_term_id = json.dumps(
+                record.pa_domain_property_supplier_payment_term_id = json.dumps(
                 [('id','not in',non_cash_payment_term_line_ids), ('company_id', 'in', (False, record.company_id.id))]
                 )
+
+    @api.depends('pa_pricelist_id')
+    @api.onchange('pa_pricelist_id')
+    def update_pricelist_id_to_pa_field(self):
+        self.property_product_pricelist = self.pa_pricelist_id.id
+
+    @api.depends('pa_payment_term_id')
+    @api.onchange('pa_payment_term_id')
+    def update_payment_term_id_to_pa_field(self):
+        self.property_payment_term_id = self.pa_payment_term_id.id
+
+    @api.depends('pa_user_id')
+    @api.onchange('pa_user_id')
+    def update_user_id_to_pa_field(self):
+        self.user_id = self.pa_user_id.id
+
+    @api.depends('pa_team_id')
+    @api.onchange('pa_team_id')
+    def update_team_id_to_pa_field(self):
+        self.team_id = self.pa_team_id.id
+
+    @api.depends('pa_buyer_id')
+    @api.onchange('pa_buyer_id')
+    def update_buyer_id_to_pa_field(self):
+        self.buyer_id = self.pa_buyer_id.id
+
+    @api.depends('pa_vendor_currency_id')
+    @api.onchange('pa_vendor_currency_id')
+    def update_vendor_currency_id_to_pa_field(self):
+        self.property_purchase_currency_id = self.pa_vendor_currency_id.id
+
+    @api.depends('pa_payment_term_id')
+    @api.onchange('pa_payment_term_id')
+    def update_vendor_payment_term_id_to_pa_field(self):
+        self.property_supplier_payment_term_id = self.pa_payment_term_id.id
+
+    
 
     @api.depends('current_kyc_id','current_crm_id','current_customer_credit_id','current_customer_strategy_id','current_vrm_id','current_vendor_credit_id','current_vendor_strategy_id')
     def _lock_partner(self):
@@ -158,14 +254,6 @@ class ResPartner(models.Model):
         
         return super(ResPartner, self).write(vals)
 
-    
-    """
-    @api.depends('current_kyc_id','current_crm_id','current_customer_credit_id','current_customer_strategy_id','current_vrm_id','current_vendor_credit_id','current_vendor_strategy_id')
-    def _get_active_applications(self):
-        for record in self:
-            #record.active_application_ids = self.env['res.partner.application'].sudo().search([('id','=','1')])
-            record.active_application_ids = record.current_kyc_id + record.current_crm_id  + record.current_customer_credit_id  + record.current_customer_strategy_id  + record.current_vrm_id  + record.current_vendor_credit_id + record.current_vendor_strategy_id
-    """
 
     #Application fields
     current_kyc_id = fields.Many2one('res.partner.application', string="KYC Application", tracking=True, domain="[('partner_id', '=', id),('application_type','=','kyc'),('state','=','active')]")
@@ -209,116 +297,6 @@ class ResPartner(models.Model):
     current_vendor_strategy_late_review = fields.Boolean(string="Vendor Strategy Late", related="current_vendor_strategy_id.is_late_review")
     current_vendor_strategy_expiry_date = fields.Date(string="Vendor Strategy Expiry Date", related="current_vendor_strategy_id.expiry_date")
     current_vendor_strategy_review_date = fields.Date(string="Vendor Strategy Review Date", related="current_vendor_strategy_id.review_date")
-
-    """
-    @api.onchange('current_kyc_id')
-    def _update_partner_kyc_fields(self):
-        for record in self:
-            record.company_type = record.current_kyc_id.company_type
-            record.street = record.current_kyc_id.street
-            record.street2 = record.current_kyc_id.street2
-            record.city = record.current_kyc_id.city
-            record.state_id = record.current_kyc_id.state_id.id
-            record.zip = record.current_kyc_id.zip
-            record.country_id = record.current_kyc_id.country_id.id
-            #record.l10n_sa_edi_building_number = record.current_kyc_id.l10n_sa_edi_building_number
-            #record.l10n_sa_edi_plot_identification = record.current_kyc_id.l10n_sa_edi_plot_identification
-            #record.is_customer = True if record.current_kyc_id.application_direction == 'customer' else record.is_vendor
-            #record.is_vendor = True if record.current_kyc_id.application_direction == 'vendor' else record.is_vendor       
-            record.name = record.current_kyc_id.legal_name
-            record.trade_name = record.current_kyc_id.trade_name
-            record.arabic_name = record.current_kyc_id.arabic_name
-            record.category_id = record.current_kyc_id.category_id.ids
-            record.company_registry = record.current_kyc_id.company_registry
-            record.vat = record.current_kyc_id.vat
-            record.ref = record.current_kyc_id.ref
-            record.legal_type = record.current_kyc_id.legal_type
-            record.industry_id = record.current_kyc_id.industry_id.id
-            record.paidup_capital = record.current_kyc_id.paidup_capital
-            record.ownership_structure = record.current_kyc_id.ownership_structure
-            record.management_structure = record.current_kyc_id.management_structure
-            record.year_founded = record.current_kyc_id.year_founded
-            record.function = record.current_kyc_id.function
-            record.title = record.current_kyc_id.title
-    """     
-            
-          
-
-
-    """
-    def action_validate(self):
-        for rec in self:
-            rec.write({'state': 'validated'})
-
-    def action_approve(self):
-        for rec in self:
-            rec.write({'state': 'approved'})
-
-    def action_activate(self):
-        for rec in self:
-            rec.write({'state': 'active'})
-
-    def action_hold(self):
-        for rec in self:
-            rec.write({'state': 'hold'})
-
-    def action_exception(self):
-        for rec in self:
-            rec.write({'state': 'exception'})
-
-    def action_blacklist(self):
-        for rec in self:
-            rec.write({'state': 'blacklist'})
-
-    def action_draft(self):
-        for rec in self:
-            rec.write({'state': 'draft'})
-
-    def write(self, values):
-        if 'state' in values:
-            new_state = values.get('state')
-            if new_state == 'approved' or self.state == 'approved':
-                if not self.env.user.has_group(
-                        'ges_logistics_partner.'
-                        'ges_logistics_partner_group_approval'):
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
-            if new_state == 'validated' or self.state == 'draft':
-                if not self.env.user.has_group(
-                        'ges_logistics_partner.'
-                        'ges_logistics_partner_group_validation'):
-                    raise ValidationError(
-                        _("Only Managers can perform that move!"))
-            if new_state == 'active' or self.state == 'active':
-                if not self.env.user.has_group(
-                        'ges_logistics_partner.'
-                        'ges_logistics_partner_group_activate'):
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
-            if new_state == 'hold' or self.state == 'hold':
-                if not self.env.user.has_group(
-                        'ges_logistics_partner.'
-                        'ges_logistics_partner_group_hold'):
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
-            if new_state == 'exception' or self.state == 'exception':
-                if not self.env.user.has_group(
-                        'ges_logistics_partner.'
-                        'ges_logistics_partner_group_exception'):
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
-            if new_state == 'blacklist' or self.state == 'blacklist':
-                if not self.env.user.has_group(
-                        'ges_logistics_partner.'
-                        'ges_logistics_partner_group_blacklist'):
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
-        return super().write(values)
-    """
-
-    #purchase teams inherits
-
-    purchase_partner_team_id = fields.Many2one('purchase.team', string="Purchase Team")
 
 
 

@@ -199,8 +199,8 @@
         <field name="groups" eval="[(4, ref('ges_logistics_partner.group_sale_salesman_team_docs'))]"/>
     </record>
     
-    <record id="group_purchase_team" model="res.groups">
-        <field name="name">Show Purchase Teams</field>
+    <record id="group_purchase_team_admin" model="res.groups">
+        <field name="name">Purchase Teams Admin</field>
     </record>
     
 </odoo>
