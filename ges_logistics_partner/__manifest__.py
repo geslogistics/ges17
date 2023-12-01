@@ -14,7 +14,12 @@
     'company': 'GES Logistics',
     'maintainer': 'GES Logistics',
     'website': "https://www.geslogistics.com",
-    'depends': ['base','base_automation','project','sale','sale_management','crm','purchase','account'],
+    'depends': ['base','base_automation','sale','sale_management','crm','purchase','account'],
+    'assets': {
+        'web.assets_backend': [
+            'ges_logistics_partner/static/src/css/pa_styles.css',
+        ],
+    },
     'data': [
         # Data
         'data/application_sequence_data.xml',
@@ -32,8 +37,13 @@
         'views/sale_order_views.xml',
         'views/purchase_order_views.xml',
         'views/menu.xml',
-        'views/res_config_settings_views.xml'
+        'views/res_config_settings_views.xml',
+        'views/crm_views.xml',
+
+        #wizard
+        'wizard/res_application_action_wizard_views.xml',
     ],
+    
     'images': ['static/description/banner.png'],
     'license': 'AGPL-3',
     'installable': True,

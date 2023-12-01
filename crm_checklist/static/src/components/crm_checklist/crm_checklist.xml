@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="crm_checklist.CRMChecklist" owl="1">
+        <div class="w-100 mb16 crm-checklist">
+            <div t-if="state.allCheckPoints.length == 0">
+                There are no checkpoints found
+            </t>
+            <div t-else="" class="w-100">
+                <t t-foreach="state.allCheckPoints" t-as="checkPoint" t-key="checkPoint.id">
+                    <t t-set="doneCheckPoint" t-value="props.checkPoints.includes(checkPoint.id)"/>
+                    <div t-attf-class="w-100 d-flex mb4 checklist-checkpoint #{doneCheckPoint and 'text-success' or ''} #{props.readonly and 'checklist-checkpoint-disabled' or ''}" t-att-title="checkPoint.description" t-on-click="() => this.onToggleApprove(checkPoint.id, doneCheckPoint)">
+                        <div>
+                            <i t-attf-class="fa fa-2x fa-#{doneCheckPoint and 'check-square-o' or 'square-o'} mr16"/>
+                        </div>
+                        <div><t t-out="checkPoint.name"/></div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+</templates>

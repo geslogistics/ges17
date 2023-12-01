@@ -132,7 +132,6 @@
         <field name="domain_force">[('partner_id.team_id','in',(user.sale_team_id.id,False))]</field>
         <field name="groups" eval="[(4, ref('ges_logistics_partner.group_sale_salesman_team_docs'))]"/>
     </record>
-    
 
     <record id="sale_order_report_team_rule" model="ir.rule">
         <field name="name">Team Orders Analysis</field>
@@ -155,10 +154,6 @@
         <field name="groups" eval="[(4, ref('ges_logistics_partner.group_sale_salesman_team_docs'))]"/>
     </record>
 
-
-
-    
-    <!-- Multi - Salesmen invoice and account move assignation rules -->
     <record id="account_invoice_rule_see_team" model="ir.rule">
         <field name="name">Team Invoices</field>
         <field name="model_id" ref="sale.model_account_move"/>
@@ -173,17 +168,12 @@
         <field name="groups" eval="[(4, ref('ges_logistics_partner.group_sale_salesman_team_docs'))]"/>
     </record>
 
-
-    <!-- Wizard access rules -->
     <record id="account_invoice_send_rule_see_team" model="ir.rule">
         <field name="name">Team Invoice Send and Print</field>
         <field name="model_id" ref="account.model_account_move_send"/>
         <field name="domain_force">[('invoice_ids.move_type', 'in', ('out_invoice', 'out_refund')), ('invoice_ids.partner_id.team_id','in',(user.sale_team_id.id,False))]</field>
         <field name="groups" eval="[(4, ref('ges_logistics_partner.group_sale_salesman_team_docs'))]"/>
     </record>
-
-    
-
 
     <record id="crm_rule_team_lead" model="ir.rule">
         <field name="name">Team Leads</field>
@@ -198,9 +188,159 @@
         <field name="domain_force">[('partner_id.team_id','in',(user.sale_team_id.id,False))]</field>
         <field name="groups" eval="[(4, ref('ges_logistics_partner.group_sale_salesman_team_docs'))]"/>
     </record>
+
+
+
+    
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','sale_order_line_personal_rule')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','sale_order_report_personal_rule')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','account_invoice_line_rule_see_personal')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','account_invoice_report_rule_see_personal')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','account_invoice_send_rule_see_personal')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','sale_order_personal_rule')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','account_invoice_rule_see_personal')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'crm'),('name', '=','crm_rule_personal_lead')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'crm'),('name', '=','crm_activity_report_rule_personal_activities')]"/>
+        <value eval="{'noupdate': False}"/>
+    </function>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Order Lines -->
+    <record id="sale.sale_order_line_personal_rule" model="ir.rule">
+        <field name="domain_force">[('order_id.partner_id.user_id','in',(user.id,False))]</field>
+        <field name="name">Personal Order Lines</field>
+        <field ref="sale.model_sale_order_line" name="model_id"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Orders Analysis -->
+    <record id="sale.sale_order_report_personal_rule" model="ir.rule">
+        <field name="name">Personal Orders Analysis</field>
+        <field ref="sale.model_sale_report" name="model_id"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="domain_force">[('partner_id.user_id','in',(user.id,False))]</field>
+    </record>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Invoice Lines -->
+    <record id="sale.account_invoice_line_rule_see_personal" model="ir.rule">
+        <field name="name">Personal Invoice Lines</field>
+        <field name="model_id" ref="sale.model_account_move_line"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="domain_force">[('move_id.move_type', 'in', ('out_invoice', 'out_refund')), ('move_id.partner_id.user_id', 'in', (user.id,False))]</field>
+    </record>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Invoices Analysis -->
+    <record id="sale.account_invoice_report_rule_see_personal" model="ir.rule">
+        <field name="name">Personal Invoices Analysis</field>
+        <field name="model_id" ref="sale.model_account_invoice_report"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="domain_force">[('partner_id.user_id', 'in', (user.id,False))]</field>
+    </record>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Invoice Send and Print -->
+    <record id="sale.account_invoice_send_rule_see_personal" model="ir.rule">
+        <field name="name">Personal Invoice Send and Print</field>
+        <field name="model_id" ref="account.model_account_move_send"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="domain_force">[('move_ids.move_type', 'in', ('out_invoice', 'out_refund')), ('move_ids.partner_id.user_id', 'in', (user.id,False))]</field>
+    </record>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Orders -->
+    <record id="sale.sale_order_personal_rule" model="ir.rule">
+        <field name="domain_force">[('partner_id.user_id','in',(user.id,False))]</field>
+        <field name="name">Personal Orders</field>
+        <field ref="sale.model_sale_order" name="model_id"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Invoices -->
+    <record id="sale.account_invoice_rule_see_personal" model="ir.rule">
+        <field name="name">Personal Invoices</field>
+        <field name="model_id" ref="sale.model_account_move"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="domain_force">[('move_type', 'in', ('out_invoice', 'out_refund')), ('partner_id.user_id', 'in', (user.id,False))]</field>
+    </record>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Leads -->
+    <record id="crm.crm_rule_personal_lead" model="ir.rule">
+        <field name="name">Personal Leads</field>
+        <field ref="crm.model_crm_lead" name="model_id"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="domain_force">['|','&amp;',('partner_id','!=',False),('partner_id.user_id','in',(user.id,False)),'&amp;',('partner_id','=',False),('user_id','in',(user.id,False))]</field>
+    </record>
+
+    <!-- Adjust Sales Own Docs Rules - Personal Activities -->
+    <record id="crm.crm_activity_report_rule_personal_activities" model="ir.rule">
+        <field name="name">Personal Activities</field>
+        <field ref="crm.model_crm_activity_report" name="model_id"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="domain_force">['|','&amp;',('partner_id','!=',False),('partner_id.user_id','in',(user.id,False)),'&amp;',('partner_id','=',False),('user_id','in',(user.id,False))]</field>
+    </record>
+
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','sale_order_line_personal_rule')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','sale_order_report_personal_rule')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','account_invoice_line_rule_see_personal')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','account_invoice_report_rule_see_personal')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','account_invoice_send_rule_see_personal')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','sale_order_personal_rule')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'sale'),('name', '=','account_invoice_rule_see_personal')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'crm'),('name', '=','crm_rule_personal_lead')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('module', '=', 'crm'),('name', '=','crm_activity_report_rule_personal_activities')]"/>
+        <value eval="{'noupdate': True}"/>
+    </function>
+
+    
     
     <record id="group_purchase_team_admin" model="res.groups">
         <field name="name">Purchase Teams Admin</field>
     </record>
-    
 </odoo>

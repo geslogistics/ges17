@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<odoo>
+    
+
+    <record id="crm_lead_view_form_custom" model="ir.ui.view">
+        <field name="name">crm.lead.form.custom</field>
+        <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='%(crm.action_crm_lead2opportunity_partner)d']" position="attributes">
+                    <attribute name="groups">crm_checklist.group_crm_checklist_superuser</attribute>
+                </xpath>
+            </field>
+    </record>
+
+    <record id="crm.action_crm_send_mass_convert" model="ir.actions.act_window">
+        <field name="name">Convert to opportunities</field>
+        <field name="res_model">crm.lead2opportunity.partner.mass</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="crm.view_crm_lead2opportunity_partner_mass"/>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+        <field name="binding_model_id" ref="model_crm_lead"/>
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(4, ref('crm_checklist.group_crm_checklist_superuser'))]"/>
+    </record>
+
+
+    <record id="crm_check_list_view_search" model="ir.ui.view">
+        <field name="name">crm.check.list.search</field>
+        <field name="model">crm.check.list</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="crm_stage_st_id"/>
+                <field name="team_ids"/>
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="group_type" context="{'group_by':'crm_stage_st_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="crm_check_list_view_form" model="ir.ui.view">
+        <field name="name">crm.check.list.form</field>
+        <field name="model">crm.check.list</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="w-100">
+                        <h3><field class="w-100" name="name" placeholder="what should be done"/></h3>
+                    </div>
+                    <group>
+                        <field name="crm_stage_st_id" placeholder="at which stage this should be done"/>
+                        <field name="team_ids"
+                               widget="many2many_tags"
+                               options="{'no_quick_create': True, 'no_create_edit': True}"
+                               placeholder="for which teams this should be done"
+                        />
+                        <field name="group_ids"
+                               widget="many2many_tags"
+                               options="{'no_quick_create': True, 'no_create_edit': True}"
+                               placeholder="which user groups can do that"
+                        />
+                        <field name="should_be_reset"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="description" placeholder="enter any comments"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="crm_check_list_view_tree" model="ir.ui.view">
+        <field name="name">crm.check.list.tree</field>
+        <field name="model">crm.check.list</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="crm_stage_st_id"/>
+                <field name="team_ids" widget="many2many_tags"/>
+                <field name="group_ids" widget="many2many_tags"/>
+                <field name="should_be_reset"/>
+            </tree>
+        </field>
+    </record>
+    <record id="crm_check_list_action" model="ir.actions.act_window">
+        <field name="name">Checklist</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">crm.check.list</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{"search_default_group_type": 1}</field>
+        <field name="search_view_id" eval="crm_check_list_view_search"/>
+    </record>
+    <menuitem id="menu_task_checklist"
+              action="crm_check_list_action"
+              parent="crm.menu_crm_config_lead"
+              groups="sales_team.group_sale_manager"
+              sequence="10"
+    />
+
+</odoo>

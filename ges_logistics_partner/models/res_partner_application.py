@@ -3,6 +3,7 @@ from odoo import models, fields, api, _
 from ast import literal_eval
 from odoo.exceptions import ValidationError, UserError
 from dateutil.relativedelta import relativedelta
+from pytz import timezone
 
 class ResPartnerApplication(models.Model):
     _name = 'res.partner.application'
@@ -97,22 +98,25 @@ class ResPartnerApplication(models.Model):
     application_request_type = fields.Selection([('new','New'),('review','Review'),('amend','Amend')], default="new", string="Request Type")
     #application_purpose_note = fields.Html("Purpose")
     #application_justification_note = fields.Html("Justification")
-    expiry_date_formula = fields.Selection([('1y', '1 Year'),('6m', '6 Months'),('3m', '3 Months'),('specific', 'Specific')], default="1y", string='Expiry Date')
+    expiry_date_formula = fields.Selection([('1y', '1 Year'),('6m', '6 Months'),('3m', '3 Months'),('specific', 'Specific')], default="1y", string='Expiry Date', help="Expiry date of the application")
     expiry_date = fields.Date(string="Expiry Date")
     
-    review_date_formula = fields.Selection([('3m', '1 Months'),('2m', '2 Months'),('1m', '1 Month'),('specific', 'Specific')], default="3m", string='Review Date', help="Period Before Expiry Date")
-    review_date = fields.Date(string="Review Date")
+    review_date_formula = fields.Selection([('3m', '3 Months'),('2m', '2 Months'),('1m', '1 Month'),('specific', 'Specific')], default="1m", string='Review Date', help="Period Before Expiry Date")
+    review_date = fields.Date(string="Review Date", help="Due date of the next review")
+
+    
 
     @api.onchange('expiry_date_formula','review_date_formula','expiry_date','review_date')
     def _update_expiry_review_dates(self):
         if self.expiry_date_formula == '3m':
-            self.expiry_date = fields.Date.today() + relativedelta(months=3) 
+            self.expiry_date = (fields.Datetime.now() + relativedelta(months=3)).astimezone(timezone(self.env.user.tz))
         elif self.expiry_date_formula == '6m':
-            self.expiry_date = fields.Date.today() + relativedelta(months=6) 
+            self.expiry_date = (fields.Datetime.now() + relativedelta(months=6)).astimezone(timezone(self.env.user.tz))
         elif self.expiry_date_formula == '1y':
-            self.expiry_date = fields.Date.today() + relativedelta(years=1) 
+            self.expiry_date = (fields.Datetime.now() + relativedelta(years=1)).astimezone(timezone(self.env.user.tz))
         elif self.expiry_date_formula == '2y':
-            self.expiry_date = fields.Date.today() + relativedelta(years=2) 
+            self.expiry_date = (fields.Datetime.now() + relativedelta(years=2)).astimezone(timezone(self.env.user.tz))
+        
 
         if self.expiry_date:
             if self.review_date_formula == '1m':
@@ -139,11 +143,11 @@ class ResPartnerApplication(models.Model):
 
     ## COMMON KYC FIELDS
     company_type = fields.Selection(string='Company Type', selection=[('company', 'Company'),('person', 'Individual')], default="company")
-    legal_name = fields.Char(string='English Official Name')
-    arabic_name = fields.Char(string='Arabic Official Name')
+    legal_name = fields.Char(string='Name', help="Official / Legal English Name")
+    arabic_name = fields.Char(string='Arabic Name', help="Official / Legal Arabic Name")
     trade_name = fields.Char(string='Trading Name', translate=True, help="if different from Legal Entity Name")
     
-    category_id = fields.Many2many('res.partner.category', 'partner_tags_application', 'application_partner_id' ,'application_category_id', string='Tags')
+    category_id = fields.Many2many('res.partner.category', 'partner_tags_application', 'application_partner_id' ,'application_category_id', string='Tags', help="Account tags can be used for filtering and reporting")
     street = fields.Char()
     street2 = fields.Char()
     zip = fields.Char(change_default=True)
@@ -155,23 +159,25 @@ class ResPartnerApplication(models.Model):
     phone = fields.Char(unaccent=False)
     mobile = fields.Char(unaccent=False)
     website = fields.Char('Website Link')
-    company_registry = fields.Char(string="Official ID", help="The official registry/ID number. Use it if it is different from the Tax ID. It must be unique across all partners of a same country")
-    company_registry_expiry_date = fields.Date(string="Official ID Expiry")
-    vat = fields.Char(string='Tax ID')
-    ref = fields.Char(string='Reference')
+    company_registry = fields.Char(string="CR/ID Number", help="The official CR/ID number. Use it if it is different from the Tax ID. It must be unique across all partners of a same country")
+    company_registry_expiry_date = fields.Date(string="CR/ID Expiry")
+    vat = fields.Char(string='Tax ID', help="i.e. VAT Number")
+    ref = fields.Char(string='Reference', help="Internal reference to be used for the account")
 
     ## KYC - Companies
     legal_type = fields.Selection([('establishment','Establishment'),('joint_liability','Joint Liability Company'),('limited_partnership','Limited Partnership Company'),('simple_joint','Simple Joint Stock Company'),('closed_joint','Closed Joint Stock Company'),('public','Public Joint Stock Company'),('llc','Limited Liability Company'),('one_llc','One Person Limited Liability Company')], default="llc")
     industry_id = fields.Many2one('res.partner.industry', 'Industry')
-    paidup_capital = fields.Monetary("Paid-up Capital")
-    ownership_structure = fields.Html("Ownership Structure")
-    management_structure = fields.Html("Management Structure")
-    year_founded = fields.Integer("Year Founded")
-    #contact_ids = fields.Many2many("res.partner", string="Contacts")
+    paidup_capital = fields.Monetary("Paid-up Capital", help="As per registration")
+    ownership_structure = fields.Html("Ownership Structure", help="List of owners and their ownership percentages")
+    management_structure = fields.Html("Management Structure", help="List of account's management team members")
+    year_founded = fields.Char("Year Founded")
 
     ## KYC - Individuals
     function = fields.Char("Job Position")
     title = fields.Many2one('res.partner.title', string="Title")
+
+    ## KYC - Duplication
+    duplicate_approved = fields.Boolean('Duplicate Partner', default=False)
 
     @api.onchange('company_type')
     @api.depends('company_type')
@@ -190,22 +196,30 @@ class ResPartnerApplication(models.Model):
     customer_class = fields.Selection([('general','General Account'),('key','Key Account'),('strategic','Strategic Account')], string="Customer Class", default="general", tracking=True)
     customer_segment = fields.Selection([('gov','Government/Semi-Government'),('large','Large Corporates'),('sme','Small & Medium Enterprises'),('retail','Retail')], default="retail", string="Customer Segment", tracking=True)
     customer_pricelist_ids = fields.Many2many('product.pricelist', 'customer_pricelists_application', 'pricelist_id', 'application_id', string="Customer Pricelists")
+    
 
 
     ## Customer CRM - Business Info
-    annual_revenues = fields.Monetary(string="Annual Revenues")
+    annual_revenues = fields.Monetary(string="Annual Revenues", help="Annual gross revenue/sales of the entity/person")
     employee_count = fields.Integer("Number of Employees")
-    countries_covered = fields.Many2many('res.country', 'countries_covered_application', 'country_id', 'application_id', string='Countries of Business')    
-    business_brief = fields.Html("Business Brief")
+    countries_covered = fields.Many2many('res.country', 'countries_covered_application', 'country_id', 'application_id', string='Countries of Business', help="Countries where the entity conduct business")    
+    business_brief = fields.Html("Business Brief", help="Brief about the entity, business model, history, track record, market position, etc..")
 
     ## Customer CRM - Logistics Requirements
-    annual_teus = fields.Integer("Annual Volume in TEUs")
-    ship_type = fields.Selection([('pallet', 'Pallet'), ('container', 'Container'), ('bulk', 'Bulk'), ('others', 'Others')], string='Main Shipping Type')
-    goods_type = fields.Html("Goods Type")
-    goods_value = fields.Html("Goods Value")
+    account_requirements = fields.Html("Account Requirements", help="Service/products requirements, volumes, TEUs, type of goods, value of goods, etc..")
+    #annual_teus = fields.Integer("Annual Volume in TEUs")
+    #ship_type = fields.Selection([('pallet', 'Pallet'), ('container', 'Container'), ('bulk', 'Bulk'), ('others', 'Others')], string='Main Shipping Type')
+    #goods_type = fields.Html("Goods Type")
+    #goods_value = fields.Html("Goods Value")
     major_countries = fields.Many2many('res.country', 'countries_destinations_application', 'country_id', 'application_id', string='Major Origins/Destinations')
-    services_needed = fields.Many2many('product.product', 'services_needed_application', 'product_id', 'application_id', string='Services')
-    operation_brief = fields.Html("Operation Note")
+    services_needed = fields.Many2many('product.product', 'services_needed_application', 'product_id', 'application_id', string='Services/Products')
+    service_categories_needed = fields.Many2many('product.category', 'service_categories_needed_application', 'product_category_id', 'application_id', string='Categories', compute='_get_services_needed_categories', store=True, compute_sudo=True, depends=['services_needed'])
+    @api.depends('services_needed','services_needed.categ_id')
+    def _get_services_needed_categories(self):
+        for record in self:
+            record.service_categories_needed = [(6,0,record.services_needed.categ_id.ids)]
+
+    operation_brief = fields.Html("Operation Note", help="Brief explaination of the operation requirements of the account")
     
     # Customer Strategy Fields
     account_kpis = fields.Html("Client's KPIs", help="KPIs and metrics that the account is focusing on")
@@ -233,14 +247,14 @@ class ResPartnerApplication(models.Model):
     cross_sell = fields.Html("Cross-sell &amp; Upsell Opportunities", help="Outside of previously listed opportunities, what can or will you pitch as a cross-sell or upsell opportunity as your relationship with the account strengthens over time?")
     risks_challenges = fields.Html("Risks &amp; Challenges", help="What issues lie in the way of selling, cross-selling, or upselling your account on any of the above mentioned line items? Address how you will counter them - if possible.")
     critical_resources = fields.Html("Critical Resources", help="List the resources available to your team for this project. Examples include your ERP/CRM, customer retention manuals, how to sell documentation, communication methods for the team, the account's company website, and more.")
-    project_ids = fields.Many2many('project.project', 'project_application', 'project_id', 'application_id', string="Customer Projects", help="Create or link Projects and tasks")
+    #project_ids = fields.Many2many('project.project', 'project_application', 'project_id', 'application_id', string="Customer Projects", help="Create or link Projects and tasks")
 
     # Customer Credit Fields
-    monthly_expected_business = fields.Monetary(string="Monthly Expected Sales")
+    monthly_expected_business = fields.Monetary(string="Monthly Expected Sales", help="Expected monthly account revenues")
     customer_credit_limit = fields.Monetary(string="Customer Credit Limit")
-    #credit_days = fields.Integer(string="Credit Days")
     credit_trade_references = fields.Html(string="Trade References", help="Please provide at least 3 Credit Trade References")
-    customer_payment_term_ids = fields.Many2many('account.payment.term', 'customer_payment_terms_application', 'term_id', 'application_id', string="Customer Payment Terms")
+    #customer_payment_term_ids = fields.Many2many('account.payment.term', 'customer_payment_terms_application', 'term_id', 'application_id', string="Customer Payment Terms")
+    customer_payment_term_ids = fields.Many2one('account.payment.term', string="Customer Payment Terms")
 
     #### VENDOR FIELDS
 
@@ -253,15 +267,22 @@ class ResPartnerApplication(models.Model):
 
 
     ## Vendor VRM - Business Info
-    vendor_annual_revenues = fields.Monetary(string="Annual Revenues")
+    vendor_annual_revenues = fields.Monetary(string="Annual Revenues", help="Annual gross revenue/sales of the entity/person")
     vendor_employee_count = fields.Integer("Number of Employees")
-    vendor_countries_covered = fields.Many2many('res.country', 'vendor_countries_covered_application', 'country_id', 'application_id', string='Countries of Business')    
-    vendor_business_brief = fields.Html("Business Brief")
+    vendor_countries_covered = fields.Many2many('res.country', 'vendor_countries_covered_application', 'country_id', 'application_id', string='Countries of Business', help="Countries where the entity conduct business")    
+    vendor_business_brief = fields.Html("Business Brief", help="Brief about the entity, business model, history, track record, market position, etc..")
 
     ## Vendor VRM - Logistics Requirements
+    vendor_account_offerings = fields.Html("Account Offerings", help="Service/products provided, rates, etc..")
     vendor_major_countries = fields.Many2many('res.country', 'vendor_countries_destinations_application', 'country_id', 'application_id', string='Major Origins/Destinations')
-    services_provided = fields.Many2many('product.product', 'vendor_services_needed_application', 'product_id', 'application_id', string='Services')
-    vendor_operation_brief = fields.Html("Operation Note")
+    services_provided = fields.Many2many('product.product', 'vendor_services_needed_application', 'product_id', 'application_id', string='Services/Products')
+    service_categories_provided = fields.Many2many('product.category', 'service_categories_provided_application', 'product_category_id', 'application_id', string='Categories', compute='_get_services_provided_categories', store=True, compute_sudo=True, depends=['services_provided'])
+    @api.depends('services_needed','services_needed.categ_id')
+    def _get_services_provided_categories(self):
+        for record in self:
+            record.service_categories_provided = [(6,0,record.services_provided.categ_id.ids)]
+            
+    vendor_operation_brief = fields.Html("Operation Note", help="Brief explaination of the operation requirements of the account")
     
     # Vendor Strategy Fields
     vendor_kpis = fields.Html("Vendor's KPIs", help="KPIs and metrics that the account is focusing on")
@@ -287,13 +308,13 @@ class ResPartnerApplication(models.Model):
     purchases_targets = fields.Html("Procurement Targets", help="For the time period of your choosing, what are your procurement goals for this account?")
     vendor_risks_challenges = fields.Html("Risks &amp; Challenges", help="What issues lie in the way of buying on any of the above mentioned line items? Address how you will counter them - if possible.")
     vendor_critical_resources = fields.Html("Critical Resources", help="List the resources available to your team for this project. Examples include your ERP/CRM, customer retention manuals, how to sell documentation, communication methods for the team, the account's company website, and more.")
-    vendor_project_ids = fields.Many2many('project.project', 'project_vendor_application', 'project_id', 'application_id', string="Vendor Projects", help="Create or link Projects and tasks")
+    #vendor_project_ids = fields.Many2many('project.project', 'project_vendor_application', 'project_id', 'application_id', string="Vendor Projects", help="Create or link Projects and tasks")
 
     # Vendor Credit Fields
-    vendor_monthly_expected_business = fields.Monetary(string="Monthly Expected Procurement")
-    vendor_credit_limit = fields.Monetary(string="Credit Limit")
-    #vendor_credit_days = fields.Integer(string="Credit Days")
-    vendor_payment_term_ids = fields.Many2many('account.payment.term', 'vendor_payment_terms_application', 'term_id', 'application_id', string="Vendor Payment Terms")
+    vendor_monthly_expected_business = fields.Monetary(string="Monthly Expected Procurement", help="Expected monthly account purchases")
+    vendor_credit_limit = fields.Monetary(string="Vendor Credit Limit")
+    #vendor_payment_term_ids = fields.Many2many('account.payment.term', 'vendor_payment_terms_application', 'term_id', 'application_id', string="Vendor Payment Terms")
+    vendor_payment_term_ids = fields.Many2one('account.payment.term', string="Vendor Payment Terms")
 
     #attachment fields
     attachment_ids = fields.One2many('res.partner.application.attachment','application_id', string="Attachments")
@@ -338,11 +359,14 @@ class ResPartnerApplication(models.Model):
     previous_paidup_capital = fields.Monetary(string="Paid-up Capital", related="current_kyc_id.paidup_capital")
     previous_ownership_structure = fields.Html(string="Ownership Structure", related="current_kyc_id.ownership_structure")
     previous_management_structure = fields.Html(string="Management Structure", related="current_kyc_id.management_structure")
-    previous_year_founded = fields.Integer(string="Year Founded", related="current_kyc_id.year_founded")
+    previous_year_founded = fields.Char(string="Year Founded", related="current_kyc_id.year_founded")
 
     ## Previous KYC - Individuals
     previous_function = fields.Char(string="Job Position", related="current_kyc_id.function")
     previous_title = fields.Many2one('res.partner.title', string="Title", related="current_kyc_id.title")
+
+    ## Previous KYC - Duplication
+    previous_duplicate_approved = fields.Boolean('Duplicate Partner')
 
 
     #### PREVIOUS CUSTOMER FIELDS
@@ -363,19 +387,23 @@ class ResPartnerApplication(models.Model):
     previous_business_brief = fields.Html("Business Brief", related="current_crm_id.business_brief")
 
     ## Previous Customer CRM - Logistics Requirements
-    previous_annual_teus = fields.Integer("Annual Volume in TEUs", related="current_crm_id.annual_teus")
-    previous_ship_type = fields.Selection([('pallet', 'Pallet'), ('container', 'Container'), ('bulk', 'Bulk'), ('others', 'Others')], string='Main Shipping Type', related="current_crm_id.ship_type")
-    previous_goods_type = fields.Html("Goods Type", related="current_crm_id.goods_type")
-    previous_goods_value = fields.Html("Goods Value", related="current_crm_id.goods_value")
+    previous_account_requirements = fields.Html("Account Requirements", related="current_crm_id.account_requirements")
+    #previous_annual_teus = fields.Integer("Annual Volume in TEUs", related="current_crm_id.annual_teus")
+    #previous_ship_type = fields.Selection([('pallet', 'Pallet'), ('container', 'Container'), ('bulk', 'Bulk'), ('others', 'Others')], string='Main Shipping Type', related="current_crm_id.ship_type")
+    #previous_goods_type = fields.Html("Goods Type", related="current_crm_id.goods_type")
+    #previous_goods_value = fields.Html("Goods Value", related="current_crm_id.goods_value")
     previous_major_countries = fields.Many2many('res.country', 'countries_destinations_application', 'country_id', 'application_id', string='Major Origins/Destinations', related="current_crm_id.major_countries")
-    previous_services_needed = fields.Many2many('product.product', 'services_needed_application', 'product_id', 'application_id', string='Services', related="current_crm_id.services_needed")
+    previous_services_needed = fields.Many2many('product.product', 'previous_services_needed_application', 'product_id', 'previous_application_id', string='Services', related="current_crm_id.services_needed")
+    previous_service_categories_needed = fields.Many2many('product.category', 'previous_service_categories_needed_application', 'product_category_id', 'previous_application_id', string='Categories', related="current_crm_id.service_categories_needed")
+
     previous_operation_brief = fields.Html("Operation Note", related="current_crm_id.operation_brief")
     
     # Previous Customer Credit Fields
     previous_monthly_expected_business = fields.Monetary(string="Monthly Expected Sales", related="current_customer_credit_id.monthly_expected_business")
     previous_customer_credit_limit = fields.Monetary(string="Customer Credit Limit", related="current_customer_credit_id.customer_credit_limit")
     previous_credit_trade_references = fields.Html(string="Trade References", related="current_customer_credit_id.credit_trade_references")
-    previous_customer_payment_term_ids = fields.Many2many('account.payment.term', 'customer_payment_terms_previous_application', 'term_id', 'application_id', string="Customer Payment Terms", related="current_customer_credit_id.customer_payment_term_ids")
+    #previous_customer_payment_term_ids = fields.Many2many('account.payment.term', 'customer_payment_terms_previous_application', 'term_id', 'application_id', string="Customer Payment Terms", related="current_customer_credit_id.customer_payment_term_ids")
+    previous_customer_payment_term_ids = fields.Many2one('account.payment.term', string="Customer Payment Terms", related="current_customer_credit_id.customer_payment_term_ids")
 
     # Previous Customer Strategy Fields
     previous_account_kpis = fields.Html("Client's KPIs", related="current_customer_strategy_id.account_kpis")
@@ -403,7 +431,7 @@ class ResPartnerApplication(models.Model):
     previous_cross_sell = fields.Html("Cross-sell &amp; Upsell Opportunities", related="current_customer_strategy_id.cross_sell")
     previous_risks_challenges = fields.Html("Risks &amp; Challenges", related="current_customer_strategy_id.risks_challenges")
     previous_critical_resources = fields.Html("Critical Resources", related="current_customer_strategy_id.critical_resources")
-    previous_project_ids = fields.Many2many('project.project', 'project_previous_application', 'project_id', 'application_id', string="Customer Projects", related="current_customer_strategy_id.project_ids")
+    #previous_project_ids = fields.Many2many('project.project', 'project_previous_application', 'project_id', 'application_id', string="Customer Projects", related="current_customer_strategy_id.project_ids")
 
     
 
@@ -426,14 +454,17 @@ class ResPartnerApplication(models.Model):
     previous_vendor_business_brief = fields.Html("Business Brief", related="current_vrm_id.vendor_business_brief")
 
     ## Vendor VRM - Logistics Requirements
+    previous_vendor_account_offerings = fields.Html("Account Offerings", related="current_vrm_id.vendor_account_offerings")
     previous_vendor_major_countries = fields.Many2many('res.country', 'vendor_countries_destinations_previous_application', 'country_id', 'application_id', string='Major Origins/Destinations', related="current_vrm_id.vendor_major_countries")
-    previous_services_provided = fields.Many2many('product.product', 'vendor_services_needed_previous_application', 'product_id', 'application_id', string='Services', related="current_vrm_id.services_provided")
+    previous_services_provided = fields.Many2many('product.product', 'vendor_previous_services_needed_previous_application', 'product_id', 'previous_application_id', string='Services', related="current_vrm_id.services_provided")
+    previous_service_categories_provided = fields.Many2many('product.category', 'previous_service_categories_provided_application', 'product_category_id', 'previous_application_id', string='Categories', related="current_crm_id.service_categories_provided")
     previous_vendor_operation_brief = fields.Html("Operation Note", related="current_vrm_id.vendor_operation_brief")
     
     # Vendor Credit Fields
     previous_vendor_monthly_expected_business = fields.Monetary(string="Monthly Expected Procurement", related="current_vendor_credit_id.vendor_monthly_expected_business")
     previous_vendor_credit_limit = fields.Monetary(string="Credit Limit", related="current_vendor_credit_id.vendor_credit_limit")
-    previous_vendor_payment_term_ids = fields.Many2many('account.payment.term', 'vendor_payment_terms_previous_application', 'term_id', 'application_id', string="Vendor Payment Terms", related="current_vendor_credit_id.vendor_payment_term_ids")
+    #previous_vendor_payment_term_ids = fields.Many2many('account.payment.term', 'vendor_payment_terms_previous_application', 'term_id', 'application_id', string="Vendor Payment Terms", related="current_vendor_credit_id.vendor_payment_term_ids")
+    previous_vendor_payment_term_ids = fields.Many2one('account.payment.term', string="Vendor Payment Terms", related="current_vendor_credit_id.vendor_payment_term_ids")
 
     # Vendor Strategy Fields
     previous_vendor_kpis = fields.Html("Vendor's KPIs", related="current_vendor_strategy_id.vendor_kpis")
@@ -459,11 +490,135 @@ class ResPartnerApplication(models.Model):
     previous_purchases_targets = fields.Html("Procurement Targets", related="current_vendor_strategy_id.purchases_targets")
     previous_vendor_risks_challenges = fields.Html("Risks &amp; Challenges", related="current_vendor_strategy_id.vendor_risks_challenges")
     previous_vendor_critical_resources = fields.Html("Critical Resources", related="current_vendor_strategy_id.vendor_critical_resources")
-    previous_vendor_project_ids = fields.Many2many('project.project', 'project_vendor_previous_application', 'project_id', 'application_id', string="Vendor Projects", related="current_vendor_strategy_id.vendor_project_ids")
+    #previous_vendor_project_ids = fields.Many2many('project.project', 'project_vendor_previous_application', 'project_id', 'application_id', string="Vendor Projects", related="current_vendor_strategy_id.vendor_project_ids")
 
     
-        
+    ####check duplication fields
+    same_pa_vat_partner_id = fields.Many2one('res.partner', string='Partner with same Tax ID', compute='_compute_same_pa_partner_id', store=False)
+    same_pa_company_registry_partner_id = fields.Many2one('res.partner', string='Partner with same Company Registry', compute='_compute_same_pa_partner_id', store=False)
+    same_pa_name_partner_id = fields.Many2one('res.partner', string='Partner with same Name', compute='_compute_same_pa_partner_id', store=False)
+    same_pa_website_partner_id = fields.Many2one('res.partner', string='Partner with same Website', compute='_compute_same_pa_partner_id', store=False)
+    same_pa_email_partner_id = fields.Many2one('res.partner', string='Partner with same Website', compute='_compute_same_pa_partner_id', store=False)
+    same_pa_phone_partner_id = fields.Many2one('res.partner', string='Partner with same Phone', compute='_compute_same_pa_partner_id', store=False)
+    same_pa_mobile_partner_id = fields.Many2one('res.partner', string='Partner with same Mobile', compute='_compute_same_pa_partner_id', store=False)
     
+
+    @api.depends('vat', 'company_id', 'company_registry', 'country_id', 'legal_name','website','email','phone','mobile')
+    #@api.onchange('vat', 'company_id', 'company_registry', 'country_id', 'legal_name','website','email','phone','mobile')
+    def _compute_same_pa_partner_id(self):
+        for partner in self.sudo():
+            partner.same_pa_vat_partner_id = False
+            partner.same_pa_company_registry_partner_id = False
+            partner.same_pa_name_partner_id = False
+            partner.same_pa_website_partner_id = False
+            partner.same_pa_email_partner_id = False
+            partner.same_pa_phone_partner_id = False
+            partner.same_pa_mobile_partner_id = False
+
+            if not partner.partner_id.duplicate_approved:
+                # use _origin to deal with onchange()
+                partner_id = partner.partner_id._origin.id
+                #active_test = False because if a partner has been deactivated you still want to raise the error,
+                #so that you can reactivate it instead of creating a new one, which would loose its history.
+                Partner = self.with_context(active_test=False).env['res.partner'].sudo()
+                
+                # check vat
+                domain = [
+                    ('vat', '=', partner.vat), 
+                    ('country_id','=',partner.country_id.id),
+                    #('duplicate_approved', '=', False), 
+                ]
+                if partner.company_id:
+                    domain += [('company_id', 'in', [False, partner.company_id.id])]
+                if partner_id:
+                    domain += [('id', '!=', partner_id), '!', ('id', 'child_of', partner_id)]
+                if partner.partner_id.parent_id:
+                    domain += [('id', '!=', partner.partner_id.parent_id.id)]
+
+                # For VAT number being only one character, we will skip the check just like the regular check_vat
+                should_check_vat = partner.vat and len(partner.vat) != 1
+                partner.same_pa_vat_partner_id = should_check_vat and Partner.search(domain, limit=1)
+                
+                # check company_registry
+                domain = [
+                    ('company_registry', '=', partner.company_registry),
+                    ('country_id','=',partner.country_id.id),
+                    ('company_id', 'in', [False, partner.company_id.id]),
+                    #('duplicate_approved', '=', False), 
+                ]
+                if partner_id:
+                    domain += [('id', '!=', partner_id), '!', ('id', 'child_of', partner_id)]
+                if partner.partner_id.parent_id:
+                    domain += [('id', '!=', partner.partner_id.parent_id.id)]
+                
+                partner.same_pa_company_registry_partner_id = bool(partner.company_registry) and Partner.search(domain, limit=1)
+
+                # check name
+                domain = [
+                    ('name', 'ilike', partner.legal_name),
+                    ('country_id','=',partner.country_id.id),
+                    ('company_id', 'in', [False, partner.company_id.id]),
+                    #('duplicate_approved', '=', False), 
+                ]
+                if partner_id:
+                    domain += [('id', '!=', partner_id), '!', ('id', 'child_of', partner_id)]
+                if partner.partner_id.parent_id:
+                    domain += [('id', '!=', partner.partner_id.parent_id.id)]
+                partner.same_pa_name_partner_id = bool(partner.legal_name) and Partner.search(domain, limit=1)
+
+                # check website
+                domain = [
+                    ('website', '=', partner.website),
+                    ('country_id','=',partner.country_id.id),
+                    ('company_id', 'in', [False, partner.company_id.id]),
+                    #('duplicate_approved', '=', False), 
+                ]
+                if partner_id:
+                    domain += [('id', '!=', partner_id), '!', ('id', 'child_of', partner_id)]
+                if partner.partner_id.parent_id:
+                    domain += [('id', '!=', partner.partner_id.parent_id.id)]
+                partner.same_pa_website_partner_id = bool(partner.website) and Partner.search(domain, limit=1)
+
+                # check email
+                domain = [
+                    ('email', '=', partner.email),
+                    ('country_id','=',partner.country_id.id),
+                    ('company_id', 'in', [False, partner.company_id.id]),
+                    #('duplicate_approved', '=', False), 
+                ]
+                if partner_id:
+                    domain += [('id', '!=', partner_id), '!', ('id', 'child_of', partner_id)]
+                if partner.partner_id.parent_id:
+                    domain += [('id', '!=', partner.partner_id.parent_id.id)]
+                partner.same_pa_email_partner_id = bool(partner.email) and Partner.search(domain, limit=1)
+
+                # check phone
+                domain = [
+                    ('phone', '=', partner.phone),
+                    ('country_id','=',partner.country_id.id),
+                    ('company_id', 'in', [False, partner.company_id.id]),
+                    #('duplicate_approved', '=', False), 
+                ]
+                if partner_id:
+                    domain += [('id', '!=', partner_id), '!', ('id', 'child_of', partner_id)]
+                if partner.partner_id.parent_id:
+                    domain += [('id', '!=', partner.partner_id.parent_id.id)]
+                partner.same_pa_phone_partner_id = bool(partner.phone) and Partner.search(domain, limit=1)
+
+                # check mobile
+                domain = [
+                    ('mobile', '=', partner.mobile),
+                    ('country_id','=',partner.country_id.id),
+                    ('company_id', 'in', [False, partner.company_id.id]),
+                    #('duplicate_approved', '=', False), 
+                ]
+                if partner_id:
+                    domain += [('id', '!=', partner_id), '!', ('id', 'child_of', partner_id)]
+                if partner.partner_id.parent_id:
+                    domain += [('id', '!=', partner.partner_id.parent_id.id)]
+                partner.same_pa_mobile_partner_id = bool(partner.mobile) and Partner.search(domain, limit=1)
+
+
     @api.model
     def create(self, values):
         if values.get('name', ('New')) == ('New'):
@@ -512,6 +667,7 @@ class ResPartnerApplication(models.Model):
         self.legal_type = self.previous_legal_type
         self.function = self.previous_function
         self.title = self.previous_title
+        self.duplicate_approved = self.previous_duplicate_approved
         
     def _copy_previous_kyc_address_info(self):
         self.street = self.previous_street
@@ -547,14 +703,16 @@ class ResPartnerApplication(models.Model):
         self.business_brief = self.previous_business_brief
     
     def _copy_previous_crm_customer_logistics_info(self):
-        self.annual_teus = self.previous_annual_teus
-        self.ship_type = self.previous_ship_type
-        self.goods_type = self.previous_goods_type
-        self.goods_value = self.previous_goods_value
+        self.account_requirements = self.previous_account_requirements
+        #self.annual_teus = self.previous_annual_teus
+        #self.ship_type = self.previous_ship_type
+        #self.goods_type = self.previous_goods_type
+        #self.goods_value = self.previous_goods_value
         self.major_countries = self.previous_major_countries.ids
 
     def _copy_previous_crm_account_operations_info(self):
         self.services_needed = self.previous_services_needed.ids
+        self.service_categories_needed = self.previous_service_categories_needed.ids
         self.operation_brief = self.previous_operation_brief
 
     def _copy_previous_customer_credit_info(self):
@@ -590,7 +748,7 @@ class ResPartnerApplication(models.Model):
         self.cross_sell = self.previous_cross_sell
         self.risks_challenges = self.previous_risks_challenges
         self.critical_resources = self.previous_critical_resources
-        self.project_ids = self.previous_project_ids.ids
+        #self.project_ids = self.previous_project_ids.ids
     
     def _copy_previous_vrm_segmentation_info(self):
         self.buyer_id = self.previous_buyer_id.id
@@ -605,8 +763,10 @@ class ResPartnerApplication(models.Model):
         self.vendor_business_brief = self.previous_vendor_business_brief
 
     def _copy_previous_vrm_vendor_operations_info(self):
+        self.vendor_account_offerings = self.previous_vendor_account_offerings
         self.vendor_major_countries = self.previous_vendor_major_countries.ids
         self.services_provided = self.previous_services_provided.ids
+        self.service_categories_provided = self.previous_service_categories_provided.ids
         self.vendor_operation_brief = self.previous_vendor_operation_brief
 
     def _copy_previous_vendor_credit_info(self):
@@ -638,7 +798,50 @@ class ResPartnerApplication(models.Model):
         self.purchases_targets = self.previous_purchases_targets
         self.vendor_risks_challenges = self.previous_vendor_risks_challenges
         self.vendor_critical_resources = self.previous_vendor_critical_resources
-        self.vendor_project_ids = self.previous_vendor_project_ids
+        #self.vendor_project_ids = self.previous_vendor_project_ids
+
+    
+
+
+
+
+    def _copy_partner_kyc_to_new(self):
+        self.company_type = self.partner_id.company_type
+        self.legal_name = self.partner_id.name
+        self.category_id = self.partner_id.category_id.ids
+        self.company_registry = self.partner_id.company_registry
+        self.vat = self.partner_id.vat
+        self.ref = self.partner_id.ref
+        self.function = self.partner_id.function
+        self.title = self.partner_id.title      
+        self.street = self.partner_id.street
+        self.street2 = self.partner_id.street2
+        self.zip = self.partner_id.zip
+        self.city = self.partner_id.city
+        self.state_id = self.state_id.id
+        self.country_id = self.partner_id.country_id.id
+        self.email = self.partner_id.email
+        self.phone = self.partner_id.phone
+        self.mobile = self.partner_id.mobile
+        self.website = self.partner_id.website
+        self.industry_id = self.partner_id.industry_id.id
+        self.duplicate_approved = self.partner_id.duplicate_approved
+
+    def _copy_partner_crm_to_new(self):
+        self.user_id = self.partner_id.user_id.id
+        self.customer_pricelist_ids = [(6,0, self.partner_id.property_product_pricelist.ids)]
+
+    def _copy_partner_customer_credit_to_new(self):
+        self.customer_payment_term_ids = [(6,0,self.partner_id.property_payment_term_id.ids)]
+
+    def _copy_partner_vrm_to_new(self):
+        self.buyer_id = self.partner_id.buyer_id.id
+        self.vendor_currency_ids = [(6,0, self.partner_id.property_purchase_currency_id.ids)]
+    
+    def _copy_partner_vendor_credit_to_new(self):
+        self.vendor_payment_term_ids = [(6,0, self.partner_id.property_supplier_payment_term_id.ids)]
+
+
 
     @api.onchange('application_request_type','partner_id','application_type')
     def _copy_previous_kyc(self):
@@ -664,9 +867,35 @@ class ResPartnerApplication(models.Model):
             self._copy_previous_vendor_credit_info()
         if self.application_type == 'vendor_strategy' and self.application_request_type in ('review','amend'):
             self._copy_previous_vendor_strategy_info()
-           
 
-    def action_submit(self):
+        if self.application_type == 'kyc' and self.application_request_type == 'new':
+            self._copy_partner_kyc_to_new()
+        if self.application_type == 'crm' and self.application_request_type == 'new':
+            self._copy_partner_crm_to_new()
+        if self.application_type == 'customer_credit' and self.application_request_type == 'new':
+            self._copy_partner_customer_credit_to_new()
+        if self.application_type == 'vrm' and self.application_request_type == 'new':
+            self._copy_partner_vrm_to_new()
+        if self.application_type == 'vendor_credit' and self.application_request_type == 'new':
+            self._copy_partner_vendor_credit_to_new()
+    
+
+    def action_wizard_submit(self):
+
+        return {
+            'name': 'Submit Application(s)',
+            'view_mode': 'form',
+            'res_model': 'res.partner.application.user.action.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'default_application_ids': self.ids,
+                'default_name': 'submitted'
+                }
+        }
+       
+
+    def _action_submit(self, note=False):
         for record in self:
             record.write({'state': 'submitted'})
             
@@ -677,6 +906,7 @@ class ResPartnerApplication(models.Model):
                 'user_id': self.env.user.id,
                 'action':'submitted' if not user_action_id else 'resubmitted',
                 'action_datetime': fields.Datetime.now(),
+                'note': note,
             }
             record.user_action_ids = [(0, 0, datas)] 
             
@@ -706,25 +936,42 @@ class ResPartnerApplication(models.Model):
                 for user in user_records:
                     datas = {
                         'user_id': user.id,
-                        'action':'pending',
+                        'action':'pending_validation',
                         'action_datetime': fields.Datetime.now(),
                     }
                     record.user_action_ids = [(0, 0, datas)] if user_records else False
     
-    def action_validate(self):
+    def action_wizard_validate(self):
+
+        return {
+            'name': 'Validate Application(s)',
+            'view_mode': 'form',
+            'res_model': 'res.partner.application.user.action.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'default_application_ids': self.ids,
+                'default_name': 'validated'
+                }
+        }
+    
+    def _action_validate(self, note=False):
         for record in self:
             ok_to_proceed = False
             
             # change pending action for current user(s)
-            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('user_id','=',self.env.user.id),('action','=','pending')])
+            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('user_id','=',self.env.user.id),('action','=','pending_validation')])
+
             if user_action_id:
-                datas = {
-                    'user_id': self.env.user.id,
-                    'action':'validated',
-                    'action_datetime': fields.Datetime.now(),
-                    'pending_timestamp': user_action_id.action_datetime,
-                }
-                user_action_id.write(datas)
+                for uac in user_action_id:
+                    datas = {
+                        'user_id': self.env.user.id,
+                        'action':'validated',
+                        'action_datetime': fields.Datetime.now(),
+                        'pending_timestamp': uac.action_datetime,
+                        'note': note,
+                    }
+                    uac.write(datas)
             else:
                 raise UserError("You cannot perform this action. Either already done or another user is required. (Error: No pending actions)")
                 
@@ -748,13 +995,13 @@ class ResPartnerApplication(models.Model):
 
             if decision_making == 'singly':
                 ok_to_proceed = True
-                user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending')])
+                user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending_validation')])
                 datas = {
                     'action':'validated_by_others',
                 }
                 user_action_id.write(datas)
             elif decision_making == 'jointly':
-                user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending')])
+                user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending_validation')])
                 if not user_action_id:
                     ok_to_proceed = True
             
@@ -787,24 +1034,38 @@ class ResPartnerApplication(models.Model):
                     for user in user_records:
                         datas = {
                             'user_id': user.id,
-                            'action':'pending',
+                            'action':'pending_approval',
                             'action_datetime': fields.Datetime.now(),
                         }
                         record.user_action_ids = [(0, 0, datas)] if user_records else False
-        
 
-    def action_approve(self):
+    def action_wizard_approve(self):
+
+        return {
+            'name': 'Approve Application(s)',
+            'view_mode': 'form',
+            'res_model': 'res.partner.application.user.action.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'default_application_ids': self.ids,
+                'default_name': 'approved'
+                }
+        } 
+
+    def _action_approve(self, note=False):
         for record in self:
             ok_to_proceed = False
             
             # change pending action for current user(s)
-            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('user_id','=',self.env.user.id),('action','=','pending')])
+            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('user_id','=',self.env.user.id),('action','=','pending_approval')])
             if user_action_id:
                 datas = {
                     'user_id': self.env.user.id,
                     'action':'approved',
                     'action_datetime': fields.Datetime.now(),
                     'pending_timestamp': user_action_id.action_datetime,
+                    'note': note,
                 }
                 user_action_id.write(datas)
             else:
@@ -830,31 +1091,45 @@ class ResPartnerApplication(models.Model):
             
             if decision_making == 'singly':
                 ok_to_proceed = True
-                user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending')])
+                user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending_approval')])
                 datas = {
                     'action':'approved_by_others',
                 }
                 user_action_id.write(datas)
             elif decision_making == 'jointly':
-                user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending')])
+                user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending_approval')])
                 if not user_action_id:
                     ok_to_proceed = True
             
             if ok_to_proceed:
                 record.write({'state': 'approved'})
-                record.action_activate()
+                record._action_activate()
             
+    def action_wizard_reject(self):
 
-    def action_reject(self):
+        return {
+            'name': 'Reject Application(s)',
+            'view_mode': 'form',
+            'res_model': 'res.partner.application.user.action.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'default_application_ids': self.ids,
+                'default_name': 'rejected'
+                }
+        } 
+
+    def _action_reject(self, note=False):
         for record in self:  
             # change pending action for current user(s)
-            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('user_id','=',self.env.user.id),('action','=','pending')])
+            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('user_id','=',self.env.user.id),('action','=','pending_approval')])
             if user_action_id:
                 datas = {
                     'user_id': self.env.user.id,
                     'action':'rejected',
                     'action_datetime': fields.Datetime.now(),
                     'pending_timestamp': user_action_id.action_datetime,
+                    'note': note,
                 }
                 user_action_id.write(datas)
             else:
@@ -862,7 +1137,7 @@ class ResPartnerApplication(models.Model):
                 
             # change application status and/or other user actions depending on Application Type Decision Making - signly or jointly
             
-            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending')])
+            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending_approval')])
             datas = {
                 'action':'rejected_by_others',
             }
@@ -871,7 +1146,7 @@ class ResPartnerApplication(models.Model):
             record.write({'state': 'rejected'})
             
 
-    def action_activate(self):
+    def _action_activate(self):
         for record in self:
             
 
@@ -931,26 +1206,68 @@ class ResPartnerApplication(models.Model):
                 partner_rec.partner_id.industry_id = record.industry_id.id
                 partner_rec.partner_id.function = record.function
                 partner_rec.partner_id.title = record.title
+                partner_rec.partner_id.duplicate_approved = record.duplicate_approved
 
             if record.application_type == "crm":
                 partner_rec.partner_id.user_id = record.user_id.id
                 partner_rec.partner_id.team_id = record.team_id.id
+                partner_rec.partner_id.pa_user_id = record.user_id.id
+                partner_rec.partner_id.pa_team_id = record.team_id.id
+                if record.partner_id.pa_property_product_pricelist:
+                    if record.partner_id.pa_property_product_pricelist.id not in record.customer_pricelist_ids.ids:
+                        partner_rec.partner_id.property_product_pricelist = False
+                        partner_rec.partner_id.pa_property_product_pricelist = False
+
+            if record.application_type == "customer_credit":
+                partner_rec.partner_id.property_payment_term_id = record.customer_payment_term_ids
+                partner_rec.partner_id.pa_property_payment_term_id = record.customer_payment_term_ids
 
             if record.application_type == "vrm":
                 partner_rec.partner_id.buyer_id = record.buyer_id.id
                 partner_rec.partner_id.purchase_partner_team_id = record.purchase_team_id.id
+                partner_rec.partner_id.pa_buyer_id = record.buyer_id.id
+                if record.partner_id.pa_property_purchase_currency_id:
+                    if record.partner_id.pa_property_purchase_currency_id.id not in record.vendor_currency_ids.ids:
+                        partner_rec.partner_id.property_purchase_currency_id = False
+                        partner_rec.partner_id.pa_property_purchase_currency_id = False
 
 
-    def action_cancel(self):
+            if record.application_type == "vendor_credit":
+                partner_rec.partner_id.property_supplier_payment_term_id = record.vendor_payment_term_ids
+                partner_rec.partner_id.pa_property_supplier_payment_term_id = record.vendor_payment_term_ids
+
+
+    def action_wizard_cancel(self):
+
+        return {
+            'name': 'Cancel Application(s)',
+            'view_mode': 'form',
+            'res_model': 'res.partner.application.user.action.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'default_application_ids': self.ids,
+                'default_name': 'cancelled'
+                }
+        } 
+
+    def _action_cancel(self, note=False):
         for record in self:
             # add action for current user(s)
             datas = {
                 'user_id': self.env.user.id,
                 'action':'cancelled',
                 'action_datetime': fields.Datetime.now(),
+                'note': note,
             }
             record.user_action_ids = [(0, 0, datas)] 
             record.write({'state': 'cancel'})
+
+            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','in',['pending_validation','pending_approval'])])
+            datas = {
+                'action':'cancelled_by_others',
+            }
+            user_action_id.write(datas)
 
             #remove active application on partner
             if record.application_type == "kyc":
@@ -971,16 +1288,31 @@ class ResPartnerApplication(models.Model):
             #update partner.active_application_ids
             record.partner_id.active_application_ids = [(3, record.id)]
 
-    def action_draft(self):
+    def action_wizard_draft(self):
+
+        return {
+            'name': 'Return Application(s)',
+            'view_mode': 'form',
+            'res_model': 'res.partner.application.user.action.wizard',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'default_application_ids': self.ids,
+                'default_name': 'returned'
+                }
+        } 
+
+    def _action_draft(self, note=False):
         for record in self:  
             # change pending action for current user(s)
-            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('user_id','=',self.env.user.id),('action','=','pending')])
+            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('user_id','=',self.env.user.id),('action','=','pending_validation')])
             if user_action_id:
                 datas = {
                     'user_id': self.env.user.id,
                     'action':'returned',
                     'action_datetime': fields.Datetime.now(),
                     'pending_timestamp': user_action_id.action_datetime,
+                    'note': note,
                 }
                 user_action_id.write(datas)
             else:
@@ -988,13 +1320,25 @@ class ResPartnerApplication(models.Model):
                 
             # change application status and/or other user actions depending on Application Type Decision Making - signly or jointly
             
-            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending')])
+            user_action_id = self.env['res.partner.application.user.action'].search([('application_id','=',record.id),('action','=','pending_validation')])
             datas = {
                 'action':'returned_by_others',
             }
             user_action_id.write(datas)
         
-            record.write({'state': 'draft'})                
+            record.write({'state': 'draft'})         
+
+    def _action_expire(self, note=False):
+        for record in self:
+            # add action for current user(s)
+            datas = {
+                'user_id': self.env.user.id,
+                'action':'expired',
+                'action_datetime': fields.Datetime.now(),
+                'note': note,
+            }
+            record.user_action_ids = [(0, 0, datas)] 
+            record.write({'state': 'expired'})
 
     def write(self, values):
         if 'state' in values:
@@ -1104,7 +1448,53 @@ class ResPartnerApplication(models.Model):
 
     @api.onchange('partner_id','application_type','application_request_type')
     def _get_request_type_options(self):
+
         if self.partner_id:
+
+            #check user permissions
+            
+            sale_user_not = self.partner_id.user_id != self.current_user_id and self.partner_id.user_id != False
+            sale_team_not = self.partner_id.team_id != self.current_sale_team_id and self.partner_id.team_id != False
+            all_sale_not = sale_user_not and sale_team_not
+            
+            purchase_user_not = self.partner_id.buyer_id != self.current_user_id and self.partner_id.buyer_id != False
+            purchase_team_not = self.partner_id.purchase_partner_team_id != self.current_purchase_team_id and self.partner_id.current_purchase_team_id != False
+            all_purchase_not = purchase_user_not and purchase_team_not
+            
+            all_user_not = sale_user_not and purchase_user_not
+            all_team_not = sale_team_not and purchase_team_not
+            all_not = all_user_not and all_team_not
+
+            is_kyc = self.application_type == 'kyc'
+            is_customer = self.application_type in ['crm','customer_credit','customer_strategy']
+            is_vendor = self.application_type in ['vrm','vendor_credit','vendor_strategy']
+
+            #raise UserError(str(sale_team_not) + ' - ' + str(self.partner_id.team_id) + ' - ' + str(self.current_sale_team_id))
+
+            if self.env.user.has_group('ges_logistics_partner.group_partner_application_user_all_docs'):
+                A = 1
+            elif self.env.user.has_group('ges_logistics_partner.group_partner_application_user_team_docs'):
+                if is_kyc:
+                    if sale_team_not and purchase_team_not:
+                        raise UserError("You do not have access to this record.")
+                elif is_customer:
+                    if sale_team_not:
+                        raise UserError("You do not have access to this record.")
+                elif is_vendor:
+                    if purchase_team_not:
+                        raise UserError("You do not have access to this record.")
+            elif self.env.user.has_group('ges_logistics_partner.group_partner_application_user_own_docs'):
+                if is_kyc:
+                    if all_user_not and purchase_user_not:
+                        raise UserError("You do not have access to this record.")
+                elif is_customer:
+                    if sale_user_not:
+                        raise UserError("You do not have access to this record.")
+                elif is_vendor:
+                    if purchase_user_not:
+                        raise UserError("You do not have access to this record.")
+        
+            #check application request type
             if self.application_request_type != 'new':
                 if self.application_type == 'kyc' and not self.current_kyc_id:
                     raise UserError("No current Active application to review/amend")
@@ -1120,7 +1510,7 @@ class ResPartnerApplication(models.Model):
                     raise UserError("No current Active application to review/amend")
                 if self.application_type == 'vendor_strategy' and not self.current_vendor_strategy_id:
                     raise UserError("No current Active application to review/amend")
-            else:
+            elif self.application_request_type == 'new':
                 if self.application_type == 'kyc' and self.current_kyc_id:
                     raise UserError("There is an existing application, please choose to either Review or Amend")
                 if self.application_type == 'crm' and self.current_crm_id:
@@ -1137,6 +1527,299 @@ class ResPartnerApplication(models.Model):
                     raise UserError("There is an existing application, please choose to either Review or Amend")
                 
    
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        res = super().fields_get(allfields, attributes)
+        hide_list = [
+            #'active',
+            #'name',
+            'color',
+            #'company_id',
+            #'currency_id',
+            #'state',
+            'current_user_id',
+            'current_sale_team_id',
+            'current_purchase_team_id',
+            #'partner_id',
+            'is_late_review',
+            'is_admin',
+            'current_kyc_id',
+            'current_kyc_state',
+            'current_kyc_expiry_date',
+            'current_kyc_review_date',
+            'current_crm_id',
+            'current_crm_state',
+            'current_crm_expiry_date',
+            'current_crm_review_date',
+            'current_vrm_id',
+            'current_vrm_state',
+            'current_vrm_expiry_date',
+            'current_vrm_review_date',
+            'current_customer_credit_id',
+            'current_customer_credit_state',
+            'current_customer_credit_expiry_date',
+            'current_customer_credit_review_date',
+            'current_vendor_credit_id',
+            'current_vendor_credit_state',
+            'current_vendor_credit_expiry_date',
+            'current_vendor_credit_review_date',
+            'current_customer_strategy_id',
+            'current_customer_strategy_state',
+            'current_customer_strategy_expiry_date',
+            'current_customer_strategy_review_date',
+            'current_vendor_strategy_id',
+            'current_vendor_strategy_state',
+            'current_vendor_strategy_expiry_date',
+            'current_vendor_strategy_review_date',
+            #'application_type',
+            #'application_request_type',
+            'expiry_date_formula',
+            #'expiry_date',
+            'review_date_formula',
+            #'review_date',
+            #'company_type',
+            #'legal_name',
+            #'arabic_name',
+            #'trade_name',
+            #'category_id',
+            #'street',
+            #'street2',
+            #'zip',
+            #'city',
+            #'state_id',
+            #'country_id',
+            #'email',
+            #'phone',
+            #'mobile',
+            #'website',
+            #'company_registry',
+            #'company_registry_expiry_date',
+            #'vat',
+            #'ref',
+            #'legal_type',
+            #'industry_id',
+            #'paidup_capital',
+            #'ownership_structure',
+            #'management_structure',
+            #'year_founded',
+            #'function',
+            #'title',
+            #'duplicate_approved',
+            #'user_id',
+            #'team_id',
+            #'customer_class',
+            #'customer_segment',
+            #'customer_pricelist_ids',
+            #'annual_revenues',
+            #'employee_count',
+            #'countries_covered',
+            #'business_brief',
+            #'account_requirements',
+            #'major_countries',
+            #'services_needed',
+            #'service_categories_needed',
+            #'operation_brief',
+            #'account_kpis',
+            #'client_projects',
+            #'client_profile',
+            #'client_history',
+            #'stakeholders',
+            #'whitespace',
+            #'sales_performance',
+            #'margin_performance',
+            #'wins_losses',
+            #'account_competitors',
+            #'competitors_stregnths',
+            #'competitors_weaknesses',
+            #'buyer_journey',
+            #'content_channels',
+            #'evaluation_criteria',
+            #'decision_criteria',
+            #'relationship_current_status',
+            #'relationship_target_status',
+            #'core_business_partners',
+            #'relationship_progression_strategy',
+            #'services',
+            #'sales_targets',
+            #'cross_sell',
+            #'risks_challenges',
+            #'critical_resources',
+            #'monthly_expected_business',
+            #'customer_credit_limit',
+            #'credit_trade_references',
+            #'customer_payment_term_ids',
+            #'buyer_id',
+            #'purchase_team_id',
+            #'vendor_class',
+            #'vendor_segment',
+            #'vendor_currency_ids',
+            #'vendor_annual_revenues',
+            #'vendor_employee_count',
+            #'vendor_countries_covered',
+            #'vendor_business_brief',
+            #'vendor_account_offerings',
+            #'vendor_major_countries',
+            #'services_provided',
+            #'service_categories_provided',
+            #'vendor_operation_brief',
+            #'vendor_kpis',
+            #'vendor_projects',
+            #'vendor_profile',
+            #'vendor_history',
+            #'vendor_stakeholders',
+            #'vendor_whitespace',
+            #'purchases_performance',
+            #'vendor_wins_losses',
+            #'vendor_competitors',
+            #'vendor_competitors_stregnths',
+            #'vendor_competitors_weaknesses',
+            #'selling_journey',
+            #'vendor_content_channels',
+            #'vendor_evaluation_criteria',
+            #'vendor_decision_criteria',
+            #'vendor_relationship_current_status',
+            #'vendor_relationship_target_status',
+            #'vendor_core_business_partners',
+            #'vendor_relationship_progression_strategy',
+            #'vendor_services',
+            #'purchases_targets',
+            #'vendor_risks_challenges',
+            #'vendor_critical_resources',
+            #'vendor_monthly_expected_business',
+            #'vendor_credit_limit',
+            #'vendor_payment_term_ids',
+            #'attachment_ids',
+            #'user_action_ids',
+            'previous_company_type',
+            'previous_legal_name',
+            'previous_arabic_name',
+            'previous_trade_name',
+            'previous_category_id',
+            'previous_street',
+            'previous_street2',
+            'previous_zip',
+            'previous_city',
+            'previous_state_id',
+            'previous_country_id',
+            'previous_email',
+            'previous_phone',
+            'previous_mobile',
+            'previous_website',
+            'previous_company_registry',
+            'previous_company_registry_expiry_date',
+            'previous_vat',
+            'previous_ref',
+            'previous_legal_type',
+            'previous_industry_id',
+            'previous_paidup_capital',
+            'previous_ownership_structure',
+            'previous_management_structure',
+            'previous_year_founded',
+            'previous_function',
+            'previous_title',
+            'previous_duplicate_approved',
+            'previous_user_id',
+            'previous_team_id',
+            'previous_customer_class',
+            'previous_customer_segment',
+            'previous_customer_pricelist_ids',
+            'previous_annual_revenues',
+            'previous_employee_count',
+            'previous_countries_covered',
+            'previous_business_brief',
+            'previous_account_requirements',
+            'previous_major_countries',
+            'previous_services_needed',
+            'previous_service_categories_needed',
+            'previous_operation_brief',
+            'previous_monthly_expected_business',
+            'previous_customer_credit_limit',
+            'previous_credit_trade_references',
+            'previous_customer_payment_term_ids',
+            'previous_account_kpis',
+            'previous_client_projects',
+            'previous_client_profile',
+            'previous_client_history',
+            'previous_stakeholders',
+            'previous_whitespace',
+            'previous_sales_performance',
+            'previous_margin_performance',
+            'previous_wins_losses',
+            'previous_account_competitors',
+            'previous_competitors_stregnths',
+            'previous_competitors_weaknesses',
+            'previous_buyer_journey',
+            'previous_content_channels',
+            'previous_evaluation_criteria',
+            'previous_decision_criteria',
+            'previous_relationship_current_status',
+            'previous_relationship_target_status',
+            'previous_core_business_partners',
+            'previous_relationship_progression_strategy',
+            'previous_services',
+            'previous_sales_targets',
+            'previous_cross_sell',
+            'previous_risks_challenges',
+            'previous_critical_resources',
+            'previous_buyer_id',
+            'previous_purchase_team_id',
+            'previous_vendor_class',
+            'previous_vendor_segment',
+            'previous_vendor_currency_ids',
+            'previous_vendor_annual_revenues',
+            'previous_vendor_employee_count',
+            'previous_vendor_countries_covered',
+            'previous_vendor_business_brief',
+            'previous_vendor_account_offerings',
+            'previous_vendor_major_countries',
+            'previous_services_provided',
+            'previous_service_categories_provided',
+            'previous_vendor_operation_brief',
+            'previous_vendor_monthly_expected_business',
+            'previous_vendor_credit_limit',
+            'previous_vendor_payment_term_ids',
+            'previous_vendor_kpis',
+            'previous_vendor_projects',
+            'previous_vendor_profile',
+            'previous_vendor_history',
+            'previous_vendor_stakeholders',
+            'previous_vendor_whitespace',
+            'previous_purchases_performance',
+            'previous_vendor_wins_losses',
+            'previous_vendor_competitors',
+            'previous_vendor_competitors_stregnths',
+            'previous_vendor_competitors_weaknesses',
+            'previous_selling_journey',
+            'previous_vendor_content_channels',
+            'previous_vendor_evaluation_criteria',
+            'previous_vendor_decision_criteria',
+            'previous_vendor_relationship_current_status',
+            'previous_vendor_relationship_target_status',
+            'previous_vendor_core_business_partners',
+            'previous_vendor_relationship_progression_strategy',
+            'previous_vendor_services',
+            'previous_purchases_targets',
+            'previous_vendor_risks_challenges',
+            'previous_vendor_critical_resources',
+            'same_pa_vat_partner_id',
+            'same_pa_company_registry_partner_id',
+            'same_pa_name_partner_id',
+            'same_pa_website_partner_id',
+            'same_pa_email_partner_id',
+            'same_pa_phone_partner_id',
+            'same_pa_mobile_partner_id',
+        ]
+        for field in hide_list:
+            if res.get(field):
+                res[field]['searchable'] = False
+                res[field]['selectable'] = False # to hide in Add Custom filter view
+                res[field]['sortable'] = False # to hide in group by view
+                res[field]['exportable'] = False # to hide in export list
+                res[field]['store'] = False # to hide in 'Select Columns' filter in tree views
+
+        return res
+
+
 
 class ResPartnerApplicationAttachment(models.Model):
     _name = 'res.partner.application.attachment'
@@ -1162,11 +1845,12 @@ class ResPartnerApplicationUserAction(models.Model):
     _description = "Application User Actions"
     
     user_id = fields.Many2one('res.users', string='User', no_sort=True)
-    action = fields.Selection([('created','Created'),('submitted','Submitted'),('resubmitted','Re-Submitted'),('validated','Validated'),('returned','Returned'),('approved','Approved'),('activated','Activated'),('rejected','Rejected'),('pending','Pending'),('validated_by_others','Validated by Others'),('approved_by_others','Approved by Others'),('rejected_by_others','Rejected by Others'),('returned_by_others','Returned by Others'),('cancelled','Cancelled'),('cancelled_by_others','Cancelled by Others'),('expired','Expired')], string="Action", no_sort=True)
+    action = fields.Selection([('created','Created'),('submitted','Submitted'),('resubmitted','Re-Submitted'),('validated','Validated'),('returned','Returned'),('approved','Approved'),('activated','Activated'),('rejected','Rejected'),('pending_validation','Pending Validation'),('pending_approval','Pending Approval'),('validated_by_others','Validated by Others'),('approved_by_others','Approved by Others'),('rejected_by_others','Rejected by Others'),('returned_by_others','Returned by Others'),('cancelled','Cancelled'),('cancelled_by_others','Cancelled by Others'),('expired','Expired')], string="Action", no_sort=True)
     action_datetime = fields.Datetime(string="Timestamp", default=fields.Datetime.now(), no_sort=True)
     pending_timestamp = fields.Datetime(string="Pending Timestamp", no_sort=True)
     pending_time = fields.Float(string="Pending Hours", compute="_compute_pending_time", no_sort=True)
     application_id = fields.Many2one('res.partner.application', string="Application", no_sort=True)
+    note = fields.Text(string="Notes")
 
     @api.depends('action_datetime','pending_timestamp')
     def _compute_pending_time(self):

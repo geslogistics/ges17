@@ -13,6 +13,16 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <record id="res_partner_sequence" model="ir.sequence">
+            <field name="name">Partner Sequence</field>
+            <field name="code">res.partner.uniqseq</field>
+            <field name="prefix"></field>
+            <field name="padding"></field>
+            <field name="number_next">3000</field>
+            <field name="number_increment">16</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
 
     </data>
 </odoo>
