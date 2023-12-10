@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_form_inherit_partner_application" model="ir.ui.view">
+        <field name="name">
+            purchase.order.inherit.partner.application
+        </field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <field name="current_user_id" invisible="1"/>
+                <field name="is_pa_user" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="attributes">
+                <attribute name="invisible">is_pa_user</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="readonly">is_pa_user</attribute>
+                <attribute name="force_save">1</attribute>
+            </xpath>
+          
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="pa_partner_id" widget="res_partner_many2one" options="{'no_quick_create': True, 'no_create': True}" context="{'res_partner_search_mode': 'supplier', 'show_vat': True}" placeholder="Name, TIN, Email, or Reference" readonly="state in ['cancel', 'done', 'purchase']"  invisible="is_pa_user == False" required="is_pa_user"/>
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="pa_domain_currency_id" invisible="1"/>
+                <field name="pa_currency_id" force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" readonly="state in ['cancel', 'done', 'purchase']" domain="pa_domain_currency_id" invisible="is_pa_user == False" required="is_pa_user"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="pa_domain_payment_term_id" invisible="1"/>
+                <field name="pa_payment_term_id" readonly="invoice_status == 'invoiced' or state == 'done'" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" domain="pa_domain_payment_term_id" invisible="is_pa_user == False"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="team_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False" readonly="1"/>
+                <field name="pa_user_id" string="Assigned User" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False" />
+                <field name="pa_team_id" string="Assigned Team" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" invisible="is_pa_user == False" />
+            </xpath>
+            <group name="other_info" position="after">
+                <group name="pa_sales_team" invisible="is_pa_user == False">
+                    <field name="sale_user_id" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                    <field name="sale_team_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                    <field name="pa_sale_user_id" string="Assigned User" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                    <field name="pa_sale_team_id" string="Assigned Team" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

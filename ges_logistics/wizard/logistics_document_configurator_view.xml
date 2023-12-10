@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="logistics_wizard_doc_config_form_view" model="ir.ui.view">
+            <field name="name">logistics.wizard.doc.config.form.view</field>
+            <field name="model">logistics.wizard.doc.config</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name" invisible="1"/>
+                            <field name="sol_id" invisible="1"/>
+                            <field name="so_id" invisible="1"/>
+                            <field name="product_id" invisible="1"/>
+                            <field name="partner_id" invisible="1"/>
+                            <field name="sale_order_line_workflow" invisible="1"/>
+                            <field name="shipment_order_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True,'no_create_edit':True}"  invisible="sale_order_line_workflow != 'sho'"/>
+                            <field name="transport_order_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True,'no_create_edit':True}"  invisible="sale_order_line_workflow != 'tro'"/>
+                            <field name="storage_order_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True,'no_create_edit':True}"  invisible="sale_order_line_workflow != 'sto'"/>
+                            <field name="customs_order_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True,'no_create_edit':True}"  invisible="sale_order_line_workflow != 'cco'"/>
+                            <field name="service_order_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True,'no_create_edit':True}"  invisible="sale_order_line_workflow != 'svo'"/>
+                        </group>
+                    </sheet>
+                    <footer>
+
+                        <button name="apply_doc_config_wizard" string="SELECT" class="btn-primary" type="object" data-hotkey="s" />
+                        <button name="action_create_order" string="NEW" class="btn-success" type="object" data-hotkey="n" />
+                        <button name="cancel" string="CANCEL" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+
+</odoo>
