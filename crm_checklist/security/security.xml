@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_crm_checklist" model="ir.module.category">
+        <field name="name">CRM Checklist</field>
+        <field name="sequence">2000</field>
+        <field name="parent_id" ref="base.module_category_sales"/>
+    </record>
+    <record id="group_crm_checklist_superuser" model="res.groups">
+        <field name="name">Checklist Super User</field>
+        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        <field name="category_id" ref="crm_checklist.module_category_crm_checklist"/>
+    </record>
+
+</odoo>

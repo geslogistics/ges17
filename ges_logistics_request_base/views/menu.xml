@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--Requests-->
+        <record id="request_root_menu" model="ir.ui.menu">
+            <field name="name">Requests</field>
+            <field name="sequence">251</field>
+            <field name="web_icon">ges_logistics,static/description/icon.png</field>
+        </record>
+        <!--Logistics Ticket - Tickets -->
+        <record id="request_request_top_menu" model="ir.ui.menu">
+            <field name="name">Requests</field>
+            <field name="sequence">20</field>
+            <field name="parent_id" ref="request_root_menu"/>
+        </record>
+
+
+    </data>
+</odoo>

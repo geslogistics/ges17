@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	
+
+	<record id="crm_lead_view_form_inherit_partner_application" model="ir.ui.view">
+		<field name="name">crm.lead.view.form.inherit.partner.application</field>
+		<field name="model">crm.lead</field>
+		<field name="inherit_id" ref="crm.crm_lead_view_form" />
+		<field name="priority">9999</field>
+		<field name="arch" type="xml">
+			<xpath expr="//sheet" position="before">
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_tax"
+					invisible="not same_pa_vat_partner_id">
+					A Partner with the same <span>
+						<span class="o_vat_label">Tax ID</span>
+					</span> already exists (
+					<field name="same_pa_vat_partner_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_company"
+					invisible="not same_pa_company_registry_partner_id">
+					A Partner with the same <span>
+						<span class="o_vat_label">Company Registry</span>
+					</span> already exists (
+					<field name="same_pa_company_registry_partner_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_name"
+					invisible="not same_pa_name_partner_id">
+					A Partner with the same <span>
+						<span class="o_vat_label">Name</span>
+					</span> already exists (
+					<field name="same_pa_name_partner_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_website"
+					invisible="not same_pa_website_partner_id">
+					A Partner with the same <span>
+						<span class="o_vat_label">Website</span>
+					</span> already exists (
+					<field name="same_pa_website_partner_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_email"
+					invisible="not same_pa_email_partner_id">
+					A Partner with the same <span>
+						<span class="o_vat_label">Email</span>
+					</span> already exists (
+					<field name="same_pa_email_partner_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_phone"
+					invisible="not same_pa_phone_partner_id">
+					A Partner with the same <span>
+						<span class="o_vat_label">Phone</span>
+					</span> already exists (
+					<field name="same_pa_phone_partner_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_mobile"
+					invisible="not same_pa_mobile_partner_id">
+					A Partner with the same <span>
+						<span class="o_vat_label">Mobile</span>
+					</span> already exists (
+					<field name="same_pa_mobile_partner_id" />
+					).
+				</div>
+
+
+
+
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_lead_tax"
+					invisible="not same_pa_vat_lead_id">
+					A Lead with the same <span>
+						<span class="o_vat_label">Tax ID</span>
+					</span> already exists (
+					<field name="same_pa_vat_lead_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_lead_company"
+					invisible="not same_pa_company_registry_lead_id">
+					A Lead with the same <span>
+						<span class="o_vat_label">Company Registry</span>
+					</span> already exists (
+					<field name="same_pa_company_registry_lead_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_lead_name"
+					invisible="not same_pa_name_lead_id">
+					A Lead with the same <span>
+						<span class="o_vat_label">Name</span>
+					</span> already exists (
+					<field name="same_pa_name_lead_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_lead_website"
+					invisible="not same_pa_website_lead_id">
+					A Lead with the same <span>
+						<span class="o_vat_label">Website</span>
+					</span> already exists (
+					<field name="same_pa_website_lead_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_lead_email"
+					invisible="not same_pa_email_lead_id">
+					A Lead with the same <span>
+						<span class="o_vat_label">Email</span>
+					</span> already exists (
+					<field name="same_pa_email_lead_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_lead_phone"
+					invisible="not same_pa_phone_lead_id">
+					A Lead with the same <span>
+						<span class="o_vat_label">Phone</span>
+					</span> already exists (
+					<field name="same_pa_phone_lead_id" />
+					).
+				</div>
+				<div class="alert alert-danger oe_edit_only" role="alert" name="warning_lead_mobile"
+					invisible="not same_pa_mobile_lead_id">
+					A Lead with the same <span>
+						<span class="o_vat_label">Mobile</span>
+					</span> already exists (
+					<field name="same_pa_mobile_lead_id" />
+					).
+				</div>
+			</xpath>
+			<xpath expr="//form" position="inside">
+				<field name="current_user_id" invisible="1" />
+				<field name="same_pa_vat_partner_id" invisible="1" />
+				<field name="same_pa_company_registry_partner_id" invisible="1" />
+				<field name="same_pa_name_partner_id" invisible="1" />
+				<field name="same_pa_website_partner_id" invisible="1" />
+				<field name="same_pa_email_partner_id" invisible="1" />
+				<field name="same_pa_phone_partner_id" invisible="1" />
+				<field name="same_pa_mobile_partner_id" invisible="1" />
+				<field name="same_pa_vat_lead_id" invisible="1" />
+				<field name="same_pa_company_registry_lead_id" invisible="1" />
+				<field name="same_pa_name_lead_id" invisible="1" />
+				<field name="same_pa_website_lead_id" invisible="1" />
+				<field name="same_pa_email_lead_id" invisible="1" />
+				<field name="same_pa_phone_lead_id" invisible="1" />
+				<field name="same_pa_mobile_lead_id" invisible="1" />
+			</xpath>
+
+			<xpath expr="//sheet[1]/group[1]" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+
+			<xpath expr="(//field[@name='user_id'])[1]" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+			<xpath expr="(//field[@name='user_id'])[2]" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+			<xpath expr="(//field[@name='team_id'])[1]" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+			<xpath expr="(//field[@name='team_id'])[2]" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+
+			<xpath expr="(//page[@name='lead'])/group[1]/group[1]" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+
+			<xpath expr="(//page[@name='lead'])/group[1]/group[2]" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+
+			
+
+			<xpath expr="//div[hasclass('oe_title')]" position="after">
+				
+				
+				<div invisible="not partner_id">
+					<field name="current_kyc_state" invisible="1"/>
+					<field name="current_crm_state" invisible="1"/>
+					<field name="current_customer_credit_state" invisible="1"/>
+					<field name="current_customer_strategy_state" invisible="1"/>
+					<field name="current_vrm_state" invisible="1"/>
+					<field name="current_vendor_credit_state" invisible="1"/>
+					<field name="current_vendor_strategy_state" invisible="1"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'kyc', 'crm_app_state': 'new'}"
+					invisible="current_kyc_state != False"
+					string="KYC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'kyc', 'crm_app_state': 'amend'}"
+					invisible="current_kyc_state != 'active'"
+					string="KYC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'kyc', 'crm_app_state': 'review'}"
+					invisible="current_kyc_state != 'expired'"
+					string="KYC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'crm', 'crm_app_state': 'new'}"
+					invisible="current_crm_state != False"
+					string="CRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'crm', 'crm_app_state': 'amend'}"
+					invisible="current_crm_state != 'active'"
+					string="CRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'crm', 'crm_app_state': 'review'}"
+					invisible="current_crm_state != 'expired'"
+					string="CRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'new'}"
+					invisible="current_customer_credit_state != False"
+					string="CC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'amend'}"
+					invisible="current_customer_credit_state != 'active'"
+					string="CC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'review'}"
+					invisible="current_customer_credit_state != 'expired'"
+					string="CC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'new'}"
+					invisible="current_customer_strategy_state != False"
+					string="CS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'amend'}"
+					invisible="current_customer_strategy_state != 'active'"
+					string="CS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'review'}"
+					invisible="current_customer_strategy_state != 'expired'"
+					string="CS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'vrm', 'crm_app_state': 'new'}"
+					invisible="current_vrm_state != False"
+					string="VRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'vrm', 'crm_app_state': 'amend'}"
+					invisible="current_vrm_state != 'active'"
+					string="VRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'vrm', 'crm_app_state': 'review'}"
+					invisible="current_vrm_state != 'expired'"
+					string="VRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'new'}"
+					invisible="current_vendor_credit_state != False"
+					string="VC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'amend'}"
+					invisible="current_vendor_credit_state != 'active'"
+					string="VC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'review'}"
+					invisible="current_vendor_credit_state != 'expired'"
+					string="VC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'new'}"
+					invisible="current_vendor_strategy_state != False"
+					string="VS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'amend'}"
+					invisible="current_vendor_strategy_state != 'active'"
+					string="VS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'review'}"
+					invisible="current_vendor_strategy_state != 'expired'"
+					string="VS"/>
+					
+				</div>
+				
+				<group name="pa_kyc_groups" invisible="">
+					
+					<group string="Basic Information">
+						<field name="partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"
+							context="{'default_name': contact_name,'default_title': title,'default_street': street,'default_street2': street2,'default_city': city,'default_state_id': state_id,'default_zip': zip,'default_country_id': country_id,'default_function': function,'default_phone': phone,'default_mobile': mobile,'default_email': email_from,'default_user_id': user_id,'default_team_id': team_id,'default_website': website,'default_lang': lang_code,'show_vat': True}"
+							invisible="type == 'lead' and not is_partner_visible" />
+						<field name="partner_name" string="Name" invisible="type == 'opportunity' or partner_id" readonly="company_type == 'person'" force_save="1" required="company_type == 'company' and not partner_id" />
+						<field name="name_alt_lang" string="Name (AR)" invisible="partner_id"/>
+						<field name="trade_name"  invisible="partner_id"/>
+						<field name="trade_name_alt_lang"  invisible="partner_id"/>
+						<field name="ref" string="Internal Reference"  invisible="partner_id"/>
+						<field name="company_type" string="Account Type" widget="radio"
+							options="{'horizontal': true}"  invisible="partner_id"/>
+						<field name="legal_type" invisible="company_type == 'person' or partner_id" />
+						<field name="company_registry"  invisible="partner_id"/>
+						<field name="company_registry_expiry_date"  invisible="partner_id"/>
+						<field name="vat"  invisible="partner_id" />
+
+						<field name="pa_name_alt_lang" string="Name (AR)"  invisible="not partner_id"/>
+						<field name="pa_trade_name" invisible="not partner_id"/>
+						<field name="pa_trade_name_alt_lang" invisible="not partner_id"/>
+						<field name="pa_ref" string="Internal Reference" invisible="not partner_id"/>
+						<field name="pa_company_type" string="Account Type" widget="radio"
+							options="{'horizontal': true}" invisible="not partner_id"/>
+						<field name="pa_legal_type" invisible="company_type == 'person' or not partner_id" />
+						<field name="pa_company_registry" invisible="not partner_id"/>
+						<field name="pa_company_registry_expiry_date" invisible="not partner_id"/>
+						<field name="pa_vat" invisible="not partner_id"/>
+					</group>
+					
+					<group string="Revenue, Assignment &amp; Teams">
+						<field name="type" invisible="1"/>
+						<field name="expected_revenue" widget="monetary" options="{'currency_field': 'company_currency'}"/>
+						<label for="probability"/>
+						<div>
+							<span class="oe_inline">%</span>	
+							<field name="probability" class="oe_inline"/>
+						</div>
+						<field name="date_deadline" invisible="type == 'lead'"/>
+						<field name="priority" widget="priority" />
+						<field name="tag_ids" widget="many2many_tags"
+							options="{'color_field': 'color', 'no_create_edit': True}" />
+						
+						
+						<field name="pa_sales_user_id" widget="many2one_avatar_user"
+							options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"
+							/>
+						<field name="pa_sales_ou_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"
+							readonly="1"/>
+						<field name="create_date"/>
+						<field name="create_uid" widget="many2one_avatar_user"
+							options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"
+							invisible="create_uid == False" />
+						
+						
+
+					</group>
+					<group string="Contact Person Details" invisible="partner_id">
+						
+						<field name="title" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" />
+						<field name="contact_name" required="company_type == 'person' and not contact_partner_id"/>
+						<field name="function" />
+						<label for="email_from" class="oe_inline"/>
+						<div class="o_row o_row_readonly">
+							<button name="mail_action_blacklist_remove" class="fa fa-ban text-danger" title="This email is blacklisted for mass mailings. Click to unblacklist." type="object" context="{'default_email': email_from}" invisible="not is_blacklisted"/>
+							<field name="email_from" string="Email" widget="email"/>
+							<span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer email will also be updated." invisible="not partner_email_update"/>
+						</div>
+						<field name="email_cc" />
+						<label for="mobile" class="oe_inline"/>
+						<div class="o_row o_row_readonly">
+							<button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': mobile}" invisible="not mobile_blacklisted"/>
+							<field name="mobile" widget="phone" string="Mobile"/>
+						</div>
+					</group>
+					<group string="Contact Person Details" invisible="not partner_id">
+						<field name="contact_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"  />
+						<field name="pa_title" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="pa_contact_name"/>
+						<field name="pa_function" />
+						<label for="pa_email" class="oe_inline"/>
+						<div class="o_row o_row_readonly">
+							<button name="mail_action_blacklist_remove" class="fa fa-ban text-danger" title="This email is blacklisted for mass mailings. Click to unblacklist." type="object" context="{'default_email': pa_email}" invisible="not is_blacklisted"/>
+							<field name="pa_email" string="Email" widget="email"/>
+							<span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer email will also be updated." invisible="not partner_email_update"/>
+						</div>
+						<field name="pa_email_cc" />
+						<label for="pa_mobile" class="oe_inline"/>
+						<div class="o_row o_row_readonly">
+							<button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': pa_mobile}" invisible="not mobile_blacklisted"/>
+							<field name="pa_mobile" widget="phone" string="Mobile"/>
+						</div>
+					</group>
+					<group string="Registered Address" invisible="partner_id">
+
+						<field name="street" placeholder="Street..." />
+						<field name="street2" placeholder="Street 2..." />
+						<field name="city" placeholder="City" required="not partner_id"/>
+						<field name="state_id" placeholder="State" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" />
+						<field name="zip" placeholder="ZIP"  />
+						<field name="country_id" placeholder="Country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="not partner_id" />
+						<field name="country_code" invisible="1" />
+						<field name="l10n_sa_edi_building_number" placeholder="Building Number" invisible="country_code != 'SA'" />
+                        <field name="l10n_sa_edi_plot_identification" placeholder="Plot Identification" invisible="country_code != 'SA'"/>
+					</group>
+					<group string="Registered Address"  invisible="not partner_id">
+							<field name="pa_street" placeholder="Street..." />
+							<field name="pa_street2" placeholder="Street 2..." />
+							<field name="pa_city" placeholder="City" />
+							<field name="pa_state_id" placeholder="State" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" />
+							<field name="pa_zip" placeholder="ZIP"  />
+							<field name="pa_country_id" placeholder="Country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"  />
+							<field name="pa_country_code" invisible="1" />
+							<field name="pa_l10n_sa_edi_building_number" placeholder="Building Number" invisible="pa_country_code != 'SA'"/>
+							<field name="pa_l10n_sa_edi_plot_identification" placeholder="Plot Identification" invisible="pa_country_code != 'SA'"/>
+					</group>
+					<group string="Entity Contact Details" invisible="partner_id">
+						<field name="website" widget="url" placeholder="e.g. https://www.google.com"/>
+						<label for="phone" class="oe_inline"/>
+						<div class="o_row o_row_readonly">
+							<button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': phone}" invisible="not phone_blacklisted"/>
+							<field name="phone" widget="phone"/>
+							<span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer phone number will also be updated." invisible="not partner_phone_update"/>
+						</div>
+					</group>
+					<group string="Entity Contact Details"  invisible="not partner_id">
+						<field name="pa_website" widget="url" placeholder="e.g. https://www.google.com"/>
+						<label for="pa_phone" class="oe_inline"/>
+						<div class="o_row o_row_readonly">
+							<button name="phone_action_blacklist_remove" class="fa fa-ban text-danger" title="This phone number is blacklisted for SMS Marketing. Click to unblacklist." type="object" context="{'default_phone': pa_phone}" invisible="not phone_blacklisted"/>
+							<field name="pa_phone" widget="phone"/>
+							<span class="fa fa-exclamation-triangle text-warning oe_edit_only" title="By saving this change, the customer phone number will also be updated." invisible="not partner_phone_update"/>
+						</div>
+					</group>
+					<group string="Business Information" invisible="partner_id">
+						<field name="industry_id"
+							options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" />
+						<field name="year_founded" placeholder="1950" />
+						<field name="paidup_capital" placeholder="50000" />
+						<field name="ownership_structure" />
+						<field name="management_structure" />
+					</group>
+					<group string="Business Information" invisible="not partner_id">
+						<field name="pa_industry_id"
+							options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" />
+						<field name="pa_year_founded" placeholder="1950" />
+						<field name="pa_paidup_capital" placeholder="50000" />
+						<field name="pa_ownership_structure" />
+						<field name="pa_management_structure" />
+					</group>
+				<!--CRM GROUPS-->
+					<group string="CRM Segmentation" invisible="partner_id">
+						<field name="customer_class"/>
+						<field name="customer_segment"/>
+						<field name="customer_pricelist_ids" widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="deal_min_margin"/>
+					</group>
+					<group string="CRM Customer Business" invisible="partner_id">
+						<field name="annual_revenues" />
+						<field name="employee_count" />
+						<field name="countries_covered" widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" />
+						<field name="business_brief" />
+					</group>
+					<group string="CRM Account Requirements" invisible="partner_id">
+						<field name="account_requirements"/>
+					</group>				
+					<group string="CRM Account Operations" invisible="partner_id">
+						<field name="services_needed"  widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="service_categories_needed"  widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="major_countries" widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="operation_brief"/>
+					</group>
+				<!--PA CRM GROUPS-->
+					<group string="CRM Segmentation" invisible="not partner_id">
+						<field name="pa_customer_class"/>
+						<field name="pa_customer_segment"/>
+						<field name="pa_customer_pricelist_ids" widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="pa_deal_min_margin"/>
+					</group>
+					<group string="CRM Customer Business" invisible="not partner_id">
+						<field name="pa_annual_revenues" />
+						<field name="pa_employee_count" />
+						<field name="pa_countries_covered" widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" />
+						<field name="pa_business_brief" />
+					</group>
+					<group string="CRM Account Requirements" invisible="not partner_id">
+						<field name="pa_account_requirements"/>
+					</group>				
+					<group string="CRM Account Operations" invisible="not partner_id">
+						<field name="pa_services_needed"  widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="pa_service_categories_needed"  widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="pa_major_countries" widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="pa_operation_brief"/>
+					</group>
+
+					<group string="Customer Credit Information" invisible="partner_id">
+						<field name="monthly_expected_business"/>
+						<field name="customer_credit_limit" string="Credit Limit"/>
+						<field name="customer_payment_term_ids" string="Payment Terms"  options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="credit_trade_references" />
+					</group>
+					
+					<group string="Customer Credit Information" invisible="not partner_id">
+						<field name="pa_monthly_expected_business"/>
+						<field name="pa_customer_credit_limit" string="Credit Limit"/>
+						<field name="pa_customer_payment_term_ids" string="Payment Terms"  options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+						<field name="pa_credit_trade_references" />
+					</group>
+				</group>
+
+			</xpath>
+			<xpath expr="//field[@name='checklist_progress']" position="after">
+				<group class="w-100" string="Partner Application Requirements" invisible="not requires_kyc and not requires_crm and not requires_cc and not requires_cs and not requires_vrm and not requires_vc and not requires_vs">
+					<field name="requires_kyc" invisible="1"/>
+					<field name="requires_crm" invisible="1"/>
+					<field name="requires_cc" invisible="1"/>
+					<field name="requires_cs" invisible="1"/>
+					<field name="requires_vrm" invisible="1"/>
+					<field name="requires_vc" invisible="1"/>
+					<field name="requires_vs" invisible="1"/>
+
+					<div class="w-100 d-flex mb4 checklist-checkpoint" invisible="not requires_kyc or (requires_kyc and current_kyc_state == 'active')">
+						<div>
+							<i class="fa fa-2x fa-square-o mr16"/>
+						</div>
+						<div>KYC</div>
+					</div>
+					<div class="w-100 d-flex mb4 checklist-checkpoint text-success" invisible="not requires_kyc or (requires_kyc and current_kyc_state != 'active')">
+						<div>
+							<i class="fa fa-2x fa-check-square-o mr16"/>
+						</div>
+						<div>KYC</div>
+					</div>
+
+					<div class="w-100 d-flex mb4 checklist-checkpoint" invisible="not requires_crm or (requires_crm and current_crm_state == 'active')">
+						<div>
+							<i class="fa fa-2x fa-square-o mr16"/>
+						</div>
+						<div>CRM</div>
+					</div>
+					<div class="w-100 d-flex mb4 checklist-checkpoint text-success" invisible="not requires_crm or (requires_crm and current_crm_state != 'active')">
+						<div>
+							<i class="fa fa-2x fa-check-square-o mr16"/>
+						</div>
+						<div>CRM</div>
+					</div>
+
+					<div class="w-100 d-flex mb4 checklist-checkpoint" invisible="not requires_cc or (requires_cc and current_customer_credit_state == 'active')">
+						<div>
+							<i class="fa fa-2x fa-square-o mr16"/>
+						</div>
+						<div>CC</div>
+					</div>
+					<div class="w-100 d-flex mb4 checklist-checkpoint text-success" invisible="not requires_cc or (requires_cc and current_customer_credit_state != 'active')">
+						<div>
+							<i class="fa fa-2x fa-check-square-o mr16"/>
+						</div>
+						<div>CC</div>
+					</div>
+
+					<div class="w-100 d-flex mb4 checklist-checkpoint" invisible="not requires_cs or (requires_cs and current_customer_strategy_state == 'active')">
+						<div>
+							<i class="fa fa-2x fa-square-o mr16"/>
+						</div>
+						<div>CS</div>
+					</div>
+					<div class="w-100 d-flex mb4 checklist-checkpoint text-success" invisible="not requires_cs or (requires_cs and current_customer_strategy_state != 'active')">
+						<div>
+							<i class="fa fa-2x fa-check-square-o mr16"/>
+						</div>
+						<div>CS</div>
+					</div>
+
+					<div class="w-100 d-flex mb4 checklist-checkpoint" invisible="not requires_vrm or (requires_vrm and current_vrm_state == 'active')">
+						<div>
+							<i class="fa fa-2x fa-square-o mr16"/>
+						</div>
+						<div>VRM</div>
+					</div>
+					<div class="w-100 d-flex mb4 checklist-checkpoint text-success" invisible="not requires_vrm or (requires_vrm and current_vrm_state != 'active')">
+						<div>
+							<i class="fa fa-2x fa-check-square-o mr16"/>
+						</div>
+						<div>VRM</div>
+					</div>
+
+					<div class="w-100 d-flex mb4 checklist-checkpoint" invisible="not requires_vc or (requires_vc and current_vendor_credit_state == 'active')">
+						<div>
+							<i class="fa fa-2x fa-square-o mr16"/>
+						</div>
+						<div>VC</div>
+					</div>
+					<div class="w-100 d-flex mb4 checklist-checkpoint text-success" invisible="not requires_vc or (requires_vc and current_vendor_credit_state != 'active')">
+						<div>
+							<i class="fa fa-2x fa-check-square-o mr16"/>
+						</div>
+						<div>VC</div>
+					</div>
+
+					<div class="w-100 d-flex mb4 checklist-checkpoint" invisible="not requires_vs or (requires_vs and current_vendor_strategy_state == 'active')">
+						<div>
+							<i class="fa fa-2x fa-square-o mr16"/>
+						</div>
+						<div>VS</div>
+					</div>
+					<div class="w-100 d-flex mb4 checklist-checkpoint text-success" invisible="not requires_vs or (requires_vs and current_vendor_strategy_state != 'active')">
+						<div>
+							<i class="fa fa-2x fa-check-square-o mr16"/>
+						</div>
+						<div>VS</div>
+					</div>
+				</group>
+			</xpath>
+		</field>
+	</record>
+
+	<record id="crm_quick_create_opportunity_form_inherit_pa" model="ir.ui.view">
+		<field name="name">crm.lead.form.quick_create.inherit.pa</field>
+		<field name="model">crm.lead</field>
+		<field name="inherit_id" ref="crm.quick_create_opportunity_form" />
+		<field name="priority">9999</field>
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='partner_id']" position="attributes">
+				<attribute name="options">{'no_open': True, 'no_quick_create': True, 'no_create': True}</attribute>
+			</xpath>
+			<xpath expr="//field[@name='name']" position="after">
+				<field name="current_user_id" invisible="1" />
+			</xpath>
+			<xpath expr="//field[@name='email_from']" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+			<xpath expr="//field[@name='phone']" position="attributes">
+				<attribute name="invisible">1</attribute>
+			</xpath>
+		</field>
+	</record>
+	
+	<record id="view_crm_lead2opportunity_partner_pa_inherit" model="ir.ui.view">
+		<field name="name">
+			crm.lead2opportunity.partner.form.pa.inherit
+		</field>
+		<field name="model">crm.lead2opportunity.partner</field>
+		<field name="inherit_id" ref="crm.view_crm_lead2opportunity_partner" />
+		<field name="priority">9999</field>
+		<field name="arch" type="xml">
+			<field name="name" position="after">
+				<field name="current_user_id" invisible="1"/>
+			</field>
+			<xpath expr="(//field[@name='name'])" position="attributes">
+				<attribute name="readonly">1</attribute>
+			</xpath>
+			<xpath expr="(//field[@name='user_id'])" position="attributes">
+				<attribute name="readonly">1</attribute>
+			</xpath>
+			<xpath expr="(//field[@name='team_id'])" position="attributes">
+				<attribute name="readonly">1</attribute>
+			</xpath>
+			<xpath expr="(//field[@name='action'])" position="attributes">
+				<attribute name="readonly">1</attribute>
+			</xpath>
+
+		</field>
+	</record>
+
+	<record id="crm.action_crm_send_mass_convert" model="ir.actions.act_window">
+        
+		<field name="groups_id" eval="[(4,ref('base.group_no_one'))]"/>
+    </record>
+
+	<!-- CRM Stage Form -->
+	<record id="crm_stage_form_inherit_pa" model="ir.ui.view">
+		<field name="name">crm.stage.form.inherit.pa</field>
+		<field name="model">crm.stage</field>
+		<field name="inherit_id" ref="crm.crm_stage_form" />
+		<field name="priority">9999</field>
+		<field name="arch" type="xml">
+			<xpath expr="(//field[@name='requirements'])" position="after">
+					<div name="pa_options">
+                        <span class="d-inline-block">
+                            <field name="requires_kyc"/>
+                            <label for="requires_kyc"/>
+                        </span>
+                        <span class="d-inline-block">
+                            <field name="requires_crm"/>
+                            <label for="requires_crm"/>
+                        </span>
+						<span class="d-inline-block">
+                            <field name="requires_cc"/>
+                            <label for="requires_cc"/>
+                        </span>
+						<span class="d-inline-block">
+                            <field name="requires_cs"/>
+                            <label for="requires_cs"/>
+                        </span>
+						<span class="d-inline-block">
+                            <field name="requires_vrm"/>
+                            <label for="requires_vrm"/>
+                        </span>
+						<span class="d-inline-block">
+                            <field name="requires_vc"/>
+                            <label for="requires_vc"/>
+                        </span>
+						<span class="d-inline-block">
+                            <field name="requires_vs"/>
+                            <label for="requires_vs"/>
+                        </span>
+                    </div>
+			</xpath>
+		</field>
+	</record>
+</odoo>
