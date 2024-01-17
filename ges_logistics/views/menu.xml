@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--Logistics Operations-->
+        <record id="logistics_ges_root_menu" model="ir.ui.menu">
+            <field name="name">Operations</field>
+            <field name="sequence">253</field>
+            <field name="web_icon">ges_logistics,static/description/icon.png</field>
+        </record>
+        <!--Logistics--><!--Configuration-->
+        <record id="logistics_configuration_top_menu" model="ir.ui.menu">
+            <field name="name">Configuration</field>
+            <field name="sequence">100</field>
+            <field name="parent_id" ref="logistics_ges_root_menu"/>
+        </record>
+        <!--Logistics--><!--Configuration--><!--Products-->
+        <menuitem id="logistics_configuration_products_section_menu"
+                  name="Products"
+                  parent="logistics_configuration_top_menu"
+                  sequence="10"/>
+
+        <menuitem name="Products"
+                  id="menu_logistics_products"
+                  parent="logistics_configuration_products_section_menu"
+                  action="logistics_product_products_act_window"
+                  sequence="1"/>
+        <menuitem name="Product Groups"
+                  id="menu_logistics_product_group"
+                  parent="logistics_configuration_products_section_menu"
+                  action="logistics_product_product_group_action"
+                  sequence="2"/>
+        <menuitem name="Freight Types"
+                  id="menu_logistics_freight_types"
+                  parent="logistics_configuration_products_section_menu"
+                  action="logistics_product_freight_type_action"
+                  sequence="3"/>
+        <menuitem name="Shipment Types"
+                  id="menu_logistics_shipment_types"
+                  parent="logistics_configuration_products_section_menu"
+                  action="logistics_product_shipment_type_action"
+                  sequence="4"/>
+
+        <!--Logistics--><!--Configuration--><!--Addresses-->
+        <menuitem id="logistics_configuration_addresses_section_menu"
+                  name="Addresses"
+                  parent="logistics_configuration_top_menu"
+                  sequence="20"/>
+
+        <menuitem name="Continents"
+                  id="logistics_configuration_addresses_continent_menu"
+                  parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_continent_act_window"
+                  sequence="1"/>
+
+        <menuitem name="Regions"
+                  id="logistics_configuration_addresses_region_menu"
+                  parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_region_act_window"
+                  sequence="2"/>
+
+        <menuitem name="Countries"
+                  id="logistics_configuration_addresses_country_menu"
+                  parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_country_act_window"
+                  sequence="3"/>
+
+        <menuitem name="States"
+                  id="logistics_configuration_addresses_state_menu"
+                  parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_state_act_window"
+                  sequence="4"/>
+
+        <menuitem name="Cities"
+                  id="logistics_configuration_addresses_city_menu"
+                  parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_city_act_window"
+                  sequence="5"/>
+
+        <menuitem name="Addresses"
+                  id="logistics_configuration_addresses_menu"
+                  parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_act_window"
+                  sequence="6"/>
+
+        <!--Logistics--><!--Configuration--><!--Ports-->
+        <menuitem id="logistics_configuration_ports_section_menu"
+                  name="Ports"
+                  parent="logistics_configuration_top_menu"
+                  sequence="30"/>
+
+        <menuitem name="Ports"
+                  id="logistics_configuration_ports_ports_menu"
+                  parent="logistics_configuration_ports_section_menu"
+                  action="logistics_freight_port_act_window"
+                  sequence="1"/>
+
+        <!--Logistics--><!--Configuration--><!--Incoterms-->
+        <menuitem id="logistics_configuration_incoterms_section_menu"
+                  name="Incoterms"
+                  parent="logistics_configuration_top_menu"
+                  sequence="40"/>
+
+        <menuitem name="Incoterms"
+                  id="logistics_configuration_incoterms_incoterms_menu"
+                  parent="logistics_configuration_incoterms_section_menu"
+                  action="logistics_freight_incoterms_act_window"
+                  sequence="1"/>
+
+        <!--Logistics--><!--Configuration--><!--Move Types-->
+        <menuitem id="logistics_configuration_movetypes_section_menu"
+                  name="Move Types"
+                  parent="logistics_configuration_top_menu"
+                  sequence="50"/>
+
+        <menuitem name="Move Types"
+                  id="logistics_configuration_movetypes_movetypes_menu"
+                  parent="logistics_configuration_movetypes_section_menu"
+                  action="logistics_freight_move_type_act_window"
+                  sequence="1"/>
+
+        <!--Logistics--><!--Configuration--><!--Packages-->
+        <menuitem id="logistics_configuration_packages_section_menu"
+                  name="Packages"
+                  parent="logistics_configuration_top_menu"
+                  sequence="60"/>
+
+        <menuitem name="Packages"
+                  id="logistics_configuration_packages_packages_menu"
+                  parent="logistics_configuration_packages_section_menu"
+                  action="logistics_freight_package_act_window"
+                  sequence="1"/>
+        
+        <menuitem id="logistics_configuration_carriers_section_menu" name="Carriers"
+                  parent="logistics_configuration_top_menu" sequence="50"/>
+
+        <menuitem name="Air Carriers" id="logistics_freight_air_carriers_menu"
+                  parent="logistics_configuration_carriers_section_menu"
+                  action="logistics_freight_air_carriers_act_window" sequence="20"/>
+
+        <!--Logistics Orders-->
+        <record id="logistics_order_top_menu" model="ir.ui.menu">
+            <field name="name">Orders</field>
+            <field name="sequence">10</field>
+            <field name="parent_id" ref="logistics_ges_root_menu"/>
+        </record>
+        
+        <record id="logistics_shipment_order_shipments_order_top_menu" model="ir.ui.menu">
+            <field name="name">SHO - Shipment Orders</field>
+            <field name="sequence">10</field>
+            <field name="parent_id" ref="logistics_order_top_menu"/>
+            <field name="action" ref="ges_logistics.logistics_shipment_order_act_window"/>
+        </record>
+        <record id="logistics_customs_order_customs_order_top_menu" model="ir.ui.menu">
+            <field name="name">CCO - Customs Orders</field>
+            <field name="sequence">20</field>
+            <field name="parent_id" ref="logistics_order_top_menu"/>
+            <field name="action" ref="ges_logistics.logistics_customs_order_act_window"/>
+        </record>
+        <record id="logistics_service_order_services_order_top_menu" model="ir.ui.menu">
+            <field name="name">SVO - Service Orders</field>
+            <field name="sequence">30</field>
+            <field name="parent_id" ref="logistics_order_top_menu"/>
+            <field name="action" ref="ges_logistics.logistics_service_order_act_window"/>
+        </record>
+        <record id="logistics_storage_order_storage_order_top_menu" model="ir.ui.menu">
+            <field name="name">STO - Storage Orders</field>
+            <field name="sequence">40</field>
+            <field name="parent_id" ref="logistics_order_top_menu"/>
+            <field name="action" ref="ges_logistics.logistics_storage_order_act_window"/>
+        </record>
+        <record id="logistics_transport_order_transport_order_top_menu" model="ir.ui.menu">
+            <field name="name">TRO - Storage Orders</field>
+            <field name="sequence">50</field>
+            <field name="parent_id" ref="logistics_order_top_menu"/>
+            <field name="action" ref="ges_logistics.logistics_transport_order_act_window"/>
+        </record>
+
+    
+    </data>
+</odoo>

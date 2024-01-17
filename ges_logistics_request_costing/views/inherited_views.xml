@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_order_form_logistics" model="ir.ui.view">
+            <field name="name">logistics.view.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//tree/field[@name='price_subtotal']" position="after">
+                    <field name="request_costing_id" force_save="1" readonly="1"/>
+                    <!--<button name="action_create_prt" type="object" icon="fa-ticket" string="" class="btn-primary" invisible="not id"/>-->
+                    <button name="action_request_request_costing_wizard" type="object" icon="fa-ticket" string="" class="btn-primary" invisible="not id"/>
+                </xpath>
+                
+                <xpath expr="//t[@t-if='record.discount?.raw_value']" position="after">
+                    <div class="row" name="request_costing_order_line_div">
+                        <div class="col-12 text-muted">
+                            <button name="action_request_request_costing_wizard" type="object" icon="fa-ticket" string="" class="btn-primary mb-2" invisible="not id"/>
+                            <span> Costing: </span>
+                            <t t-out="record.request_costing_id.value"/>
+                            <field name="request_costing_id" invisible="1"/>
+                        </div>
+                    </div>
+                </xpath>
+                
+
+            </field>
+        </record>
+
+        
+
+        
+
+    </data>
+</odoo>
