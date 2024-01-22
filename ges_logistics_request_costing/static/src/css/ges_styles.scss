@@ -1,0 +1,270 @@
+.ges_tree table > thead > tr > th[data-name="requested"] { text-align: center; }
+.ges_tree table > thead > tr > th[data-name="suggested"] { text-align: center; }
+.ges_tree table > thead > tr > th[data-name="selected"] { text-align: center; }
+.ges_tree table > thead > tr > th[data-name="mandatory"] { text-align: center; }
+
+.ges_kanban_costing > .o_kanban_renderer{--KanbanRecord-width: 100% !important;}
+
+.ges-button-badge {
+    color: #333333 !important;
+    background-color: #fff !important;
+
+    margin-top: 1.5px !important;
+    margin-right: 3px !important;
+    margin-bottom: 1.5px !important;
+    margin-left: 0px !important;
+    
+    padding-top: 0px !important;
+    padding-right: 2px !important;
+    padding-bottom: 0px !important;
+    padding-left: 2px !important;
+}
+.ges-button-badge:hover {
+    color: #fff !important;
+    background-color: #333333 !important;
+}
+
+.ges-kanban-banner-container {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap:10px;
+    width:100% !important; 
+    margin-bottom: 20px;
+}
+
+.ges-kanban-banner-container-colored {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap:10px;
+    width:100% !important; 
+    margin-bottom: 20px;
+    background-color: #f2f2f2 !important; 
+    border: 1px solid #dee2e6 !important;
+}
+
+.ges-kanban-banner-col {
+    display: flex !important;
+    flex-direction: col !important;
+    flex-wrap: wrap;
+    height: 150px;
+    width: 85px;
+}
+
+.ges-kanban-banner-primary-box {
+    height: 50%;
+    width: 100%;
+    background-color: #affff6 !important; 
+    border: 1px solid #dee2e6 !important;
+}
+
+.ges-kanban-banner-secondary-box {
+    height: 50%;
+    width: 100%;
+    background-color: #d6fffa !important; 
+    border: 1px solid #dee2e6 !important;
+}
+
+.ges-kanban-banner-row-header {
+    height: 50%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.ges-kanban-banner-row-header-label {
+    height: 75%;
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    line-height: 10px;
+    border-right: 1px solid red;
+}
+.ges-kanban-banner-statbox {
+    height: 50%;
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: flex-end;
+    font-size: large;
+    line-height: 10px;
+}
+.ges-kanban-banner-statlabel {
+    height: 50%;
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    font-size: x-small;
+}
+
+
+.ges-stat-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: space-between;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.ges-stat-primary-box {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+    flex-grow:2;
+    flex-basis: 0;
+    background-color: #71639e !important; 
+    border-radius: 20px;
+    padding:20px;
+    color:#fff;
+}
+
+.ges-stat-secondary-box {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+    flex-grow:1.99;
+    flex-basis: 0;
+    background-color: #dee2e6 !important; 
+    border-radius: 20px;
+    padding:20px;
+    
+}
+
+.ges-stat-box-title {
+    font-weight:bold;
+    margin-bottom: 5px;
+}
+
+.ges-stat-box-subtitle {
+    font-size: x-small;
+    height:100%;
+}
+
+.ges-stat-box-figure {
+    font-size: x-large;
+    font-weight:bolder;
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+.ges-stat-box-bottom {
+    display:flex;
+    
+    column-gap: 10px;
+    flex-direction: row;
+    font-size: x-small;
+    margin-top: 5px;
+}
+.ges-stat-white-badge{
+    padding-left:8px;
+    padding-right:8px;
+    padding-top:3px;
+    padding-bottom:3px;
+    background-color: #fff;
+    border-radius: 20px;
+    height:15px;
+    line-height:10px;
+    color: #000;
+    display: flex;
+    flex-wrap: nowrap;
+}
+.ges-stat-white-badge-desc 
+{
+    min-width:max-content;
+}
+
+
+.ges-stat-counts-box {
+    display: flex;
+    flex-direction: column;
+    flex-grow:2;
+    flex-basis: 0;
+    border-radius: 20px;
+    border: 1px solid #dee2e6;
+    padding:20px;
+    line-height:15px;
+}
+
+.ges-stat-counts-box-item {
+    display:flex;
+    flex-direction: row;
+    align-items:flex-start;
+    width:100%
+}
+
+.ges-stat-counts-box-labels {
+    text-align: start;
+    width:100%;
+}
+.ges-stat-counts-box-values {
+    text-align: end;
+    min-width:30px;
+}
+
+
+.ges-stat-counts-box2 {
+    display: flex;
+    flex-direction: column;
+    flex-grow:2;
+    flex-basis: 0;
+    border-radius: 20px;
+    border: 1px solid #dee2e6;
+    padding:20px;
+    line-height:15px;
+}
+
+.ges-stat-box2-title {
+    display: flex;
+    flex-direction: row;
+    font-weight:bold;
+    margin-bottom: 5px;
+}
+
+.ges-stat-counts-box2-item {
+    display:flex;
+    flex-direction: row;
+}
+
+.ges-stat-counts-box2-labels {
+    text-align: start;
+    min-width:90px;
+    
+}
+.ges-stat-counts-box2-values {
+    text-align: start;
+    
+}
+
+.ges-kanban-image-container {
+    width: 100px;
+    margin-right: 8px;
+}
+
+.ges-kanban-image-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 90px; 
+    height: 90px;
+    border-radius: 15px; 
+    border: 1px solid #dee2e6 !important;
+    background-color: #fff;
+}
+
+.ges-kanban-image-img{
+    flex-shrink: 0;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.ges-kanban-small-btn{
+    font-size: 10px;
+    margin-left:3px;
+    padding: 1px 3px 1px 3px;
+}

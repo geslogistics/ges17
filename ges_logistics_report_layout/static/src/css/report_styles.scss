@@ -1,0 +1,179 @@
+@font-face {
+    font-family: 'Helvetica Bold';
+    src: url('/ges_logistics_report_layout/static/src/fonts/Helvetica-Bold.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Helvetica Light';
+    src: url('/ges_logistics_report_layout/static/src/fonts/Helvetica-Light.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Helvetica Regular';
+    src: url('/ges_logistics_report_layout/static/src/fonts/Helvetica-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Noto Bold';
+    src: url('/ges_logistics_report_layout/static/src/fonts/NotoSansArabic-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Noto Light';
+    src: url('/ges_logistics_report_layout/static/src/fonts/NotoSansArabic-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Noto Regular';
+    src: url('/ges_logistics_report_layout/static/src/fonts/NotoSansArabic-Regular.ttf') format('truetype');
+}
+
+.font_xsmall {
+    font-size: 11px !important;
+}
+.light_font_english {
+    font-family: 'Helvetica Light' !important;
+}
+.light_font_arabic {
+    font-family: 'Noto Light' !important;
+}
+.font_english {
+    font-family: 'Helvetica Regular' !important;
+}
+.font_arabic {
+    font-family: 'Noto Regular' !important;
+}
+
+.drtl {
+    direction: rtl !important;
+}
+.dltr {
+    direction: ltr !important;
+}
+
+.small_right_left_margin {
+    margin-left: 12px !important; 
+    margin-right: 12px !important;
+}
+.pr-1 {
+    padding-right:5px !important;
+}
+.pl-1 {
+    padding-left:5px !important;
+}
+
+.bg-lightgray {
+    background-color: #EDEDED !important;
+}
+
+.bg-darkgray {
+    background-color: #383838 !important;
+    color: #FFF !important;
+}
+
+.report_half_box{
+    background-color: #EDEDED !important;
+    border-radius: 10px !important;
+    padding: 20px !important;
+}
+
+
+.larger_line_height{
+    line-height: 20px !important;
+}
+
+
+.report_th{
+    background-color: #383838 !important;
+    color: #FFF !important;
+}
+
+
+.report_th_start{
+    border-radius: 10px 0 0 0 !important;
+    padding: 10px 0 10px 20px !important;
+}
+
+.report_th_mid{
+    border-radius: 0 !important;
+    padding: 10px 0 10px 0 !important;
+}
+
+.report_th_end{
+    border-radius: 0 10px 0 0 !important;
+    padding: 10px 20px 10px 0 !important;
+}
+
+.report_th_single{
+    border-radius: 10px 10px 0 0 !important;
+    padding: 10px 20px 10px 20px !important;
+}
+
+
+
+.report_td_start{
+    border-top: 1px !important;
+    border-right: 0 !important;
+    border-bottom: 1px !important;
+    border-left: 1px !important;
+    border-style: solid !important;
+    border-color: #EDEDED !important;
+    padding: 10px 0 10px 20px !important;
+}
+
+.report_td_mid{
+    border-top: 1px !important;
+    border-right: 0 !important;
+    border-bottom: 1px !important;
+    border-left: 0 !important;
+    border-style: solid !important;
+    border-color: #EDEDED !important;
+    padding: 10px 0 10px 0 !important;
+}
+
+.report_td_end{
+    border-top: 1px !important;
+    border-right: 1px !important;
+    border-bottom: 1px !important;
+    border-left: 0 !important;
+    border-style: solid !important;
+    border-color: #EDEDED !important;
+    padding: 10px 20px 10px 0 !important;
+}
+
+.report_section{
+    background-color: #EDEDED !important;
+    border-top: 1px !important;
+    border-right: 1px !important;
+    border-bottom: 1px !important;
+    border-left: 1px !important;
+    border-style: solid !important;
+    border-color: #EDEDED !important;
+    padding: 10px 20px 10px 20px !important;
+}
+
+.report_note{
+    border-top: 1px !important;
+    border-right: 1px !important;
+    border-bottom: 1px !important;
+    border-left: 1px !important;
+    border-style: solid !important;
+    border-color: #EDEDED !important;
+    padding: 10px 20px 10px 20px !important;
+}
+
+.report_section_subtotal{
+    border-top: 1px !important;
+    border-right: 1px !important;
+    border-bottom: 1px !important;
+    border-left: 1px !important;
+    border-style: solid !important;
+    border-color: #EDEDED !important;
+    padding: 10px 20px 10px 20px !important;
+}
+
+.report_field_padding_start{
+    padding: 10px 0 10px 20px !important;
+}
+
+.report_field_padding_end{
+    padding: 10px 20px 10px 0 !important
+}

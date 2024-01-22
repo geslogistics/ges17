@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+
+
+
+    <record id="view_partner_form_inherit_partner_application" model="ir.ui.view">
+        <field name="name">
+            res.partner.view.form.inherit.customer.partner.application
+        </field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='warning_tax']" position="attributes">
+                <attribute name="invisible">not same_vat_partner_id</attribute>
+            </xpath>
+            <xpath expr="//div[@name='warning_company']" position="attributes">
+                <attribute name="invisible">not same_company_registry_partner_id</attribute>
+            </xpath>
+            
+            
+            <xpath expr="//div[@name='warning_company']" position="after">
+                <div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_tax"
+                    invisible="not same_pa_vat_partner_id">
+                    A Partner with the same <span>
+                        <span class="o_vat_label">Tax ID</span>
+                    </span> already exists (
+                    <field name="same_pa_vat_partner_id" />
+                    ).
+                </div>
+                <div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_company"
+                    invisible="not same_pa_company_registry_partner_id">
+                    A Partner with the same <span>
+                        <span class="o_vat_label">Company Registry</span>
+                    </span> already exists (
+                    <field name="same_pa_company_registry_partner_id" />
+                    ).
+                </div>
+                <div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_name"
+                    invisible="not same_pa_name_partner_id">
+                    A Partner with the same <span>
+                        <span class="o_vat_label">Name</span>
+                    </span> already exists (
+                    <field name="same_pa_name_partner_id" />
+                    ).
+                </div>
+                <div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_website"
+                    invisible="not same_pa_website_partner_id">
+                    A Partner with the same <span>
+                        <span class="o_vat_label">Website</span>
+                    </span> already exists (
+                    <field name="same_pa_website_partner_id" />
+                    ).
+                </div>
+                <div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_email"
+                    invisible="not same_pa_email_partner_id">
+                    A Partner with the same <span>
+                        <span class="o_vat_label">Email</span>
+                    </span> already exists (
+                    <field name="same_pa_email_partner_id" />
+                    ).
+                </div>
+                <div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_phone"
+                    invisible="not same_pa_phone_partner_id">
+                    A Partner with the same <span>
+                        <span class="o_vat_label">Phone</span>
+                    </span> already exists (
+                    <field name="same_pa_phone_partner_id" />
+                    ).
+                </div>
+                <div class="alert alert-danger oe_edit_only" role="alert" name="warning_partner_mobile"
+                    invisible="not same_pa_mobile_partner_id">
+                    A Partner with the same <span>
+                        <span class="o_vat_label">Mobile</span>
+                    </span> already exists (
+                    <field name="same_pa_mobile_partner_id" />
+                    ).
+                </div>
+            </xpath>
+            <xpath expr="//group[@name='sale']/field[@name='user_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='team_id'][1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <xpath expr="//field[@name='company_registry']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='ref']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//sheet/group[1]" position="attributes">
+                <attribute name="name">main_group</attribute>
+                <attribute name="string">Contact &amp; Business Information</attribute>
+            </xpath>
+            <xpath expr="//sheet/group[1]/group[1]/div[2]" position="attributes">
+                <attribute name="name">vat_field_div</attribute>
+            </xpath>
+            <xpath expr="//field[@name='property_product_pricelist']" position="attributes">
+                <attribute name="domain">pa_domain_property_product_pricelist</attribute>
+                <attribute name="options">{'no_open': True, 'no_quick_create': True, 'no_create': True}</attribute>
+            </xpath>                   
+            <xpath expr="//field[@name='property_product_pricelist']" position="after">
+                <field name="pa_domain_property_product_pricelist" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='property_payment_term_id']" position="attributes">
+                <attribute name="domain">pa_domain_property_payment_term_id</attribute>
+            </xpath>                   
+            <xpath expr="//field[@name='property_payment_term_id']" position="after">
+                <field name="pa_domain_property_payment_term_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='property_supplier_payment_term_id']" position="attributes">
+                <attribute name="domain">pa_domain_property_supplier_payment_term_id</attribute>
+            </xpath>                   
+            <xpath expr="//field[@name='property_supplier_payment_term_id']" position="after">
+                <field name="pa_domain_property_supplier_payment_term_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='property_purchase_currency_id']" position="attributes">
+                <attribute name="domain">pa_domain_property_purchase_currency_id</attribute>
+            </xpath>                   
+            <xpath expr="//field[@name='property_purchase_currency_id']" position="after">
+                <field name="pa_domain_property_purchase_currency_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <group name="kyc_group" string="KYC Basic Data">
+                    <field name="company_registry" string="CR/ID Number" invisible="parent_id"/>
+                    <field name="name_alt_lang" string="Name (AR)"/>
+                    <field name="trade_name" string="Trading Name"/>
+                    <field name="trade_name_alt_lang" string="Trading Name (AR)"/>
+                    <field name="ref" string="Internal Reference"/>
+                </group>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                
+				<div>
+					<field name="current_kyc_state" invisible="1"/>
+					<field name="current_crm_state" invisible="1"/>
+					<field name="current_customer_credit_state" invisible="1"/>
+					<field name="current_customer_strategy_state" invisible="1"/>
+					<field name="current_vrm_state" invisible="1"/>
+					<field name="current_vendor_credit_state" invisible="1"/>
+					<field name="current_vendor_strategy_state" invisible="1"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'kyc', 'crm_app_state': 'new'}"
+					invisible="current_kyc_state != False"
+					string="KYC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'kyc', 'crm_app_state': 'amend'}"
+					invisible="current_kyc_state != 'active'"
+					string="KYC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'kyc', 'crm_app_state': 'review'}"
+					invisible="current_kyc_state != 'expired'"
+					string="KYC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'crm', 'crm_app_state': 'new'}"
+					invisible="current_crm_state != False"
+					string="CRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'crm', 'crm_app_state': 'amend'}"
+					invisible="current_crm_state != 'active'"
+					string="CRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'crm', 'crm_app_state': 'review'}"
+					invisible="current_crm_state != 'expired'"
+					string="CRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'new'}"
+					invisible="current_customer_credit_state != False"
+					string="CC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'amend'}"
+					invisible="current_customer_credit_state != 'active'"
+					string="CC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'review'}"
+					invisible="current_customer_credit_state != 'expired'"
+					string="CC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'new'}"
+					invisible="current_customer_strategy_state != False"
+					string="CS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'amend'}"
+					invisible="current_customer_strategy_state != 'active'"
+					string="CS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'review'}"
+					invisible="current_customer_strategy_state != 'expired'"
+					string="CS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'vrm', 'crm_app_state': 'new'}"
+					invisible="current_vrm_state != False"
+					string="VRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'vrm', 'crm_app_state': 'amend'}"
+					invisible="current_vrm_state != 'active'"
+					string="VRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'vrm', 'crm_app_state': 'review'}"
+					invisible="current_vrm_state != 'expired'"
+					string="VRM"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'new'}"
+					invisible="current_vendor_credit_state != False"
+					string="VC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'amend'}"
+					invisible="current_vendor_credit_state != 'active'"
+					string="VC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'review'}"
+					invisible="current_vendor_credit_state != 'expired'"
+					string="VC"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-none-badge" 
+					context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'new'}"
+					invisible="current_vendor_strategy_state != False"
+					string="VS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-active-badge" 
+					context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'amend'}"
+					invisible="current_vendor_strategy_state != 'active'"
+					string="VS"/>
+
+					<button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+					class="pa-expired-badge" 
+					context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'review'}"
+					invisible="current_vendor_strategy_state != 'expired'"
+					string="VS"/>
+					
+				</div>
+            </xpath>
+            <xpath expr="//group[@name='kyc_group']" position="inside">
+                <xpath expr="//field[@name='perform_vies_validation']" position="move"/>
+                <xpath expr="//label[@for='vat']" position="move"/>
+                <xpath expr="//div[@name='vat_field_div']" position="move"/>
+            </xpath>
+            <xpath expr="//form" position="inside">
+                <field name="current_user_id" invisible="1"/>
+            </xpath>
+            
+
+            <xpath expr="//notebook/page[last()]" position="after">
+                
+                <page string="Applications" invisible="0">
+                    <group>
+                        <group string="KYC">
+                            <field name="current_kyc_id" readonly="1"/>
+                            <field name="current_kyc_state"/>
+                            <field name="current_kyc_expiry_date"/>
+                            <field name="current_kyc_review_date"/>
+                            <field name="duplicate_approved"/>
+                        </group>
+                        <group string="CRM">
+                            <field name="current_crm_id" readonly="1"/>
+                            <field name="current_crm_state"/>
+                            <field name="current_crm_expiry_date"/>
+                            <field name="current_crm_review_date"/>
+                        </group>
+                        <group string="VRM">
+                            <field name="current_vrm_id" readonly="1"/>
+                            <field name="current_vrm_state"/>
+                            <field name="current_vrm_expiry_date"/>
+                            <field name="current_vrm_review_date"/>
+                        </group>
+                        <group string="Customer Credit">
+                            <field name="current_customer_credit_id" readonly="1"/>
+                            <field name="current_customer_credit_state"/>
+                            <field name="current_customer_credit_expiry_date"/>
+                            <field name="current_customer_credit_review_date"/>
+                        </group>
+                        <group string="Vendor Credit">
+                            <field name="current_vendor_credit_id" readonly="1"/>
+                            <field name="current_vendor_credit_state"/>
+                            <field name="current_vendor_credit_expiry_date"/>
+                            <field name="current_vendor_credit_review_date"/>
+                        </group>
+                        <group string="Customer Strategy">
+                            <field name="current_customer_strategy_id" readonly="1"/>
+                            <field name="current_customer_strategy_state"/>
+                            <field name="current_customer_strategy_expiry_date"/>
+                            <field name="current_customer_strategy_review_date"/>
+                        </group>
+                        <group string="Vendor Strategy">
+                            <field name="current_vendor_strategy_id" readonly="1"/>
+                            <field name="current_vendor_strategy_state"/>
+                            <field name="current_vendor_strategy_expiry_date"/>
+                            <field name="current_vendor_strategy_review_date"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            
+        </field>
+    </record>
+
+    <record id="res_partner_kanban_view" model="ir.ui.view">
+        <field name="name">
+            res.partner.view.kanban.inherit.partner.application
+        </field>
+        <field name="model">res.partner</field>
+        <field name="priority">999</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('o_kanban_record_bottom')]" position="attributes">
+                <t groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs">
+                    <attribute name="style">align-items: flex-end;</attribute>
+                </t>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="attributes">
+                <t groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs">
+                    <attribute name="style">flex-wrap: wrap;</attribute>
+                </t>
+            </xpath>
+            
+            
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
+                <t groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs">
+                    
+                    <div style="width: 100%">
+                        <field name="current_kyc_state" invisible="1"/>
+                        <field name="current_crm_state" invisible="1"/>
+                        <field name="current_customer_credit_state" invisible="1"/>
+                        <field name="current_customer_strategy_state" invisible="1"/>
+                        <field name="current_vrm_state" invisible="1"/>
+                        <field name="current_vendor_credit_state" invisible="1"/>
+                        <field name="current_vendor_strategy_state" invisible="1"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-none-badge" 
+                        context="{'crm_app_type': 'kyc', 'crm_app_state': 'new'}"
+                        invisible="current_kyc_state != False"
+                        string="KYC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-active-badge" 
+                        context="{'crm_app_type': 'kyc', 'crm_app_state': 'amend'}"
+                        invisible="current_kyc_state != 'active'"
+                        string="KYC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-expired-badge" 
+                        context="{'crm_app_type': 'kyc', 'crm_app_state': 'review'}"
+                        invisible="current_kyc_state != 'expired'"
+                        string="KYC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-none-badge" 
+                        context="{'crm_app_type': 'crm', 'crm_app_state': 'new'}"
+                        invisible="current_crm_state != False"
+                        string="CRM"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-active-badge" 
+                        context="{'crm_app_type': 'crm', 'crm_app_state': 'amend'}"
+                        invisible="current_crm_state != 'active'"
+                        string="CRM"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-expired-badge" 
+                        context="{'crm_app_type': 'crm', 'crm_app_state': 'review'}"
+                        invisible="current_crm_state != 'expired'"
+                        string="CRM"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-none-badge" 
+                        context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'new'}"
+                        invisible="current_customer_credit_state != False"
+                        string="CC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-active-badge" 
+                        context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'amend'}"
+                        invisible="current_customer_credit_state != 'active'"
+                        string="CC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-expired-badge" 
+                        context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'review'}"
+                        invisible="current_customer_credit_state != 'expired'"
+                        string="CC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-none-badge" 
+                        context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'new'}"
+                        invisible="current_customer_strategy_state != False"
+                        string="CS"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-active-badge" 
+                        context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'amend'}"
+                        invisible="current_customer_strategy_state != 'active'"
+                        string="CS"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-expired-badge" 
+                        context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'review'}"
+                        invisible="current_customer_strategy_state != 'expired'"
+                        string="CS"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-none-badge" 
+                        context="{'crm_app_type': 'vrm', 'crm_app_state': 'new'}"
+                        invisible="current_vrm_state != False"
+                        string="VRM"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-active-badge" 
+                        context="{'crm_app_type': 'vrm', 'crm_app_state': 'amend'}"
+                        invisible="current_vrm_state != 'active'"
+                        string="VRM"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-expired-badge" 
+                        context="{'crm_app_type': 'vrm', 'crm_app_state': 'review'}"
+                        invisible="current_vrm_state != 'expired'"
+                        string="VRM"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-none-badge" 
+                        context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'new'}"
+                        invisible="current_vendor_credit_state != False"
+                        string="VC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-active-badge" 
+                        context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'amend'}"
+                        invisible="current_vendor_credit_state != 'active'"
+                        string="VC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-expired-badge" 
+                        context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'review'}"
+                        invisible="current_vendor_credit_state != 'expired'"
+                        string="VC"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-none-badge" 
+                        context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'new'}"
+                        invisible="current_vendor_strategy_state != False"
+                        string="VS"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-active-badge" 
+                        context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'amend'}"
+                        invisible="current_vendor_strategy_state != 'active'"
+                        string="VS"/>
+
+                        <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                        class="pa-expired-badge" 
+                        context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'review'}"
+                        invisible="current_vendor_strategy_state != 'expired'"
+                        string="VS"/>
+                        
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_partner_search_application_inherited" model="ir.ui.view">
+        <field name="name">
+            res.partner.view.search.inherit.application
+        </field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/group" position="inside">
+                <filter string="KYC" name="active_kyc" domain="[('current_kyc_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <separator groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <filter string="Active Customer" name="active_customer" domain="[('current_kyc_id','!=',False),('current_crm_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <filter string="CRM" name="active_crm" domain="[('current_crm_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <filter string="Customer Credit" name="active_customer_credit" domain="[('current_customer_credit_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <filter string="Customer Strategy" name="active_customer_strategy" domain="[('current_customer_strategy_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <separator groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <filter string="Active Vendor" name="active_vendor" domain="[('current_kyc_id','!=',False),('current_vrm_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <filter string="VRM" name="active_vrm" domain="[('current_vrm_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <filter string="Vendor Credit" name="active_vendor_credit" domain="[('current_vendor_credit_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+                <filter string="Vendor Strategy" name="active_vendor_strategy" domain="[('current_vendor_strategy_id','!=',False)]" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_tree_partner_application_inherited" model="ir.ui.view">
+        <field name="name">res.partner.view.tree.inherit.partner.application</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="priority">17</field>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//tree" position="inside">
+                <!--<field name="active_application_ids" optional="show" widget="many2many_tags" options="{'color_field': 'color'}" context="{'show_type': 1}" groups="ges_logistics_application_partner.group_partner_application_admin, ges_logistics_application_partner.group_partner_application_user_own_docs, ges_logistics_application_partner.group_partner_application_user_team_docs, ges_logistics_application_partner.group_partner_application_user_all_docs"/>-->
+                <field name="current_kyc_state" column_invisible="1"/>
+                <field name="current_crm_state" column_invisible="1"/>
+                <field name="current_customer_credit_state" column_invisible="1"/>
+                <field name="current_customer_strategy_state" column_invisible="1"/>
+                <field name="current_vrm_state" column_invisible="1"/>
+                <field name="current_vendor_credit_state" column_invisible="1"/>
+                <field name="current_vendor_strategy_state" column_invisible="1"/>
+                
+                
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-none-badge" 
+                context="{'crm_app_type': 'kyc', 'crm_app_state': 'new'}"
+                invisible="current_kyc_state != False"
+                string="KYC"/>
+                
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-active-badge" 
+                context="{'crm_app_type': 'kyc', 'crm_app_state': 'amend'}"
+                invisible="current_kyc_state != 'active'"
+                string="KYC"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-expired-badge" 
+                context="{'crm_app_type': 'kyc', 'crm_app_state': 'review'}"
+                invisible="current_kyc_state != 'expired'"
+                string="KYC"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-none-badge" 
+                context="{'crm_app_type': 'crm', 'crm_app_state': 'new'}"
+                invisible="current_crm_state != False"
+                string="CRM"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-active-badge" 
+                context="{'crm_app_type': 'crm', 'crm_app_state': 'amend'}"
+                invisible="current_crm_state != 'active'"
+                string="CRM"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-expired-badge" 
+                context="{'crm_app_type': 'crm', 'crm_app_state': 'review'}"
+                invisible="current_crm_state != 'expired'"
+                string="CRM"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-none-badge" 
+                context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'new'}"
+                invisible="current_customer_credit_state != False"
+                string="CC"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-active-badge" 
+                context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'amend'}"
+                invisible="current_customer_credit_state != 'active'"
+                string="CC"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-expired-badge" 
+                context="{'crm_app_type': 'customer_credit', 'crm_app_state': 'review'}"
+                invisible="current_customer_credit_state != 'expired'"
+                string="CC"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-none-badge" 
+                context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'new'}"
+                invisible="current_customer_strategy_state != False"
+                string="CS"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-active-badge" 
+                context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'amend'}"
+                invisible="current_customer_strategy_state != 'active'"
+                string="CS"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-expired-badge" 
+                context="{'crm_app_type': 'customer_strategy', 'crm_app_state': 'review'}"
+                invisible="current_customer_strategy_state != 'expired'"
+                string="CS"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-none-badge" 
+                context="{'crm_app_type': 'vrm', 'crm_app_state': 'new'}"
+                invisible="current_vrm_state != False"
+                string="VRM"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-active-badge" 
+                context="{'crm_app_type': 'vrm', 'crm_app_state': 'amend'}"
+                invisible="current_vrm_state != 'active'"
+                string="VRM"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-expired-badge" 
+                context="{'crm_app_type': 'vrm', 'crm_app_state': 'review'}"
+                invisible="current_vrm_state != 'expired'"
+                string="VRM"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-none-badge" 
+                context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'new'}"
+                invisible="current_vendor_credit_state != False"
+                string="VC"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-active-badge" 
+                context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'amend'}"
+                invisible="current_vendor_credit_state != 'active'"
+                string="VC"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-expired-badge" 
+                context="{'crm_app_type': 'vendor_credit', 'crm_app_state': 'review'}"
+                invisible="current_vendor_credit_state != 'expired'"
+                string="VC"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-none-badge" 
+                context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'new'}"
+                invisible="current_vendor_strategy_state != False"
+                string="VS"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-active-badge" 
+                context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'amend'}"
+                invisible="current_vendor_strategy_state != 'active'"
+                string="VS"/>
+
+                <button name="initiate_partner_application" title="Initiate Partner Application" type="object" 
+                class="pa-expired-badge" 
+                context="{'crm_app_type': 'vendor_strategy', 'crm_app_state': 'review'}"
+                invisible="current_vendor_strategy_state != 'expired'"
+                string="VS"/>
+                        
+            </xpath>
+        </field>
+    </record>
+
+   
+
+    
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="logistics_popup_view" model="ir.ui.view">
+            <field name="name">logistics.popup.view</field>
+            <field name="model">logistics.popup</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="name" readonly="1" invisible="name == False" />
+                    <field name="message" readonly="1"/>
+                    <footer>
+                        <button name="cancel" string="OK" special="cancel" class="btn-primary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="logistics_popup_action" model="ir.actions.act_window">
+            <field name="name">Popup</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">logistics.popup</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+
+</odoo>
+
