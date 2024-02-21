@@ -167,14 +167,14 @@
         <field name="domain_force">[('move_id.move_type', 'in', ('out_invoice', 'out_refund')),('move_id.partner_id.team_id','in',(user.sale_team_id.id,False))]</field>
         <field name="groups" eval="[(4, ref('ges_logistics_application_partner.group_sale_salesman_team_docs'))]"/>
     </record>
-
+    <!--
     <record id="account_invoice_send_rule_see_team" model="ir.rule">
         <field name="name">Team Invoice Send and Print</field>
         <field name="model_id" ref="account.model_account_move_send"/>
         <field name="domain_force">[('invoice_ids.move_type', 'in', ('out_invoice', 'out_refund')), ('invoice_ids.partner_id.team_id','in',(user.sale_team_id.id,False))]</field>
         <field name="groups" eval="[(4, ref('ges_logistics_application_partner.group_sale_salesman_team_docs'))]"/>
     </record>
-
+    -->
     <record id="crm_rule_team_lead" model="ir.rule">
         <field name="name">Team Leads</field>
         <field ref="crm.model_crm_lead" name="model_id"/>
