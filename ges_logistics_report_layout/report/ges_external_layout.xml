@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="external_layout_ges">
+        <div t-attf-class="header o_ges_header o_company_#{company.id}_layout" t-att-style="report_header_style">
+            <div class="row light_font_english font_xsmall">
+                <div class="col-3 mb4">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 55px;" alt="Logo"/>
+                </div>
+                <div class="col-9 text-end text-muted mt-1" name="company_address">
+                    <ul class="list-unstyled" name="company_address_list">
+                        <li t-if="company.is_company_details_empty">
+                            <div name="name_alt_lang_address">
+                                <span t-field="company.partner_id.name_alt_lang" class="light_font_arabic"/>
+                            </div>
+                            <div name="name_address">
+                                <span t-field="company.partner_id.name"/>
+                            </div>
+                            <div name="street_address">
+                                <span t-field="company.partner_id.street"/>
+                                <span> </span>
+                                <span t-field="company.partner_id.street2"/>
+                            </div>
+                            <div name="city_zip_state_country_address">
+                                <span t-if="company.partner_id.city" t-esc="company.with_context(lang=company.partner_id.lang).partner_id.city"/>
+                                <span> </span>
+                                <span t-field="company.partner_id.zip"/>
+                                <span> </span>
+                                <span t-if="company.partner_id.state_id" t-esc="company.with_context(lang=company.partner_id.lang).partner_id.state_id.name"/>
+                                <span> </span>
+                                <span t-if="company.partner_id.country_id" t-esc="company.with_context(lang=company.partner_id.lang).partner_id.country_id.name"/>
+                            </div>
+                            <div name="vat_address" t-if="not forced_vat">
+                                <t t-esc="company.with_context(lang=company.partner_id.lang).country_id.vat_label or 'Tax ID'">Tax ID</t>:
+                                <span t-field="company.partner_id.vat">US12345671</span>
+                            </div>
+                        </li>
+                        <li t-else="">
+                            <span t-field="company.company_details">
+                                <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                                    <strong>Company details block</strong>
+                                    <div>Contains the company details.</div>
+                                </div>
+                            </span>
+                        </li>
+                        <li t-if="not forced_vat"/>
+                        <li t-else="">
+                            <t t-esc="company.country_id.vat_label or 'Tax ID'">Tax ID</t>:
+                            <span t-esc="forced_vat">US12345671</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-9 text-end light_font_english font_xsmall" style="margin-top:22px;" t-if="company.report_header" t-field="company.report_header" name="moto">Company tagline</div>
+            </div>
+            <div t-if="company.logo or company.report_header" class="row zero_min_height">
+                <div class="col-12">
+                </div>
+            </div>
+            
+        </div>
+
+        <div t-attf-class="article o_report_layout_ges o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div class="pt-5" t-if="not force_hide_address">
+                <!-- This div ensures that the address is not cropped by the header. -->
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+
+        <div t-attf-class="footer text-muted light_font_english font_xsmall o_ges_footer o_company_#{company.id}_layout">
+            <!--
+            <div class="row">
+                <div class="col-6">
+                    <ul class="list-inline mb4">
+                        <div t-field="company.report_footer"/>
+                    </ul>
+                </div>
+                <div t-if="report_type == 'pdf' and display_name_in_footer" class="col-6 text-center text-muted">
+                    <span t-out="o.name">(document name)</span>
+                </div>
+            </div>
+            -->
+            <div class="row" style="border-top: 1px solid gray;">
+                <div name="footer_contacts" class="col-9 mt-2 text-muted text-start">
+                    <span t-if="company.partner_id.trade_name">
+                        <span t-field="company.partner_id.trade_name"/>
+                        <span t-esc="' | '" class="small_right_left_margin"/>
+                    </span>
+                    <!--
+                    <span t-if="company.partner_id.trade_name_alt_lang">
+                        <span t-field="company.partner_id.trade_name_alt_lang" class="light_font_arabic"/> | 
+                    </span>
+                    -->
+                    <span t-if="company.partner_id.company_registry">
+                        <span t-esc="'C.R. # ' + str(company.partner_id.company_registry)"/>
+                        <span t-esc="' | '" class="small_right_left_margin"/>
+                    </span>
+                    <span t-if="company.partner_id.phone">
+                        <span t-field="company.partner_id.phone"/>
+                        <span t-esc="' | '" class="small_right_left_margin"/>
+                    </span>
+                    <span t-if="company.partner_id.email">
+                        <span t-field="company.partner_id.email"/>
+                        <span t-esc="' | '" class="small_right_left_margin"/>
+                    </span>
+                    <span t-if="company.partner_id.website">
+                        <span t-field="company.partner_id.website"/>
+                    </span>
+                </div>
+                <div t-if="report_type == 'pdf'" class="col-3  mt-2 text-muted text-end">
+                    Page: <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    
+
+    <data noupdate="1">
+        <record id="report_layout_ges" model="report.layout">
+            <field name="name">GES Layout</field>
+            <field name="sequence">6</field>
+            <field name="view_id" ref="ges_logistics_report_layout.external_layout_ges"/>
+        </record>
+    </data>
+   
+</odoo>
+
+

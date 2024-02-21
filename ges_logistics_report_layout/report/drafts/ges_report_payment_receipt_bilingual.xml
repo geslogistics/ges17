@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_payment_receipt_document">
+        <t t-call="web.external_layout">
+            <t t-set="force_hide_address" t-value="True"/>
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <t t-set="values" t-value="o._get_payment_receipt_report_values()"/>
+            <div class="page">
+
+                <h3 class="mt-4">
+                    <div class="row">
+                        <div class="col-4">
+                            <span>Payment Receipt</span>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span t-field="o.name"/>
+                        </div>
+                        <div class="col-4 drtl font_arabic">
+                            <span>إيصال دفع</span>
+                        </div>
+                    </div>
+                </h3>
+
+                <table width="100%" class="font_xsmall">
+                    <tr>
+                        <td width="49%" class="report_half_box font_xsmall larger_line_height">
+                            <div id="informations">
+                                <div class="row" t-if="o.date" name="date">
+                                    <div class="col-3">
+                                        <strong style="white-space:nowrap">Payment Date:</strong>
+                                    </div>
+                                    <div class="col-6 text-center">
+                                        <span t-field="o.date"/>
+                                    </div>
+                                    <div class="col-3 drtl font_arabic">
+                                        <strong style="white-space:nowrap">تاريخ الدفع:</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="row" t-if="values['display_payment_method'] and o.payment_method_id" name="payment_method">
+                                    <div class="col-3">
+                                        <strong style="white-space:nowrap">Payment Method:</strong>
+                                    </div>
+                                    <div class="col-6 text-center">
+                                        <span t-field="o.payment_method_id.name"/>
+                                    </div>
+                                    <div class="col-3 drtl font_arabic">
+                                        <strong style="white-space:nowrap">طريقة الدفع:</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="row" t-if="o.amount">
+                                    <div class="col-3">
+                                        <strong style="white-space:nowrap">Payment Amount:</strong>
+                                    </div>
+                                    <div class="col-6 text-center">
+                                        <span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </div>
+                                    <div class="col-3 drtl font_arabic">
+                                        <strong style="white-space:nowrap">المبلغ:</strong>
+                                    </div>
+                                </div>
+                                <div class="row" t-if="o.ref" name="reference">
+                                    <div class="col-3">
+                                        <strong style="white-space:nowrap">Reference:</strong>
+                                    </div>
+                                    <div class="col-6 text-center">
+                                        <span t-field="o.ref"/>
+                                    </div>
+                                    <div class="col-3 drtl font_arabic">
+                                        <strong style="white-space:nowrap">المرجع:</strong>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </td>
+                        <td width="2%">
+                        </td>
+                        <td width="49%" class="report_half_box">      
+                            <div class="row">
+                                <div class="row" t-if="o.partner_type">
+                                    <div class="col-2" t-if="o.partner_type == 'customer'">
+                                        <strong style="white-space:nowrap">Customer:</strong>
+                                    </div>
+                                    <div class="col-2" t-else="o.partner_type == 'supplier'">
+                                        <strong style="white-space:nowrap">Vendor:</strong>
+                                    </div>
+                                    <div class="col-8 text-center">
+                                        <span t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' style="display: inline-block"/>
+                                        <div t-if="o.partner_id.vat" class="mt16">
+                                            <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                            <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 drtl font_arabic" t-if="o.partner_type == 'customer'">
+                                        <strong style="white-space:nowrap">العميل:</strong>
+                                    </div>
+                                    <div class="col-2 drtl font_arabic" t-else="o.partner_type == 'supplier'">
+                                        <strong style="white-space:nowrap">المورد:</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+
+                <table class="font_xsmall table table-sm o_main_table table-borderless mt-4" name="invoices" t-if="values['display_invoices']">
+                    
+                    <t t-set="partials" t-value="o.move_id._get_reconciled_invoices_partials()[0]"/>
+                    <t t-set="invoices" t-value="{partial[2].move_id for partial in partials}"/>
+                    <!-- Check if invoices include different currencies -->
+                    <t t-foreach="invoices" t-as="inv">
+                        <t t-if="any(inv.currency_id != par[2].currency_id for par in inv._get_reconciled_invoices_partials()[0])" t-set="otherCurrency" t-value="True"/>
+                    </t>
+
+                    <thead>
+                        <tr class="bg-darkgray">
+                            <t t-set="colspan" t-value="6"/>
+                            <th class="report_th_start text-start">
+                                <span class="font_arabic">تاريخ الفاتورة</span>
+                                <br/>
+                                <span>Invoice Date</span>
+                            </th>
+                            <th class="report_th_mid text-start">
+                                <span class="font_arabic">رقم الفاتورة</span>
+                                <br/>
+                                <span>Invoice Number</span>
+                            </th>
+                            <th class="report_th_mid text-start">
+                                <span class="font_arabic">المرجع</span>
+                                <br/>
+                                <span>Reference</span>
+                            </th>
+                            <th t-if="otherCurrency" class="report_th_mid text-end">
+                                <span class="font_arabic">المبلغ بالعملة</span>
+                                <br/>
+                                <span>Amount In Currency</span>
+                            </th>
+                            <th class="report_th_end text-end">
+                                <span class="font_arabic drtl">المبلغ</span>
+                                <br/>
+                                <span>Amount</span>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <t t-foreach="invoices" t-as="inv">
+                            <!-- MOVE -->
+                            <t t-if="inv.move_type != 'entry'">
+                                <tr>
+                                    <td class="report_td_start text-start">
+                                        <span t-field="inv.invoice_date">2023-01-01</span>
+                                    </td>
+                                    <td class="report_td_mid text-start">
+                                        <span t-field="inv.name">INV001</span>
+                                    </td>
+                                    <td class="report_td_mid text-start">
+                                        <span t-field="inv.ref">Sample Ref</span>
+                                    </td>
+                                    <td class="report_td_mid text-start" t-if="otherCurrency"/>
+                                    <td class="report_td_end text-end">
+                                        <span t-field="inv.amount_total">100.00 USD</span>
+                                    </td>
+                                </tr>
+                                <!-- PAYMENTS/REVERSALS -->
+                                <tr t-foreach="inv._get_reconciled_invoices_partials()[0]" t-as="par">
+                                    <t t-set="payment" t-value="par[2].move_id"/>
+                                    <td class="report_td_start text-start">
+                                        <span t-field="payment.date">2023-01-05</span>
+                                    </td>
+                                    <td class="report_td_mid text-start">
+                                        <span t-field="payment.name">PAY001</span>
+                                    </td>
+                                    <td class="report_td_mid text-start">
+                                        <span t-field="payment.ref">Payment Ref</span>
+                                    </td>
+                                    <t t-set="amountPayment" t-value="-payment.amount_total"/>
+                                    <t t-set="amountInvoice" t-value="-par[1]"/>
+                                    <t t-set="currencyPayment" t-value="payment.currency_id"/>
+                                    <t t-set="currencyInvoice" t-value="inv.currency_id"/>
+                                    <!-- Fill the column "Amount In Currency" only if necessary -->
+                                    <td t-if="otherCurrency" class="report_td_mid text-end">
+                                        <span t-if="currencyPayment != currencyInvoice" t-out="amountPayment" t-options="{'widget': 'monetary', 'display_currency': currencyPayment}">50.00 EUR</span>
+                                    </td>
+                                    <td class="report_td_end text-end">
+                                        <span t-out="amountInvoice" t-options="{'widget': 'monetary', 'display_currency': currencyInvoice}">25.00 USD</span>
+                                    </td>
+                                </tr>
+                                <!-- BALANCE -->
+                                <tr>
+                                    <td class="report_td_start text-start"/>
+                                    <td class="report_td_mid text-start">
+                                        <strong>
+                                            <span>Due Amount for / </span> 
+                                            <span class="light_font_arabic">المبلغ المستحق لـ </span>
+                                            <span t-field="inv.name">INV001</span>
+                                        </strong>
+                                    </td>
+                                    <td class="report_td_mid text-start"/>
+                                    <td t-if="otherCurrency" class="report_td_mid text-start"/>
+                                    <td class="report_td_end text-end">
+                                        <strong>
+                                            <span t-field="inv.amount_residual">25.0 USD</span>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            <div class="oe_structure"></div>
+        </t>
+    </template>
+
+    <template id="report_payment_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang or o.company_id.partner_id.lang"/>
+                <t t-call="ges_logistics_report_layout.report_payment_receipt_document" t-lang="lang"/>
+            </t>
+        </t>
+    </template>
+</odoo>

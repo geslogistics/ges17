@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+        <!--Applications--><!--Applications-->
+        <record id="application_partners_applications_menu" model="ir.ui.menu">
+            <field name="name">Partner Applications</field>
+            <field name="sequence">10</field>
+            <field name="parent_id" ref="ges_logistics_application_base.application_partners_top_menu"/>
+            <field name="action" ref="application_partner_act_window"/>
+        </record>
+
+
+        <record id="sale.report_sales_team" model="ir.ui.menu">
+            <field name="active">0</field>
+        </record>
+
+        <record id="sale.sales_team_config" model="ir.ui.menu">
+            <field name="active">0</field>
+        </record>
+
+        <record id="sale.menu_reporting_salespeople" model="ir.ui.menu">
+            <field name="active">0</field>
+        </record>
+
+    </data>
+</odoo>

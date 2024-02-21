@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--Logistics Ticket-->
+        <record id="logistics_ticket_root_menu" model="ir.ui.menu">
+            <field name="name">Tickets</field>
+            <field name="sequence">252</field>
+            <field name="web_icon">ges_logistics,static/description/icon.png</field>
+        </record>
+        <!--Logistics Ticket - Tickets -->
+        <record id="ticket_ticket_top_menu" model="ir.ui.menu">
+            <field name="name">Tickets</field>
+            <field name="sequence">20</field>
+            <field name="parent_id" ref="logistics_ticket_root_menu"/>
+        </record>
+        <record id="ticket_ticket_ticket_menu" model="ir.ui.menu">
+            <field name="name">Tickets</field>
+            <field name="sequence">10</field>
+            <field name="parent_id" ref="ticket_ticket_top_menu"/>
+            <field name="action" ref="ticket_act_window"/>
+        </record>
+
+    </data>
+</odoo>

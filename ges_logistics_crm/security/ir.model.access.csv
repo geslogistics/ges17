@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_gescrm_lead,access.gescrm.lead,model_gescrm_lead,base.group_user,1,1,1,1
+access_gescrm_lead_stage,access.gescrm.lead.stage,model_gescrm_lead_stage,base.group_user,1,1,1,1
+
+
+access_gescrm_lead_wizard,access.gescrm.lead.wizard,model_gescrm_lead_wizard,base.group_user,1,1,1,1
+
+
+

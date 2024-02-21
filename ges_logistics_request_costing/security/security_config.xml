@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Add new user group-->
+<odoo>
+    
+    <record model="ir.module.category" id="module_request_costings">
+        <field name="name">Costing Requests Group</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="group_request_costing_user_own_docs" model="res.groups">
+        <field name="name">Costing Requests User - Own Documents</field>
+        <field name="category_id" ref="module_request_costings" />
+    </record>
+    <record id="group_request_costing_user_team_docs" model="res.groups">
+        <field name="name">Costing Requests User - Team Documents</field>
+        <field name="implied_ids" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_own_docs'))]"/>
+        <field name="category_id" ref="module_request_costings" />
+    </record>
+    <record id="group_request_costing_user_all_docs" model="res.groups">
+        <field name="name">Costing Requests User - All Documents</field>
+        <field name="implied_ids" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_team_docs'))]"/>
+        <field name="category_id" ref="module_request_costings" />
+    </record>
+
+    <record id="group_request_costing_admin" model="res.groups">
+        <field name="name">Costing Requests Admin</field>
+        <field name="implied_ids" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_all_docs'))]"/>
+        <field name="category_id" ref="module_request_costings" />
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+    
+    <record id="rule_request_costing_all_docs" model="ir.rule">
+        <field name="name">costing.request create/edit all docs</field>
+        <field name="model_id" ref="model_request_costing" />
+        <field name="global" eval="False" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_all_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+
+    <record id="rule_request_costing_team_docs" model="ir.rule">
+        <field name="name">costing.request create/edit team docs</field>
+        <field name="model_id" ref="model_request_costing" />
+        <field name="global" eval="False" />
+        <field name="domain_force">['|','&amp;',('requester_ou_id','!=',False),('requester_ou_id', 'in', user.operating_unit_ids.ids),'&amp;',('assigned_ou_ids','!=',False),('assigned_ou_ids', 'in', user.operating_unit_ids.ids)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_team_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+   
+    <record id="rule_request_costing_own_docs" model="ir.rule">
+        <field name="name">costing.request create/edit own docs</field>
+        <field name="model_id" ref="model_request_costing" />
+        <field name="global" eval="False" />
+        <field name="domain_force">['|','&amp;',('requester_user_id','!=',False),('requester_user_id', '=', user.id),'&amp;',('assigned_user_ids','!=',False),('assigned_user_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_own_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+
+
+
+
+
+    <record id="rule_request_costing_item_all_docs" model="ir.rule">
+        <field name="name">costing.request.item create/edit all docs</field>
+        <field name="model_id" ref="model_request_costing_item" />
+        <field name="global" eval="False" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_all_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+
+    <record id="rule_request_costing_item_team_docs" model="ir.rule">
+        <field name="name">costing.request.item create/edit team docs</field>
+        <field name="model_id" ref="model_request_costing_item" />
+        <field name="global" eval="False" />
+        <field name="domain_force">['|','&amp;',('request_id.requester_ou_id','!=',False),('request_id.requester_ou_id', 'in', user.operating_unit_ids.ids),'&amp;',('request_id.assigned_ou_ids','!=',False),('request_id.assigned_ou_ids', 'in', user.operating_unit_ids.ids)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_team_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+
+    <record id="rule_request_costing_item_own_docs" model="ir.rule">
+        <field name="name">costing.request.item create/edit own docs</field>
+        <field name="model_id" ref="model_request_costing_item" />
+        <field name="global" eval="False" />
+        <field name="domain_force">['|','&amp;',('request_id.requester_user_id','!=',False),('request_id.requester_user_id', '=', user.id),'&amp;',('request_id.assigned_user_ids','!=',False),('request_id.assigned_user_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_request_costing.group_request_costing_user_own_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+
+    <!-- ticket rules -->
+    
+
+    <record id="rule_cost_req_ticket_team_docs" model="ir.rule">
+        <field name="name">costing request ticket create/edit team docs</field>
+        <field name="model_id" ref="model_ticket" />
+        <field name="global" eval="False" />
+        <field name="domain_force">['|','&amp;',('request_costing_id.partner_id.sales_ou_id','!=',False),('request_costing_id.partner_id.sales_ou_id','in',user.operating_unit_sales_ids.ids),'&amp;',('request_costing_id.partner_id.procurement_ou_id','!=',False),('request_costing_id.partner_id.procurement_ou_id','in',user.operating_unit_procurement_ids.ids)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_ticket.group_ticket_user_team_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+   
+    <record id="rule_cost_req_ticket_own_docs" model="ir.rule">
+        <field name="name">costing request ticket create/edit own docs</field>
+        <field name="model_id" ref="model_ticket" />
+        <field name="global" eval="False" />
+        <field name="domain_force">['|','|','|',('requester_user_id','=',user.id),('user_id','=',user.id),'&amp;',('request_costing_id.partner_id.sales_user_id','!=',False),('request_costing_id.partner_id.sales_user_id', '=', user.id),'&amp;',('request_costing_id.partner_id.procurement_user_id','!=',False),('request_costing_id.partner_id.procurement_user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_ticket.group_ticket_user_own_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+
+    <record id="rule_cost_req_item_ticket_team_docs" model="ir.rule">
+        <field name="name">costing request item ticket create/edit team docs</field>
+        <field name="model_id" ref="model_ticket" />
+        <field name="global" eval="False" />
+        <field name="domain_force">['|','&amp;',('request_costing_item_id.partner_id.sales_ou_id','!=',False),('request_costing_item_id.partner_id.sales_ou_id','in',user.operating_unit_sales_ids.ids),'&amp;',('request_costing_item_id.partner_id.procurement_ou_id','!=',False),('request_costing_item_id.partner_id.procurement_ou_id','in',user.operating_unit_procurement_ids.ids)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_ticket.group_ticket_user_team_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+   
+    <record id="rule_cost_req_item_ticket_own_docs" model="ir.rule">
+        <field name="name">costing request item ticket create/edit own docs</field>
+        <field name="model_id" ref="model_ticket" />
+        <field name="global" eval="False" />
+        <field name="domain_force">['|','|','|',('requester_user_id','=',user.id),('user_id','=',user.id),'&amp;',('request_costing_item_id.partner_id.sales_user_id','!=',False),('request_costing_item_id.partner_id.sales_user_id', '=', user.id),'&amp;',('request_costing_item_id.partner_id.procurement_user_id','!=',False),('request_costing_item_id.partner_id.procurement_user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('ges_logistics_ticket.group_ticket_user_own_docs'))]" />
+        <field eval="0" name="perm_unlink" />
+        <field eval="1" name="perm_write" />
+        <field eval="1" name="perm_read" />
+        <field eval="1" name="perm_create" />
+    </record>
+
+
+
+
+    
+   
+
+
+
+</odoo>
