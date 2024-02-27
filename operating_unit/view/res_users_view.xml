@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_users_form" model="ir.ui.view">
+        <field name="name">res.users.form</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']/group[1]" position="after">
+                <group string="Allowed Units" groups="operating_unit.group_multi_operating_unit">
+                    <field name="operating_unit_ids" widget="many2many_tags" />
+                    <field name="default_operating_unit_id" domain="[('id','in',operating_unit_ids)]" invisible="1"/>
+                    <field name="operating_unit_sales_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_sales_id" domain="[('id','in',operating_unit_sales_ids)]" invisible="not operating_unit_sales_ids"/>
+                    <field name="operating_unit_sales_ops_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_sales_ops_id" domain="[('id','in',operating_unit_sales_ops_ids)]" invisible="not operating_unit_sales_ops_ids"/>
+                    <field name="operating_unit_procurement_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_procurement_id" domain="[('id','in',operating_unit_procurement_ids)]" invisible="not operating_unit_procurement_ids"/>
+                    <field name="operating_unit_procurement_ops_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_procurement_ops_id" domain="[('id','in',operating_unit_procurement_ops_ids)]" invisible="not operating_unit_procurement_ops_ids"/>
+                    <field name="operating_unit_marketing_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_marketing_id" domain="[('id','in',operating_unit_marketing_ids)]" invisible="not operating_unit_marketing_ids"/>
+                    <field name="operating_unit_hr_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_hr_id" domain="[('id','in',operating_unit_hr_ids)]" invisible="not operating_unit_hr_ids"/>
+                    <field name="operating_unit_it_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_it_id" domain="[('id','in',operating_unit_it_ids)]" invisible="not operating_unit_it_ids"/>
+                    <field name="operating_unit_marketing_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_marketing_id" domain="[('id','in',operating_unit_marketing_ids)]" invisible="not operating_unit_marketing_ids"/>
+                    <field name="operating_unit_executive_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_executive_id" domain="[('id','in',operating_unit_executive_ids)]" invisible="not operating_unit_executive_ids"/>
+                    <field name="operating_unit_virtual_ids" widget="many2many_tags" invisible="1" />
+                    <field name="default_operating_unit_virtual_id" domain="[('id','in',operating_unit_virtual_ids)]" invisible="1"/>
+
+                    <!--
+                    <field name="operating_unit_sales_ids" widget="many2many_tags" />
+                    <field name="operating_unit_procurement_ids" widget="many2many_tags" />
+                    <field name="operating_unit_marketing_ids" widget="many2many_tags" />
+                    <field name="operating_unit_hr_ids" widget="many2many_tags" />
+                    <field name="operating_unit_it_ids" widget="many2many_tags" />
+                    <field name="operating_unit_executive_ids" widget="many2many_tags" />
+                    <field name="operating_unit_virtual_ids" widget="many2many_tags" />
+                    -->
+                    
+                    
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

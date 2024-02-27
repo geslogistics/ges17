@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Actions-->
+        <record id="ticket_act_window" model="ir.actions.act_window">
+            <field name="name">Tickets</field>
+            <field name="res_model">ticket</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+
+        <!--Views-->
+
+        <record id="ticket_list_view" model="ir.ui.view">
+            <field name="name">ticket.list.view</field>
+            <field name="model">ticket</field>
+            <field name="arch" type="xml">
+                <tree create="0">
+                    <field name="action"/>
+                    <field name="reference_document"/>
+                    <field name="user_id" widget="many2one_avatar_user"/>
+                    <field name="opened_datetime"/>
+                    <field name="closed_datetime"/>
+                    <field name="state"/>
+                    <field name="requester_note" column_invisible="1"/>
+                    <field name="assignee_note" column_invisible="1"/>
+                    <button name="open_ticket" type="object" string="?" class="btn-warning" invisible="not requester_note"/>
+                    <button name="open_doc" type="object" string="!" class="btn-danger" invisible="not assignee_note"/>
+                    <button name="open_doc" type="object" icon="fa-file-text" string="" class="btn-primary" invisible="not reference_document"/>
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="ticket_form_view" model="ir.ui.view">
+            <field name="name">ticket.form.view</field>
+            <field name="model">ticket</field>
+            <field name="arch" type="xml">
+
+                <form duplicate="0">
+                    <header>
+                        <field name="state" widget="statusbar" class="o_field_statusbar" options="{'clickable': '0', 'fold_field': 'fold'}" invisible="active == False" readonly="1" force_save="1"/>                                        
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                                         
+                        </div>
+                        
+                        <field name="active" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active == True" />
+                        <div class="oe_title mb12">
+                            <h1>
+                                <field name="action" default_focus="1" readonly="1" />
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <field name="user_id" widget="many2one_avatar_user" readonly="1" />
+                            <field name="opened_datetime" readonly="1" />
+                            <field name="closed_datetime" readonly="1" />
+                            <field name="action" readonly="1" />
+                            <field name="reference_document" readonly="1" />
+                            <field name="open_duration" invisible="open_duration == 0" readonly="1" />
+                            <field name="requester_note" readonly="1" />
+                            <field name="assignee_note" readonly="1" />
+                            
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

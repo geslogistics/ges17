@@ -1,0 +1,32 @@
+.o_ges_header {
+    color:inherit;
+}
+
+.o_ges_footer {
+    .list-inline-item {
+        white-space: nowrap;
+    }
+}
+
+.o_report_layout_ges {
+    h2 {
+        color: $o-default-report-primary-color;
+    }
+    
+    #informations strong {
+        color: $o-default-report-secondary-color;
+    }
+    
+    #total strong{
+        color: $o-default-report-primary-color;
+    }
+    table {
+        thead {
+            color: $o-default-report-secondary-color;
+        }
+    }
+
+    div[name=comment] p{
+        margin-bottom: 0;
+    }
+}

@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Actions-->
+        <record id="request_costing_act_window" model="ir.actions.act_window">
+            <field name="name">Costing Requests</field>
+            <field name="res_model">request.costing</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+
+        <!--Views-->
+
+        <record id="request_costing_list_view" model="ir.ui.view">
+            <field name="name">request.costing.list.view</field>
+            <field name="model">request.costing</field>
+            <field name="arch" type="xml">
+                <tree create="0">
+                    <field name="name"/>
+                    <field name="so_line_id"/>
+                    <field name="requester_user_id" widget="many2one_avatar_user"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="request_costing_form_view" model="ir.ui.view">
+            <field name="name">request.costing.form.view</field>
+            <field name="model">request.costing</field>
+            <field name="arch" type="xml">
+
+                <form duplicate="0">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,costing,selection,confirmation,billing" class="o_field_statusbar" readonly="1" force_save="1" invisible="active == False"/>
+
+                        <button name="action_wizard_submit" data-hotkey="q" string="Submit" class="oe_highlight" type="object" invisible="not can_submit"/>
+                        <button name="action_wizard_validate" data-hotkey="q" string="Validate" class="oe_highlight btn-success" type="object" invisible="not can_validate"/>
+                        <button name="action_wizard_return" data-hotkey="z" string="Return" class="oe_highlight btn-danger" type="object" invisible="not can_return"/>
+                        <button name="action_wizard_submit_selection" data-hotkey="z" string="Submit" class="oe_highlight" type="object" invisible="not can_submit_selection"/>
+                        <button name="action_wizard_cancel" data-hotkey="z" string="Cancel" class="btn btn-secondary" type="object" invisible="not can_cancel"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                                       
+                        </div>
+                        <field name="active" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        
+                        <field name="current_user_id" invisible="1"/>
+                        <field name="current_operating_unit_sales_id" invisible="1"/>
+                        <field name="current_operating_unit_procurement_id" invisible="1"/>
+                        <field name="is_requester_user" invisible="1"/>
+                        <field name="is_requester_ou_user" invisible="1"/>
+                        <field name="is_requester_ou_manager" invisible="1"/>
+                        <field name="is_requester_manager" invisible="1"/>
+                        <field name="is_requester_any" invisible="1"/>
+                        <field name="is_assigned_user" invisible="1"/>
+                        <field name="is_assigned_ou_user" invisible="1"/>
+                        <field name="is_assigned_ou_manager" invisible="1"/>
+                        <field name="is_assigned_manager" invisible="1"/>
+                        <field name="is_assigned_any" invisible="1"/>
+
+                        <field name="can_edit_request" invisible="1"/>
+                        <field name="can_edit_offer" invisible="1"/>
+                        <field name="can_delete" invisible="1"/>
+                        <field name="can_cancel" invisible="1"/>
+                        <field name="can_submit" invisible="1"/>
+                        <field name="can_validate" invisible="1"/>
+                        <field name="can_return" invisible="1"/>
+                        <field name="can_submit_selection" invisible="1"/>
+
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active == True"/>
+            
+                        <div class="oe_title mb12">
+                            <h1>
+                                <field class="text-break" name="name" default_focus="1" readonly="1"/>
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group string="Customer">
+                                <field name="partner_id"/>
+                                <field name="customer_class"/>
+                                <field name="customer_segment"/>
+                                <field name="sales_user_id" widget="many2one_avatar_user"  readonly="1" force_save="1"/>
+                                <field name="sales_ou_id"  readonly="1" force_save="1"/>
+                            </group>
+                            <group string="Request Details">
+                                <field name="create_date"/>
+                                <field name="so_line_id" invisible="1"/>
+                                <field name="so_id"/>
+                                <field name="product_id"/>
+                                <field name="reference_document"/>
+                                <field name="reference_document_type"/>
+                                
+                            </group>
+                            <group string="From">
+                                <field name="requester_user_id" widget="many2one_avatar_user" readonly="not can_edit_request" required="1"/>
+                                <field name="requester_ou_id"/>
+                            </group>
+                            <group string="To">
+                                <!--<field name="assign_datetime"/>-->
+                                <field name="assigned_user_id" widget="many2one_avatar_user" required="not assigned_user_ids" readonly="not can_edit_request"/>
+                                <field name="assigned_ou_id"/>
+                                <field name="assigned_user_ids" widget="many2many_tags"/>
+                                <field name="assigned_ou_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Request Details">
+                                <field name="request_vendor_ids" widget="many2many_tags" options="{'no_quick_create': True, 'no_create': True,'no_create_edit':True}"/>
+                                <field name="request_product_ids" widget="many2many_tags" options="{'no_quick_create': True, 'no_create': True,'no_create_edit':True}"/>
+                                <field name="target_cost" readonly="not can_edit_request"/>
+                                <field name="target_date" readonly="not can_edit_request"/>
+                                <field name="request_notes"/>
+                            </group>
+                            <group string="Offer Details">
+                                <field name="offer_vendor_ids" widget="many2many_tags"/>
+                                <field name="offer_product_ids" widget="many2many_tags"/>
+                                <field name="total_in"/>
+                                <field name="total_ex"/>
+                                <field name="total_total"/>
+                                <field name="cost_in"/>
+                                <field name="cost_ex"/>
+                                <field name="cost_total"/>
+                                <!--<button name="compute_items_stats" string="Update Totals" class="oe_highlight m-1" type="object"/>-->
+                                <!--<field name="offer_notes"/>-->
+                            </group>
+                        </group>
+
+                        
+
+                        
+                        
+                        
+                        <group string="Quotes &amp; Services"/>
+                        <div style="width:100% !important">
+                            <field name="can_request_item" invisible="1"/>
+                            <field name="can_add_item" invisible="1"/>
+                            <field name="can_generate_po" invisible="1"/>
+
+                            <button name="action_request_request_costing_wizard" data-hotkey="e" string="Request Item(s)" class="oe_highlight m-1" type="object" groups="" invisible="not can_request_item"/>
+                            <button name="action_request_request_costing_wizard" data-hotkey="e" string="Add Item(s)" class="oe_highlight m-1" type="object" groups="" invisible="not can_add_item"/>
+                            <button name="action_generate_po_mass" data-hotkey="r" string="Generate PO(s)" class="oe_highlight m-1" type="object" groups="" invisible="not can_generate_po"/>
+
+                            <div class="mb-4"/>
+                            <field name="request_item_ids" mode="kanban">
+                                
+                            </field>
+                        </div>
+                        <group>
+                            <field name="ticket_ids" readonly="1" force_save="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="request_costing_item_act_window" model="ir.actions.act_window">
+            <field name="name">Costing Items</field>
+            <field name="res_model">request.costing.item</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+
+        
+        
+        <record id="request_costing_item_quick_create_form_view" model="ir.ui.view">
+            <field name="name">request.costing.item.quick.create.form.view</field>
+            <field name="model">request.costing.item</field>
+            <field name="arch" type="xml">
+                <form delete="0">
+                    <field name="current_user_id" invisible="1"/>
+                    <field name="current_operating_unit_sales_id" invisible="1"/>
+                    <field name="current_operating_unit_procurement_id" invisible="1"/>
+                    <field name="is_requester_user" invisible="1"/>
+                    <field name="is_requester_ou_user" invisible="1"/>
+                    <field name="is_requester_ou_manager" invisible="1"/>
+                    <field name="is_requester_manager" invisible="1"/>
+                    <field name="is_requester_any" invisible="1"/>
+                    <field name="is_assigned_user" invisible="1"/>
+                    <field name="is_assigned_ou_manager" invisible="1"/>
+                    <field name="is_assigned_manager" invisible="1"/>
+                    <field name="is_assigned_any" invisible="1"/>
+
+                    <field name="can_create" invisible="1"/>
+                    <field name="can_edit" invisible="1"/>
+                    <field name="can_delete" invisible="1"/>
+
+                    <field name="can_generate_po" invisible="1"/>
+
+                    <field name="can_quoted" invisible="1"/>
+                    <field name="can_failed" invisible="1"/>
+                    <field name="can_suggested" invisible="1"/>
+                    <field name="can_required" invisible="1"/>
+                    <field name="can_selected" invisible="1"/>
+                    <field name="can_confirm_selection" invisible="1"/>
+                    <field name="can_billed" invisible="1"/>
+                    
+                    <field name="can_remove_quoted" invisible="1"/>
+                    <field name="can_remove_failed" invisible="1"/>
+                    <field name="can_remove_suggested" invisible="1"/>
+                    <field name="can_remove_required" invisible="1"/>
+                    <field name="can_remove_selected" invisible="1"/>
+                    <field name="can_remove_confirmed" invisible="1"/>
+                    <field name="can_remove_billed" invisible="1"/>
+
+                    
+                    
+
+                    <sheet style="padding-right: 30px !important; padding-left: 30px !important; ">
+                        <group string="Type" invisible="1">
+                            <group>
+                                <field name="request_id" invisible="1"/>
+                                <field name="company_id" invisible="1"/>   
+                                <field name="sol_currency_id" invisible="1"/>                             
+                                <field name="type" nolabel="1" widget="radio" options="{'horizontal': true}"  invisible="1"/>
+                            </group>
+                        </group>
+                        
+                        
+                        <group string="Details" name="external_group" invisible="type != 'external'">
+                            <group>
+                                <field name="vendor_id" readonly="1"/>
+                                <field name="requester_user_id" invisible="1"/>
+                                <field name="requester_ou_id" invisible="1"/>
+                                <field name="assigned_user_id" invisible="1"/>
+                                <field name="assigned_ou_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="po_id" readonly="1"/>
+                                <field name="po_vendor_id"/>
+                                <field name="po_currency_id" invisible="1" />
+                                <field name="po_state"/>
+                                <field name="po_amount_untaxed" />
+                                <field name="po_amount_tax"  />
+                                <field name="po_amount_total" />
+                                <field name="applicable_po_total" invisible="applicable_po_total == po_amount_total"/>
+                                <field name="applicable_so_total" invisible="applicable_so_total == applicable_po_total"/>
+                                <field name="applicable_co_total" invisible="applicable_co_total == applicable_so_total"/>
+
+                            </group>
+                        </group>
+                        <group string="Details" name="internal_group" invisible="type != 'internal'">
+                            <group>
+                                <field name="product_id" readonly="1" context="{'display_default_code': False}"/>
+                                <field name="requester_user_id" invisible="1"/>
+                                <field name="requester_ou_id" invisible="1"/>
+                                <field name="assigned_user_id" invisible="1"/>
+                                <field name="assigned_ou_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="product_currency_id" invisible="1"/>
+                                <field name="product_uom_category_id" invisible="1"/>
+                                <field name="product_uom" force_save="1" class="oe_no_button" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="quantity"/>
+                                <field name="price_unit" widget="monetary" />
+
+                                <field name="total" widget="monetary" />
+                            </group>
+                        </group>
+                        <group string="Note">
+                            <group colspan="2">
+                                 <field nolabel="1" colspan="2" name="note"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="ticket_ids" invisible="1"/>
+                            
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="request_costing_item_kanban_view" model="ir.ui.view">
+            <field name="name">request.costing.item.kanban.view</field>
+            <field name="model">request.costing.item</field>
+            <field name="arch" type="xml">
+
+                <kanban default_group_by="type" create="false" records_draggable="true" archivable="false" group_create="false" group_edit="false" group_delete="false" class="ges_kanban_costing" >
+                    <field name="sequence" widget="handle" invisible="1" />
+
+                    <field name="current_user_id" invisible="1"/>
+                    <field name="current_operating_unit_sales_id" invisible="1"/>
+                    <field name="current_operating_unit_procurement_id" invisible="1"/>
+                    <field name="is_requester_user" invisible="1"/>
+                    <field name="is_requester_ou_user" invisible="1"/>
+                    <field name="is_requester_ou_manager" invisible="1"/>
+                    <field name="is_requester_manager" invisible="1"/>
+                    <field name="is_requester_any" invisible="1"/>
+                    <field name="is_assigned_user" invisible="1"/>
+                    <field name="is_assigned_ou_manager" invisible="1"/>
+                    <field name="is_assigned_manager" invisible="1"/>
+                    <field name="is_assigned_any" invisible="1"/>
+
+                    <field name="can_create" invisible="1"/>
+                    <field name="can_edit" invisible="1"/>
+                    <field name="can_delete" invisible="1"/>
+                    <field name="can_cancel" invisible="1"/>
+
+                    <field name="can_generate_po" invisible="1"/>
+
+                    <field name="can_quoted" invisible="1"/>
+                    <field name="can_failed" invisible="1"/>
+                    <field name="can_suggested" invisible="1"/>
+                    <field name="can_required" invisible="1"/>
+                    <field name="can_selected" invisible="1"/>
+                    <field name="can_confirm_selection" invisible="1"/>
+                    <field name="can_reject_selection" invisible="1"/>
+                    <field name="can_billed" invisible="1"/>
+
+                    <field name="can_submitted" invisible="1"/>
+                    <field name="can_validated" invisible="1"/>
+                    <field name="can_failed" invisible="1"/>
+                    <field name="can_validate_failed" invisible="1"/>
+                    
+                    <field name="can_remove_quoted" invisible="1"/>
+                    <field name="can_remove_failed" invisible="1"/>
+                    <field name="can_remove_suggested" invisible="1"/>
+                    <field name="can_remove_required" invisible="1"/>
+                    <field name="can_remove_selected" invisible="1"/>
+                    <field name="can_remove_confirmed" invisible="1"/>
+                    <field name="can_remove_billed" invisible="1"/>
+                    <field name="can_remove_billed" invisible="1"/>
+
+                    <field name="requester_user_id" invisible="1"/>
+                    <field name="requester_ou_id" invisible="1"/>
+
+                    <field name="company_id"/>
+                    <field name="sol_currency_id"/>
+                    <field name="type"/>
+                    
+                    <field name="requested"/>     
+                    <field name="to_send"/>
+                    <field name="waiting"/>
+                    <field name="late"/>      
+                    <field name="state"/>
+
+                    
+
+                    <field name="vendor_id"/>
+                    <field name="po_id"/>
+                    <field name="po_vendor_id"/>
+                    <field name="po_currency_id"/>
+                    <field name="po_state"/>
+                    <field name="po_date_order"/>
+                    <field name="po_amount_untaxed"/>
+                    <field name="po_amount_tax"/>
+                    <field name="po_amount_total"/>
+                    <field name="applicable_po_total"/>
+                    <field name="applicable_so_total"/>
+                    <field name="applicable_co_total"/>
+                    
+
+                    <field name="product_id" context="{'display_default_code': False}"/>
+                    <field name="product_currency_id"/>
+                    <field name="internal_vendor"/>
+                    <field name="quantity"/>
+                    <field name="product_uom_category_id" />
+                    <field name="product_uom"/>
+
+                    <field name="price_unit"/>
+                    <field name="total"/>
+                    
+                    <field name="note"/>
+
+                    
+
+                    <!--
+                    <control>
+                    <create name="add_item" string="Add an item"/>
+                    </control>
+                    -->
+                    <templates>
+                        <t t-name="kanban-menu">                        
+                            <a t-if="record.po_id.value" type="object" class="dropdown-item" name="open_po">View RFQ/PO</a>
+                            <a t-if="record.can_generate_po.raw_value" type="object" class="dropdown-item" name="generate_po">Generate RFQ</a>
+                            <a t-if="record.can_cancel.raw_value" type="object" class="dropdown-item" name="action_wizard_cancel_item">Cancel</a>
+                            <a t-if="record.can_delete.raw_value" type="object" class="dropdown-item" name="action_delete_item" confirm="Are you sure you want delete this item?">
+                                <i class="fa fa-fw fa-trash-o"/>
+                                <span>Delete</span>
+                            </a>
+                            <!--
+                            <div t-if="record.po_id.value or record.can_generate_po.raw_value" role="separator" class="dropdown-divider"/>
+                            
+                            <a t-if="record.can_submitted.raw_value" type="object" class="dropdown-item" name="submit_quote">Submit Quote</a>
+                            <a t-if="record.can_validated.raw_value" type="object" class="dropdown-item" name="validate_quote">Validate Quote</a>
+                            <a t-if="record.can_validated.raw_value" type="object" class="dropdown-item" name="return_quote">Return Quote</a>
+                            <a t-if="record.can_failed.raw_value" type="object" class="dropdown-item" name="submit_failed">Quote Failed</a>
+                            <a t-if="record.can_validate_failed.raw_value" type="object" class="dropdown-item" name="validate_failed">Validate Failed</a>
+                            <a t-if="record.can_validate_failed.raw_value" type="object" class="dropdown-item" name="return_failed">Return Failed</a>
+                            <a t-if="record.can_quoted.raw_value" type="object" class="dropdown-item" name="mark_quoted">Mark as Quoted</a>
+                            <a t-if="record.can_remove_quoted.raw_value" type="object" class="dropdown-item" name="remove_mark_quoted">Remove Quoted</a>
+                            <a t-if="record.can_failed.raw_value" type="object" class="dropdown-item" name="mark_failed">Mark as Failed</a>
+                            <a t-if="record.can_remove_failed.raw_value" type="object" class="dropdown-item" name="remove_mark_failed">Remove Failed</a>
+                            <a t-if="record.can_required.raw_value" type="object" class="dropdown-item" name="mark_required">Mark as Required</a>
+                            <a t-if="record.can_remove_required.raw_value" type="object" class="dropdown-item" name="remove_mark_required">Remove Required</a>
+                            
+                            <a t-if="record.can_selected.raw_value" type="object" class="dropdown-item" name="mark_selected">Select</a>
+                            <a t-if="record.can_remove_selected.raw_value" type="object" class="dropdown-item" name="remove_mark_selected">Unselect</a>
+                            <a t-if="record.can_confirm_selection.raw_value" type="object" class="dropdown-item" name="mark_confirmed">Confirm</a>
+                            <a t-if="record.can_remove_confirmed.raw_value" type="object" class="dropdown-item" name="remove_mark_confirmed">Unconfirm</a>
+                            <a t-if="record.can_billed.raw_value" type="object" class="dropdown-item" name="mark_billed">Mark as Billed</a>
+                            <a t-if="record.can_remove_billed.raw_value" type="object" class="dropdown-item" name="remove_mark_billed">Remove Billed</a>
+                            <div t-if="record.can_delete.raw_value or record.can_cancel.raw_value" role="separator" class="dropdown-divider"/>
+                            
+                            
+                            -->
+                        </t>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="px-2 oe_kanban_global_click" style="; background-color: #f8f9fa !important">                            
+                                <div class="ribbon ribbon-top-right" invisible="state != 'selected'">
+                                    <span class="text-bg-success">Selected</span>
+                                </div>
+                                <div class="ribbon ribbon-top-right" invisible="state != 'required'">
+                                    <span class="text-bg-warning">Required</span>
+                                </div>
+                                <div class="ribbon ribbon-top-right" invisible="state != 'failed'">
+                                    <span class="text-bg-danger">Failed</span>
+                                </div>
+                                <div class="ribbon ribbon-top-right" invisible="state != 'confirmed'">
+                                    <span class="text-bg-primary">Confirmed</span>
+                                </div>
+                                <div class="ribbon ribbon-top-right" invisible="state != 'rejected_selection'">
+                                    <span class="text-bg-danger">Rejected</span>
+                                </div>
+                                <div class="ribbon ribbon-top-right" invisible="state != 'billed'">
+                                    <span class="text-bg-primary" style="background-color: black !important;">Billed</span>
+                                </div>
+                                <div class="ribbon ribbon-top-right" invisible="state != 'rejected_billing'">
+                                    <span class="text-bg-danger">Rejected</span>
+                                </div>
+                                <div class="ribbon ribbon-top-right" invisible="state != 'cancel'">
+                                    <span class="text-bg-primary" style="background-color: #999999 !important;">Cancelled</span>
+                                </div>
+                                <div class="oe_kanban_details d-flex flex-column justify-content-between">
+                                    <div class="d-flex flex-row" style="min-height:85px">      
+                                        <div class="d-none d-sm-block ges-kanban-image-container">
+                                            <div class="ges-kanban-image-box">
+                                                <img class="ges-kanban-image-img" t-if="record.type.raw_value == 'external'" alt="Avatar" t-att-src="kanban_image('res.partner', 'avatar_128',record.po_vendor_id.raw_value)" onchange="0"/>
+                                                <img class="ges-kanban-image-img" t-if="record.type.raw_value == 'internal'" alt="Avatar" t-att-src="kanban_image('res.partner', 'avatar_128',record.internal_vendor.raw_value)" onchange="0" />
+                                            </div>
+                                        </div>                                        
+                                        <div style="width: 100%">
+                                            <t t-if="record.type.raw_value == 'external'">
+                                                <div class="mb-1" style="padding-right:20px">
+                                                    <strong t-esc="record.vendor_id.value"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.po_id.value" >
+                                                    <span><t t-out="record.po_state.value"/> [<span t-out="record.po_id.value"/> <t t-esc="record.po_date_order.value and record.po_date_order.value.split(' ')[0] or False"/>]</span>
+                                                    <button name="open_po" title="Open PO" type="object" t-if="record.po_id.value" class="btn badge text-bg-primary mx-1 px-0">
+                                                        <i class="fa fa-fw fa-search" role="img" aria-label="Purchases" title="Purchases"/>
+                                                    </button>
+                                                </div>
+                                            </t>
+                                            <t t-if="record.type.raw_value == 'internal'">
+                                                <div class="mb-1" style="padding-right:20px">
+                                                    <strong t-esc="record.product_id.value" />
+                                                </div>
+                                            </t>
+                                            <div class="d-flex gap-1">
+                                                <!--<span class="badge rounded-pill text-bg-light align-self-center mx-0" t-esc="record.state.value"></span>-->
+                                                <span class="badge rounded-pill text-bg-light align-self-center mx-0" t-if="record.requested.raw_value">Requested</span>
+                                                <span class="badge rounded-pill text-bg-warning align-self-center mx-0" t-if="record.state.raw_value == 'to_quote'">To Quote</span>
+                                                <span class="badge rounded-pill text-bg-warning align-self-center mx-0" t-if="record.state.raw_value == 'to_validate' or record.state.raw_value == 'to_validate_failed'">To Validate</span>
+                                                <span class="badge rounded-pill text-bg-warning align-self-center mx-0" t-if="record.to_send.raw_value">To Send</span>
+                                                <span class="badge rounded-pill text-bg-warning align-self-center mx-0" t-if="record.waiting.raw_value">Waiting</span>
+                                                <span class="badge rounded-pill text-bg-danger align-self-center mx-0" t-if="record.late.raw_value">Late</span>
+                                                <span class="badge rounded-pill text-bg-info align-self-center mx-0" t-if="record.state.raw_value == 'quoted'">Quoted</span>
+                                                
+                                                <span class="badge rounded-pill text-bg-warning align-self-center mx-0" t-if="record.state.raw_value == 'to_confirm'">To Confirm</span>
+                                                <span class="badge rounded-pill text-bg-warning align-self-center mx-0" t-if="record.state.raw_value == 'to_bill'">To Bill</span>
+                                            </div>
+                                        </div>                          
+                                    </div>
+                                    <div class="o_kanban_record_bottom mt-2" style="align-items: flex-end;">
+                                        <div class="d-none d-sm-block" style="width:100px"/>
+                                        <div class="oe_kanban_bottom_left" style="flex-wrap: wrap;">
+                                            <t t-if="record.assigned_user_id.value">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <field name="assigned_user_id" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
+                                                    <span t-esc="record.assigned_user_id.value"/>
+                                                </div>
+                                            </t>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <t t-if="record.type.raw_value == 'external'">
+                                                <t>
+                                                    <div class="d-flex flex-column text-end">
+                                                        <!--
+                                                        <div t-if="record.sol_currency_id.raw_value != record.po_currency_id.raw_value and record.sol_currency_id.raw_value != record.product_currency_id.raw_value">
+                                                            <strong t-esc="record.applicable_so_total.value" widget="monetary"/>
+                                                        </div>
+                                                        <div t-if="record.po_currency_id.raw_value != record.product_currency_id.raw_value">
+                                                            <strong t-esc="record.applicable_po_total.value" widget="monetary" />  
+                                                        </div>
+                                                        -->
+                                                        <div>
+                                                            <strong t-esc="record.applicable_co_total.value" widget="monetary" />
+                                                        </div>
+                                                    </div>                                                                                                                                    
+                                                </t>
+                                            </t>
+                                            <t t-if="record.type.raw_value == 'internal'">
+                                                <t>
+                                                    <div class="d-flex flex-column text-end">
+                                                        <!--
+                                                        <div t-if="record.sol_currency_id.raw_value != record.product_currency_id.raw_value">
+                                                            <strong t-esc="record.so_total.value" widget="monetary"/>
+                                                        </div>    
+                                                        -->                                            
+                                                        <div>
+                                                            <strong t-esc="record.applicable_co_total.value" widget="monetary" />
+                                                        </div>                                                        
+                                                    </div>                                                                                                                                    
+                                                </t>
+                                            </t>
+                                            <div>
+                                                <button invisible="not can_failed" type="object" class="btn btn-danger ges-kanban-small-btn" name="action_wizard_submit_failed" aria-label="Quote Failed" title="Quote Failed"><i class="fa fa-fw fa-ban"/></button>
+                                                <button invisible="not can_generate_po" type="object" class="btn btn-primary ges-kanban-small-btn" name="generate_po" aria-label="Generate PO" title="Generate PO"><i class="fa fa-fw fa-magic"/></button>
+                                                
+                                                <button invisible="not can_submitted" type="object" class="btn btn-primary ges-kanban-small-btn" name="action_wizard_submit_quote" aria-label="Submit" title="Submit"><i class="fa fa-fw fa-paper-plane"/></button>
+                                                <button invisible="not can_validated" type="object" class="btn btn-success ges-kanban-small-btn" name="action_wizard_validate_quote" aria-label="Validate" title="Validate"><i class="fa fa-fw fa-check"/></button>
+                                                <button invisible="not can_validated" type="object" class="btn btn-danger ges-kanban-small-btn" name="action_wizard_return_quote" aria-label="Return" title="Return"><i class="fa fa-fw fa-times"/></button>
+                                                <button invisible="not can_validate_failed" type="object" class="btn btn-success ges-kanban-small-btn" name="action_wizard_validate_failed" aria-label="Validate" title="Validate"><i class="fa fa-fw fa-check"/></button>
+                                                <button invisible="not can_validate_failed" type="object" class="btn btn-danger ges-kanban-small-btn" name="action_wizard_return_failed" aria-label="Return" title="Return"><i class="fa fa-fw fa-times"/></button>
+                                                <button invisible="not can_selected" type="object" class="btn btn-success ges-kanban-small-btn" name="mark_selected" aria-label="Select" title="Select"><i class="fa fa-fw fa-plus"/></button>
+                                                <button invisible="not can_selected" type="object" class="btn btn-warning ges-kanban-small-btn" name="action_wizard_recost" aria-label="Recost" title="Recost"><i class="fa fa-fw fa-retweet"/></button>
+                                                <button invisible="not can_remove_selected" type="object" class="btn btn-danger ges-kanban-small-btn" name="remove_mark_selected" aria-label="Unselect" title="Unselect"><i class="fa fa-fw fa-minus"/></button>
+                                                
+                                                <!--<button invisible="not can_confirm_selection" type="object" class="btn btn-success ges-kanban-small-btn" name="mark_confirmed" aria-label="Confirm" title="Confirm"><i class="fa fa-fw fa-check"/></button>
+                                                <button invisible="not can_remove_confirmed" type="object" class="btn btn-danger ges-kanban-small-btn" name="remove_mark_confirmed" aria-label="Unconfirm" title="Unconfirm"><i class="fa fa-fw fa-times"/></button>
+                                                <button invisible="not can_billed" type="object" class="btn btn-success ges-kanban-small-btn" name="mark_billed" aria-label="Billed" title="Billed"><i class="fa fa-fw fa-file-text-o"/></button>
+                                                <button invisible="not can_remove_billed" type="object" class="btn btn-danger ges-kanban-small-btn" name="remove_mark_billed" aria-label="Un-Billed" title="Un-Billed"><i class="fa fa-fw fa-times"/></button>!-->
+
+
+                                                <button invisible="not can_confirm_selection" type="object" class="btn btn-success ges-kanban-small-btn" name="action_wizard_confirm_quote" aria-label="Confirm" title="Confirm"><i class="fa fa-fw fa-check"/></button>
+                                                <button invisible="not can_reject_selection" type="object" class="btn btn-danger ges-kanban-small-btn" name="action_wizard_reject_quote" aria-label="Reject" title="Reject"><i class="fa fa-fw fa-times"/></button>
+
+                                                <button invisible="not can_remove_confirmed" type="object" class="btn btn-danger ges-kanban-small-btn" name="action_wizard_reject_quote" aria-label="Unconfirm2" title="Unconfirm"><i class="fa fa-fw fa-times"/></button>
+                                                <button invisible="not can_billed" type="object" class="btn btn-success ges-kanban-small-btn" name="action_wizard_bill_quote" aria-label="Billed2" title="Billed"><i class="fa fa-fw fa-file-text-o"/></button>
+                                                <button invisible="not can_remove_billed" type="object" class="btn btn-danger ges-kanban-small-btn" name="action_wizard_reject_bill" aria-label="Un-Billed2" title="Un-Billed"><i class="fa fa-fw fa-times"/></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        
+
+    </data>
+</odoo>

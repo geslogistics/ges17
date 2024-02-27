@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="gescrm_lead_lead_stage_search" model="ir.ui.view">
+        <field name="name">Stage - Search</field>
+        <field name="model">gescrm.lead.stage</field>
+        <field name="arch" type="xml">
+            <search string="Stage Search">
+                <field name="name"/>
+                <field name="sequence"/>
+                <field name="is_conversion"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- STAGES TREE VIEW + MUTI_EDIT -->
+    <record id="gescrm_lead_stage_tree" model="ir.ui.view">
+        <field name="name">gescrm.lead.stage.tree</field>
+        <field name="model">gescrm.lead.stage</field>
+        <field name="arch" type="xml">
+            <tree string="Stages" multi_edit="1">
+                <field name="sequence" widget="handle"/>
+                <field name="name" readonly="1"/>
+                <field name="is_conversion"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="gescrm_lead_stage_form" model="ir.ui.view">
+        <field name="name">gescrm.lead.stage.form</field>
+        <field name="model">gescrm.lead.stage</field>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <form string="Stage">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Negotiation"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="is_conversion"/>
+                            <field name="fold"/>
+                        </group>
+                    </group>
+                    <separator string="Requirements"/>
+                    <field name="requirements" nolabel="1" placeholder="Give your team the requirements to move an opportunity to this stage."/>
+                   
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="gescrm_lead_stage_action" model="ir.actions.act_window">
+        <field name="name">Stages</field>
+        <field name="res_model">gescrm.lead.stage</field>
+        <field name="view_id" ref="gescrm_lead_stage_tree"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Set a new stage in your lead generation process
+          </p><p>
+            Stages allow users to easily track how a specific opportunity
+            is positioned in the lead generation cycle.
+          </p>
+        </field>
+    </record>
+
+</odoo>
