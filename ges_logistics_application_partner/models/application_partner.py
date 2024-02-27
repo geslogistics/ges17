@@ -1665,52 +1665,35 @@ class ApplicationPartner(models.Model):
             country = self.env['res.country'].search([('id','=',values.get('country_id'))]) or self.country_id
             if self.partner_id._run_vat_test(vat,country) is False:
                 raise UserError("VAT Format Error")
-
+        
         if 'state' in values:
             new_state = values.get('state')
-            """
-            if new_state == 'validated' or self.state == 'validated':
+
+            if new_state == 'unit_validation' or self.state == 'unit_validation':
                 values['color'] = 7
-                if not self.env.user.has_group(
-                        'ges_logistics_application_partner.group_partner_application_user_validate'):
-                    raise ValidationError(
-                        _("Only Managers can perform that move!"))
+            
+            if new_state == 'function_validation' or self.state == 'function_validation':
+                values['color'] = 7
 
             if new_state == 'approved' or self.state == 'approved':
                 values['color'] = 8
-                if not self.env.user.has_group(
-                        'ges_logistics_application_partner.group_partner_application_user_approve'):
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
             
             if new_state == 'active' or self.state == 'active':
                 values['color'] = 10
-                if not self.env.user.has_group(
-                        'ges_logistics_application_partner.group_partner_application_user_activate'):
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
             
             if new_state == 'cancel' or self.state == 'cancel':
                 values['color'] = False
-                if not self.env.user.has_group(
-                        'ges_logistics_application_partner.group_partner_application_user_cancel'):
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
 
             if new_state == 'draft' and self.state != 'draft':
                 values['color'] = False
-                if not self.env.user.has_group(
-                        'ges_logistics_application_partner.group_partner_application_user_return_draft') or not self.is_unit_validator:
-                    raise ValidationError(
-                        _("Only Manager can perform that move!"))
-            """
+
             if new_state == 'expired':
                 values['color'] = 1
 
             if new_state == 'rejected':
                 values['color'] = 1
             
-            if new_state == 'submitted':
+            if new_state == 'approval':
                 values['color'] = 4
             
         if 'active' in values:
