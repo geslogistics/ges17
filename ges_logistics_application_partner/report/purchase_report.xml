@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>    
+
+
+
+    <record id="purchase_report_view_tree_inherit_partner_application" model="ir.ui.view">
+        <field name="name">purchase.report.view.tree.inherit.partner.application</field>
+        <field name="model">purchase.report</field>
+        <field name="inherit_id" ref="purchase.purchase_report_view_tree"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="procurement_ou_id" optional="show" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            <field name="user_id" position="replace">
+                <field name="procurement_user_id" optional="show" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            
+        </field>
+    </record>
+
+    <record id="view_purchase_order_search_inherit_partner_application" model="ir.ui.view">
+        <field name="name">report.purchase.order.search.inherit.partner.application</field>
+        <field name="model">purchase.report</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_search"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="procurement_ou_id" />
+            </field>
+            <field name="user_id" position="replace">
+                <field name="procurement_user_id" />
+            </field>
+
+            <filter name="user_id" position="replace">
+                <filter string="Purchase User" name="user_id" context="{'group_by':'procurement_user_id'}"/>
+                <filter string="Purchase Unit" name="unit_id" context="{'group_by':'procurement_ou_id'}"/>
+            </filter>
+            
+        </field>
+    </record>
+</odoo>

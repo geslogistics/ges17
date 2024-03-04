@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--Logistics-->
+        <menuitem id="logistics_ges_root_menu" name="Logistics" sequence="0" web_icon="ges_logistics,static/description/icon.png"/>
+
+        <!--Logistics--><!--Configuration-->
+        <menuitem id="logistics_configuration_top_menu" name="Configuration" parent="logistics_ges_root_menu" sequence="100"/>
+
+        <!--Logistics--><!--Configuration--><!--Products-->
+        <menuitem id="logistics_configuration_products_section_menu" name="Products" parent="logistics_configuration_top_menu" sequence="10"/>
+
+        <menuitem id="menu_logistics_products" name="Products" parent="logistics_configuration_products_section_menu"
+                  action="logistics_product_products_act_window" sequence="1"/>
+
+        <menuitem id="menu_logistics_product_group" name="Product Groups" parent="logistics_configuration_products_section_menu"
+                  action="logistics_product_product_group_action" sequence="2"/>
+
+        <menuitem id="menu_logistics_freight_types" name="Freight Types" parent="logistics_configuration_products_section_menu"
+                  action="logistics_product_freight_type_action" sequence="3"/>
+
+        <menuitem id="menu_logistics_shipment_modes" name="Shipment Types" parent="logistics_configuration_products_section_menu"
+                  action="logistics_product_shipment_mode_action" sequence="4"/>
+
+
+        <!--Logistics--><!--Configuration--><!--Addresses-->
+        <menuitem id="logistics_configuration_addresses_section_menu" name="Addresses" parent="logistics_configuration_top_menu" sequence="20"/>
+
+        <menuitem name="Continents" id="logistics_configuration_addresses_continent_menu" parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_continent_act_window" sequence="1"/>
+
+        <menuitem name="Regions" id="logistics_configuration_addresses_region_menu" parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_region_act_window" sequence="2"/>
+
+        <menuitem name="Countries" id="logistics_configuration_addresses_country_menu" parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_country_act_window" sequence="3"/>
+
+        <menuitem name="States" id="logistics_configuration_addresses_state_menu" parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_state_act_window" sequence="4"/>
+
+        <menuitem name="Cities" id="logistics_configuration_addresses_city_menu" parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_city_act_window" sequence="5"/>
+
+        <menuitem name="Addresses" id="logistics_configuration_addresses_menu" parent="logistics_configuration_addresses_section_menu"
+                  action="logistics_freight_address_act_window" sequence="6"/>
+
+        <!--Logistics--><!--Configuration--><!--Ports-->
+        <menuitem id="logistics_configuration_ports_section_menu" name="Ports" parent="logistics_configuration_top_menu" sequence="30"/>
+
+        <menuitem name="Ports" id="logistics_configuration_ports_ports_menu" parent="logistics_configuration_ports_section_menu"
+                  action="logistics_freight_port_act_window" sequence="1"/>
+
+        <!--Logistics--><!--Configuration--><!--Incoterms-->
+        <menuitem id="logistics_configuration_incoterms_section_menu" name="Incoterms" parent="logistics_configuration_top_menu" sequence="40"/>
+
+        <menuitem name="Incoterms" id="logistics_configuration_incoterms_incoterms_menu" parent="logistics_configuration_incoterms_section_menu"
+                  action="logistics_freight_incoterms_act_window" sequence="1"/>
+
+        <!--Shipment Order-->
+        <menuitem id="logistics_shipment_order_root_menu" name="Shipments" sequence="1" web_icon="ges_logistics,static/description/shipment.png"/>
+
+        <menuitem id="logistics_shipment_order_shipments_top_menu" name="Shipments" parent="logistics_shipment_order_root_menu" sequence="10"/>
+
+        <menuitem id="logistics_shipment_order_shipments_order_top_menu" name="Orders" parent="logistics_shipment_order_shipments_top_menu"
+                  action="ges_logistics.logistics_shipment_order_act_window" sequence="10"/>
+
+        <!--Customs Order-->
+        <menuitem id="logistics_customs_order_root_menu" name="Customs" sequence="1" web_icon="ges_logistics,static/description/customs.png"/>
+
+        <menuitem id="logistics_customs_order_customs_top_menu" name="Customs" parent="logistics_customs_order_root_menu" sequence="10"/>
+
+        <menuitem id="logistics_customs_order_customs_order_top_menu" name="Orders" parent="logistics_customs_order_customs_top_menu"
+                  action="ges_logistics.logistics_customs_order_act_window" sequence="10"/>
+
+        <!-- Payment Requests -->
+        <menuitem id="payment_requests_action_menu" name="My Payment Requests" parent="ges_logistics.logistics_customs_order_root_menu"
+                  action="payment_request_action" sequence="25"/>
+
+        <menuitem id="payment_requests_acc_action_menu" name="Payment Requests" parent="account.menu_finance_entries"
+                  action="payment_request_action_accounting" sequence="-25"/>
+
+        <!--Service Order-->
+        <menuitem id="logistics_service_order_root_menu" name="Services" sequence="1" web_icon="ges_logistics,static/description/icon.png"/>
+
+        <menuitem id="logistics_service_order_services_top_menu" name="Services" parent="logistics_service_order_root_menu" sequence="10"/>
+
+        <menuitem id="logistics_service_order_services_order_top_menu" name="Orders" parent="logistics_service_order_services_top_menu"
+                  action="ges_logistics.logistics_service_order_act_window" sequence="10"/>
+
+        <!--Storage Order-->
+        <menuitem id="logistics_storage_order_root_menu" name="Storage" sequence="1" web_icon="ges_logistics,static/description/icon.png"/>
+
+        <menuitem id="logistics_storage_order_storage_top_menu" name="Storage" parent="logistics_storage_order_root_menu" sequence="10"/>
+
+        <menuitem id="logistics_storage_order_storage_order_top_menu" name="Orders" parent="logistics_storage_order_storage_top_menu"
+                  action="ges_logistics.logistics_storage_order_act_window" sequence="10"/>
+
+
+        <!--Transport Order-->
+        <menuitem id="logistics_transport_order_root_menu" name="Transport" sequence="1"
+                  web_icon="ges_logistics,static/description/transportation.png"/>
+
+        <menuitem id="logistics_transport_order_transport_top_menu" name="Transport" parent="logistics_transport_order_root_menu" sequence="10"/>
+
+        <menuitem id="logistics_transport_order_transport_order_top_menu" name="Orders" parent="logistics_transport_order_transport_top_menu"
+                  action="ges_logistics.logistics_transport_order_act_window" sequence="10"/>
+
+        <menuitem id="logistics_configuration_carriers_section_menu" name="Carriers"
+                  parent="logistics_configuration_top_menu" sequence="50"/>
+
+        <menuitem name="Air Carriers" id="logistics_freight_air_carriers_menu"
+                  parent="logistics_configuration_carriers_section_menu"
+                  action="logistics_freight_air_carriers_act_window" sequence="20"/>
+
+        <!-- Report Category Menu -->
+        <menuitem id="report_logistics_transport_orders" name="Reports" parent="logistics_transport_order_root_menu" sequence="99"/>
+
+        <menuitem id="transport_order_report_action_menu" name="Transport Orders" parent="report_logistics_transport_orders" sequence="25"
+                  action="report_transport_action"/>
+
+
+    </data>
+</odoo>

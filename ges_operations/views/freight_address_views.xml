@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--Actions-->
+        <record id="freight_address_act_window" model="ir.actions.act_window">
+            <field name="name">Addresses</field>
+            <field name="res_model">freight.address</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <!-- Views -->
+        <record id="freight_address_list_view" model="ir.ui.view">
+            <field name="name">freight.address.list.view</field>
+            <field name="model">freight.address</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="country_id"/>
+                    <field name="state_id"/>
+                    <field name="city_id"/>
+                    <field name="zip_code"/>
+                    <field name="street"/>
+                    <field name="street2"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="freight_address_form_view" model="ir.ui.view">
+            <field name="name">freight.address.form.view</field>
+            <field name="model">freight.address</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            <field name="state_id" domain="[('country_id','=',country_id)]" options="{'no_open': True, 'no_quick_create': True}" context="{'default_country_id': country_id}"/>
+                            <field name="city_id" domain="[('state_id','=',state_id)]"  options="{'no_open': True, 'no_quick_create': True}" context="{'default_country_id': country_id, 'default_state_id': state_id}"/>
+                            <field name="zip_code"/>
+                            <field name="street"/>
+                            <field name="street2"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

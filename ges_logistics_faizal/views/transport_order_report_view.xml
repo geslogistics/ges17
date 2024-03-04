@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--    Transport Order Report Tree View-->
+    <record id="report_transport_order_tree_view" model="ir.ui.view">
+        <field name="name">transport.order.report.tree</field>
+        <field name="model">transport.order.report</field>
+        <field name="arch" type="xml">
+            <tree string="Transport Order" create="0" delete="0" edit="0">
+                <field name="creation_date"/>
+                <field name="finished_date"/>
+                <field name="partner_id"/>
+                <field name="direction"/>
+                <field name="fleet_name"/>
+                <field name="driver_name"/>
+                <field name="trip_type"/>
+                <field name="transportation_mode"/>
+                <field name="cargo_type"/>
+                <field name="shipment_mode"/>
+                <field name="trip_money"/>
+                <field name="origin_address_id"/>
+                <field name="destination_address_id"/>
+                <field name="transport_order_id"/>
+                <field name="currency_id"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--        Transport Order Report Form View-->
+    <record id="report_transport_form_view" model="ir.ui.view">
+        <field name="name">transport.order.report.form</field>
+        <field name="model">transport.order.report</field>
+        <field name="arch" type="xml">
+            <form string="Transport Order" create="false" delete="false" edit="false">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,in_progress,finished"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="creation_date"/>
+                            <field name="fleet_name"/>
+                            <field name="partner_id"/>
+                            <field name="transportation_mode" widget="radio" options="{'horizontal': true}"/>
+                            <field name="cargo_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="trip_money"/>
+                            <field name="origin_address_id"/>
+                            <field name="transport_order_id"/>
+                        </group>
+                        <group>
+                            <field name="finished_date"/>
+                            <field name="driver_name"/>
+                            <field name="trip_type"/>
+                            <field name="direction" widget="radio" options="{'horizontal': true}"/>
+                            <field name="shipment_mode"/>
+                            <field name="currency_id"/>
+                            <field name="destination_address_id"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!--        Transport Order Report Calendar View-->
+    <record id="report_transport_calendar_view" model="ir.ui.view">
+        <field name="name">transport.order.report.calendar</field>
+        <field name="model">transport.order.report</field>
+        <field name="arch" type="xml">
+            <calendar string="Transport Orders" date_start="creation_date" date_stop="finished_date" color="transport_order_id" create="false"
+                      delete="false" edit="false">
+                <field name="creation_date"/>
+                <field name="trip_money" widget="monetary"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!--        Transport Order Report Graph View-->
+    <record id="report_transport_graph_view" model="ir.ui.view">
+        <field name="name">transport.order.report.graph</field>
+        <field name="model">transport.order.report</field>
+        <field name="arch" type="xml">
+            <graph string="Transport Orders" create="false" delete="false" edit="false">
+                <field name="creation_date"/>
+                <field name="trip_money" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!--        Transport Order Report Pivot View-->
+    <record id="report_transport_pivot_view" model="ir.ui.view">
+        <field name="name">transport.order.report.pivot</field>
+        <field name="model">transport.order.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Transport Orders" create="false" delete="false" edit="false">
+                <field name="creation_date" type="row"/>
+                <field name="trip_money" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!--        Transport Order Report Search View-->
+    <record id="report_transport_search_view" model="ir.ui.view">
+        <field name="name">transport.order.report.search</field>
+        <field name="model">transport.order.report</field>
+        <field name="arch" type="xml">
+            <search string="Transport Orders">
+                <group expand="1" string="Group By">
+                    <filter string="Status" name="status" domain="[]" context="{'group_by':'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--        Transport Order Report Action View-->
+    <record id="report_transport_action" model="ir.actions.act_window">
+        <field name="name">Transport Order Report</field>
+        <field name="res_model">transport.order.report</field>
+        <field name="view_mode">tree,form,calendar,graph,pivot</field>
+        <field name="context">{'search_default_status_filter': 1}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+
+            </p>
+            <p>
+
+            </p>
+        </field>
+    </record>
+
+
+</odoo>

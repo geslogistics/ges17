@@ -1,0 +1,775 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Actions-->
+        <record id="shipment_order_act_window" model="ir.actions.act_window">
+            <field name="name">Shipment Order</field>
+            <field name="res_model">shipment.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+
+        <!--Views-->
+
+        <record id="shipment_order_list_view" model="ir.ui.view">
+            <field name="name">shipment.order.list.view</field>
+            <field name="model">shipment.order</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="category"/>
+                    <field name="direction"/>
+                    <field name="transport"/>
+                    <field name="shipment_mode"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="shipment_order_form_view" model="ir.ui.view">
+            <field name="name">shipment.order.form.view</field>
+            <field name="model">shipment.order</field>
+            <field name="arch" type="xml">
+
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_quotations" type="object" class="oe_stat_button"
+                                    icon="fa-envelope" invisible="quotation_ids_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="quotation_ids_amount_total" widget="monetary"
+                                               modifiers="{'readonly': true}"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="quotation_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Quotes
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_so" type="object" class="oe_stat_button" icon="fa-shopping-cart"
+                                    invisible="so_ids_count == 0" >
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="so_ids_amount_total" widget="monetary"
+                                               modifiers="{'readonly': true}"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="so_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Sales
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_invoices" type="object" class="oe_stat_button"
+                                    icon="fa-file-text-o" invisible="invoice_ids_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="invoice_ids_amount_total" widget="monetary"
+                                               modifiers="{'readonly': true}"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="invoice_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Invoiced
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_invoices_due" type="object" class="oe_stat_button" icon="fa-money"
+                                    invisible="invoice_ids_due_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="invoice_ids_due_amount_total" widget="monetary"
+                                               modifiers="{'readonly': true}"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="invoice_ids_due_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Dues from
+                                    </span>
+                                </div>
+                            </button>
+
+
+                            <button name="action_view_rfqs" type="object" class="oe_stat_button"
+                                    icon="fa-envelope" invisible="rfq_ids_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="rfq_ids_amount_total" widget="monetary"
+                                               modifiers="{'readonly': true}"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="rfq_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        RFQs
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_po" type="object" class="oe_stat_button" icon="fa-shopping-cart"
+                                    invisible="po_ids_count == 0" >
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="po_ids_amount_total" widget="monetary"
+                                               modifiers="{'readonly': true}"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="po_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        POs
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_bills" type="object" class="oe_stat_button"
+                                    icon="fa-file-text-o" invisible="bill_ids_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="bill_ids_amount_total" widget="monetary"
+                                               modifiers="{'readonly': true}"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="bill_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Billed
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_bills_due" type="object" class="oe_stat_button" icon="fa-money"
+                                    invisible="bill_ids_due_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="bill_ids_due_amount_total" widget="monetary"
+                                               modifiers="{'readonly': true}"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="bill_ids_due_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Dues to
+                                    </span>
+                                </div>
+                            </button>
+
+
+
+                        </div>
+                        <field name="active" invisible="1"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active == True"/>
+                        <div class="oe_title mb12">
+                            <h1>
+                                <field class="text-break" name="name" default_focus="1" readonly="1"/>
+                            </h1>
+                        </div>
+                        <div class="row g-0">
+                            <div class="col-11 col-lg-11 col-md-11 col-12 g-0 pr-4">
+                                <div class="row p-4 g-0 " style="background-color: #f2f2f2; border: 1px solid #dee2e6;">
+                                    <div class="col">
+                                        <div>
+                                            <span style="color:gray">Shipper</span>
+                                        </div>
+                                        <div class="fa fa-industry" style="font-size: 20px;"/>
+                                        <div>
+                                            <span>
+                                                <field name="shipper_id" id="shipper_id_infographic" readonly="1"
+                                                       nolabel="1" style="white-space: nowrap; font-size: small"
+                                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div>
+                                            <span style="color:gray">From</span>
+                                        </div>
+                                        <div>
+                                            <span>
+                                                <field name="origin_city_id"
+                                                    style="white-space: nowrap; font-size: small"
+                                                    invisible="origin_port_id != False"
+                                                    readonly="1" nolabel="1"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <span invisible="origin_port_id != False">, </span>
+                                                <field name="origin_country_id"
+                                                    style="white-space: nowrap; font-size: small"
+                                                    invisible="origin_port_id != False"
+                                                    readonly="1" nolabel="1"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <field name="origin_port_id"
+                                                    style="white-space: nowrap; font-size: small"
+                                                    invisible="origin_port_id == False"
+                                                    readonly="1" nolabel="1"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <span invisible="origin_port_id == False">, </span>
+                                                <field name="origin_country_id"
+                                                    style="white-space: nowrap; font-size: small"
+                                                    invisible="origin_port_id == False"
+                                                    readonly="1" nolabel="1"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>                                                                                                
+                                            </span>
+                                        </div>
+                                        <div invisible="not pickup_datetime">
+                                            <field name="pickup_datetime"
+                                                style="white-space: nowrap; font-size: small"                                                
+                                                readonly="1" nolabel="1"
+                                                />
+                                        </div>
+                                    </div>
+                                    <div class="col" style="text-align: center !important">
+                                        <div>
+                                            <span style="color:gray">Via</span>
+                                        </div>
+                                        <div class="fa fa-ship" style="font-size: 20px;"
+                                              invisible="transport != 'ocean'"/>
+                                        <div class="fa fa-plane" style="font-size: 20px;"
+                                             invisible="transport != 'air'"/>
+                                        <div class="fa fa-train" style="font-size: 20px;"
+                                             invisible="transport != 'rail'"/>
+                                        <div class="fa fa-truck" style="font-size: 20px;"
+                                             invisible="transport != 'road'"/>
+                                        <div>
+                                            <span>
+                                                <field name="transport" readonly="1" nolabel="1"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="text-align: right !important">
+                                        <div>
+                                            <span style="color:gray">To</span>
+                                        </div>
+                                        <div>
+                                            <span>
+                                                <field name="destination_city_id"
+                                                    style="white-space: nowrap; font-size: small"
+                                                    invisible="destination_port_id != False"
+                                                    readonly="1" nolabel="1"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <span invisible="destination_port_id != False">, </span>
+                                                <field name="destination_country_id"
+                                                    style="white-space: nowrap; font-size: small"
+                                                    invisible="destination_port_id != False"
+                                                    readonly="1" nolabel="1"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <field name="destination_port_id"
+                                                    style="white-space: nowrap; font-size: small"
+                                                    invisible="destination_port_id == False"
+                                                    readonly="1" nolabel="1"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <span invisible="destination_port_id == False">, </span>
+                                                <field name="destination_country_id"
+                                                    style="white-space: nowrap; font-size: small"
+                                                    invisible="destination_port_id == False"
+                                                    readonly="1" nolabel="1"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>                                                
+                                            </span>
+                                        </div>
+                                        <div invisible="not pickup_datetime">
+                                            <field name="arrival_datetime"
+                                                style="white-space: nowrap; font-size: small"                                                
+                                                readonly="1" nolabel="1"
+                                                />
+                                        </div>
+                                    </div>
+                                    <div class="col" style="text-align: right !important">
+                                        <div class="text-right">
+                                            <span style="color:gray">Consignee</span>
+                                        </div>
+                                        <div class="fa fa-flip-horizontal fa-industry" style="font-size: 20px;"/>
+                                        <div>
+                                            <span>
+                                                <field name="consignee_id" id="consignee_id_infographic" readonly="1"
+                                                       nolabel="1" style=" white-space: nowrap; font-size: small"
+                                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-12">
+                                <div class="row g-0 pt-4 pb-4 h-100" style="background-color: #f2f2f2; border: 1px solid #dee2e6;">
+                                    <div class="col" style="margin:auto; text-align:center">
+                                        <div style="line-height: 16px !important;">
+                                            <field name="direction" id="direction_infographic" readonly="1" nolabel="1" style="white-space: nowrap;"/>
+                                        </div>
+                                        <div class="fa fa-fire" style="font-size: 20px; color:red"  invisible="is_dangerous != True"/>
+                                        <div style="line-height: 16px !important; font-weight: 900;">
+                                            <span  invisible="incoterms_code == False"><field name="incoterms_code" readonly="1" nolabel="1"/></span>
+                                            <span invisible="delivery_terms_code == False or incoterms_code == False "> | </span>
+                                            <span  invisible="delivery_terms_code == False"><field name="delivery_terms_code" readonly="1" nolabel="1"/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <group>
+                            <group string="Customer">
+                                <field name="partner_id" widget="res_partner_many2one" context="{'show_address': 0, 'show_vat': 0}" options='{"no_quick_create": True}' required="1"/>
+                                <field name="partner_contact_id" required="0" invisible="not partner_id" widget="res_partner_many2one" domain="[('parent_id', '=', partner_id)]" options="{'no_quick_create': True}" context="{'default_parent_id': partner_id, 'default_is_company': 0}"/>
+                                <span class="o_form_label" invisible="not partner_contact_id"></span>
+                                <div class="o_form_field" invisible="not partner_contact_id">
+                                    <field name="customer_country" invisible="not customer_country" options="{'no_open': True}"/>
+                                    <field name="customer_email" invisible="not customer_email"/>
+                                    <field name="customer_phone" invisible="not customer_phone"/>
+                                    <field name="customer_mobile" invisible="not customer_mobile"/>
+                                </div>
+                                <field name="is_customer_agent"/>
+                            </group>
+                            <group string="Transport Details">
+                                <field name="direction" widget="radio" required="1" options="{'horizontal': true}"/>
+                                <field name="transport" widget="radio" required="1" options="{'horizontal': true}"/>
+                                <field name="ocean_shipment_mode" string="Shipment Mode"
+                                     invisible="transport != 'ocean'" required="transport == 'ocean'"/>
+                                <field name="air_shipment_mode" string="Shipment Mode"
+                                     invisible="transport != 'air'" required="transport == 'air'"/>
+                                <field name="road_shipment_mode" string="Shipment Mode"
+                                        invisible="transport != 'road'" required="transport == 'road'"/>
+                                <field name="rail_shipment_mode" string="Shipment Mode"
+                                        invisible="transport != 'rail'" required="transport =='rail'"/>
+                                <field name="move_type"/>
+                                <field name="incoterms_id"/>
+                                <field name="is_dangerous"/>
+                                <field name="is_freight_insurance"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Shipper">
+                                <field name="shipper_id" widget="res_partner_many2one" context="{'show_address': 0, 'show_vat': 0}" options='{"no_quick_create": True}' required="1" id="shipper_id_form"/>
+                                <field name="shipper_contact_id" invisible="not shipper_id" required="0" widget="res_partner_many2one" domain="[('parent_id', '=', shipper_id)]" options="{'no_quick_create': True}" context="{'default_parent_id': shipper_id, 'default_is_company': 0}"/>
+                                <span class="o_form_label" invisible="not shipper_contact_id"></span>
+                                <div class="o_form_field" invisible="not shipper_contact_id">
+                                    <field name="shipper_country" invisible="not shipper_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="shipper_email" invisible="not shipper_email"/>
+                                    <field name="shipper_phone" invisible="not shipper_phone"/>
+                                    <field name="shipper_mobile" invisible="not shipper_mobile"/>
+                                </div>
+                            </group>
+                            <group string="Consignee">
+                                <field name="consignee_id" widget="res_partner_many2one" context="{'show_address': 0, 'show_vat': 0}" options='{"no_quick_create": True}' required="1" id="consignee_id_form"/>
+                                <field name="consignee_contact_id" required="0" invisible="not consignee_id" widget="res_partner_many2one" domain="[('parent_id', '=', consignee_id)]" options="{'no_quick_create': True}" context="{'default_parent_id': consignee_id, 'default_is_company': 0}"/>
+                                <span class="o_form_label" invisible="not consignee_contact_id"></span>
+                                <div class="o_form_field" invisible="not consignee_contact_id">
+                                    <field name="consignee_country" invisible="not consignee_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="consignee_email" invisible="not consignee_email"/>
+                                    <field name="consignee_phone" invisible="not consignee_phone"/>
+                                    <field name="consignee_mobile" invisible="not consignee_mobile"/>
+                                </div>
+                            </group>
+                        </group>
+                        <group string="Notify Party">
+                            <group string="First Notify">
+                                <field name="first_notify_id" widget="res_partner_many2one" context="{'show_address': 0, 'show_vat': 0}" options='{"no_quick_create": True}' required="0" id="first_notify_id_form"/>
+                                <field name="first_notify_contact_id" required="0" invisible="not first_notify_id" widget="res_partner_many2one" domain="[('parent_id', '=', first_notify_id)]" options="{'no_quick_create': True}" context="{'default_parent_id': first_notify_id, 'default_is_company': 0}"/>
+                                <span class="o_form_label" invisible="not first_notify_contact_id"></span>
+                                <div class="o_form_field" invisible="not first_notify_contact_id">
+                                    <field name="first_notify_country" invisible="not first_notify_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="first_notify_email" invisible="not first_notify_email"/>
+                                    <field name="first_notify_phone" invisible="not first_notify_phone"/>
+                                    <field name="first_notify_mobile" invisible="not first_notify_mobile"/>
+                                </div>
+                            </group>
+                            <group string="Second Notify">
+                                <field name="second_notify_id" widget="res_partner_many2one" context="{'show_address': 0, 'show_vat': 0}" options='{"no_quick_create": True}' required="0" id="second_notify_id_form"/>
+                                <field name="second_notify_contact_id" required="0" invisible="not second_notify_id" widget="res_partner_many2one" domain="[('parent_id', '=', second_notify_id)]" options="{'no_quick_create': True}" context="{'default_parent_id': second_notify_id, 'default_is_company': 0}"/>
+                                <span class="o_form_label" invisible="not second_notify_contact_id"></span>
+                                <div class="o_form_field" invisible="not second_notify_contact_id">
+                                    <field name="second_notify_country" invisible="not second_notify_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="second_notify_email" invisible="not second_notify_email"/>
+                                    <field name="second_notify_phone" invisible="not second_notify_phone"/>
+                                    <field name="second_notify_mobile" invisible="not second_notify_mobile"/>
+                                </div>
+                            </group>
+                        </group>
+                        <group string="Main Carriage">
+                            <group string="Origin">
+                                <field name="origin_address_type" widget="radio" options="{'horizontal':True}" invisible="1"/>
+                                <field name="origin_port_id" invisible="origin_address_type != 'port'" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_address_id" invisible="origin_address_type != 'door'" options="{'no_open': True, 'no_quick_create': True}" domain="[('partner_id','=',partner_id)]" context="{'default_partner_id': partner_id}"/>
+                                <field name="pickup_datetime"/>                                        
+                                <label for="origin_address_id" string="Loading Address"/>
+                                <div name="origin_address">
+                                    <field name="origin_code" nolabel="1" invisible="not origin_code"/>
+                                    <field name="origin_street" nolabel="1" invisible="not origin_street"/>
+                                    <field name="origin_street2" nolabel="1" invisible="not origin_street2"/>
+                                    <field name="origin_zip_code" nolabel="1" invisible="not origin_zip_code"/>
+                                    <field name="origin_city_id" nolabel="1" invisible="not origin_city_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="origin_state_id" nolabel="1" invisible="not origin_state_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="origin_country_id" nolabel="1" invisible="not origin_country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <field name="origin_contact_id" required="0" invisible="not origin_address_id" widget="res_partner_many2one" options="{'no_quick_create': True}" />
+                                <span class="o_form_label" invisible="not origin_contact_id"></span>
+                                <div class="o_form_field" invisible="not origin_contact_id">
+                                    <field name="origin_contact_country" invisible="not origin_contact_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="origin_contact_email" invisible="not origin_contact_email"/>
+                                    <field name="origin_contact_phone" invisible="not origin_contact_phone"/>
+                                    <field name="origin_contact_mobile" invisible="not origin_contact_mobile"/>
+                                </div>
+                            </group>
+                            <group string="Destination">
+                                <field name="destination_address_type" widget="radio" options="{'horizontal':True}" invisible="1"/>
+                                <field name="destination_port_id" invisible="destination_address_type != 'port'" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_address_id" invisible="destination_address_type != 'door'" options="{'no_open': True, 'no_quick_create': True}" domain="[('partner_id','=',partner_id)]" context="{'default_partner_id': partner_id}"/>
+                                <field name="arrival_datetime"/>
+                                <label for="destination_address_id" string="Discharge Address"/>
+                                <div name="destination_address">
+                                    <field name="destination_code" nolabel="1" invisible="not destination_code"/>
+                                    <field name="destination_street" nolabel="1" invisible="not destination_street"/>
+                                    <field name="destination_street2" nolabel="1" invisible="not destination_street2"/>
+                                    <field name="destination_zip_code" nolabel="1" invisible="not destination_zip_code"/>
+                                    <field name="destination_city_id" nolabel="1" invisible="not destination_city_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="destination_state_id" nolabel="1" invisible="not destination_state_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="destination_country_id" nolabel="1" invisible="not destination_country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <field name="destination_contact_id" required="0" invisible="not destination_address_id" widget="res_partner_many2one" options="{'no_quick_create': True}"/>
+                                <span class="o_form_label" invisible="not destination_contact_id"></span>
+                                <div class="o_form_field" invisible="not destination_contact_id">
+                                    <field name="destination_contact_country" invisible="not destination_contact_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="destination_contact_email" invisible="not destination_contact_email"/>
+                                    <field name="destination_contact_phone" invisible="not destination_contact_phone"/>
+                                    <field name="destination_contact_mobile" invisible="not destination_contact_mobile"/>
+                                </div>
+                            </group>
+                        </group>
+                        <group string="Routes &amp; Services">
+                            <div style="width:100% !important">
+                                <button name="action_add_route" string="Add a Route" class="oe_highlight m-1" type="object"/>
+                                <button name="action_add_service" string="Add a Service" class="oe_highlight m-1" type="object"/>
+                            </div>
+
+                            <group string="Pre-Carriage Routes">
+                                <field name="pre_route_ids" mode="kanban" nolabel="1" colspan="2" context="{'form_view_initial_mode': 'edit', 'force_detailed_view': 'true'}"/>
+                            </group>
+                            <group string="On-Carriage Routes">
+                                <field name="on_route_ids" mode="kanban" nolabel="1" colspan="2" context="{'form_view_initial_mode': 'edit', 'force_detailed_view': 'true'}"/>
+                            </group>
+
+                            <!--
+                            <group string="Pre-Carriage">
+                                <field name="pickup_option" invisible="not transport in ('ocean','air','rail') or origin_address_type == 'door'"/>
+                                <field name="pickup_address_id" invisible="not pickup_option" options="{'no_open': True, 'no_quick_create': True}" domain="[('partner_id','=',partner_id)]" context="{'default_partner_id': partner_id}"/>
+                                <label for="pickup_address_id" string="Address" invisible="not pickup_option"/>
+                                <div name="pickup_address" invisible="not pickup_option">
+                                    <field name="pickup_code" nolabel="1" invisible="not pickup_code"/>
+                                    <field name="pickup_street" nolabel="1" invisible="not pickup_street"/>
+                                    <field name="pickup_street2" nolabel="1" invisible="not pickup_street2"/>
+                                    <field name="pickup_zip_code" nolabel="1" invisible="not pickup_zip_code"/>
+                                    <field name="pickup_city_id" nolabel="1" invisible="not pickup_city_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="pickup_state_id" nolabel="1" invisible="not pickup_state_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="pickup_country_id" nolabel="1" invisible="not pickup_country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                            </group>                            
+                            <group string="On-Carriage">
+                                <field name="delivery_option" invisible="not transport in ('ocean','air','rail') or destination_address_type == 'door'"/>
+                                <field name="delivery_address_id" invisible="not delivery_option" options="{'no_open': True, 'no_quick_create': True}" domain="[('partner_id','=',partner_id)]" context="{'default_partner_id': partner_id}"/>
+                                <label for="delivery_address_id" string="Address" invisible="not delivery_option"/>
+                                <div name="delivery_address" invisible="not delivery_option">
+                                    <field name="delivery_code" nolabel="1" invisible="not delivery_code"/>
+                                    <field name="delivery_street" nolabel="1" invisible="not delivery_street"/>
+                                    <field name="delivery_street2" nolabel="1" invisible="not delivery_street2"/>
+                                    <field name="delivery_zip_code" nolabel="1" invisible="not delivery_zip_code"/>
+                                    <field name="delivery_city_id" nolabel="1" invisible="not delivery_city_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="delivery_state_id" nolabel="1" invisible="not delivery_state_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                    <field name="delivery_country_id" nolabel="1" invisible="not delivery_country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                            </group>
+                            -->
+                            <group string="Pre-Carriage Services">
+                                <field name="pre_service_ids" mode="kanban" nolabel="1" colspan="2"/>
+                            </group>
+                            <group string="On-Carriage Services">
+                                <field name="on_service_ids" mode="kanban" nolabel="1" colspan="2"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="General Information">
+                                <group>
+                                    <group string="General Details">
+                                        <field name="bl_number"/>
+                                        <field name="delivery_terms"/>
+                                    </group>
+                                    <group string="Receipt Details">
+                                        <field name="contact_place_of_receipt"/>
+                                        <field name="contact_place_of_delivery"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Tracking Details">
+                                        <field name="tracking_number"/>
+                                        <field name="special_instructions"/>
+                                    </group>
+                                    <group string="Other Details">
+                                        
+                                        <field name="notes"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Main Carriage Details">
+                                <group>
+                                    <group name="air_details" invisible="transport != 'air'">
+                                        <field name="airline_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="0"/>
+                                        <field name="airline_id" options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="mawb_no"/>
+                                        <field name="flight_no"/>
+                                    </group>
+                                    <group name="ocean_details" invisible="transport != 'ocean'">
+                                        <field name="carrier_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="0"/>
+                                        <field name="vessel_id" options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="transhipment_port" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                        <field name="obl"/>
+                                        <field name="voyage_no"/>
+                                    </group>
+                                    <group name="rail_details" invisible="transport != 'rail'">
+                                        <field name="railway_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="0"/>
+                                        <field name="railway_id" options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="train_no"/>
+                                        <field name="car_no"/>
+                                    </group>
+                                    <group name="land_details" invisible="transport != 'land'">
+                                        <field name="vehicle_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="0"/>
+                                        <field name="vehicle_id" options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="truck_ref"/>
+                                    </group>                      
+                                    <group name="other details">
+                                        <field name="distance"/>
+                                        <field name="bl_document_type"/>
+                                        <field name="freight_payable"/>
+                                        <field name="no_bill"/>                                        
+                                    </group>
+                                    <group name="other details2">
+                                        <field name="freight_amount"/>
+                                        <field name="si_issue_date"/>                                      
+                                    </group>                                    
+                                </group>
+                                <div>
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:50%;text-align:center;">
+                                                    Mask and Numbers
+                                                </td>
+                                                <td style="width:50%;text-align:center;">
+                                                    Description and Packages &amp; Goods Particulars Furnished by
+                                                    Shipper
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:50%">
+                                                    <field name="mask_numbers"/>
+                                                </td>
+                                                <td style="width:50%">
+                                                    <field name="desc_pkg"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:50%;text-align:center;">
+                                                    Measurement
+                                                </td>
+                                                <td style="width:50%;text-align:center;">
+                                                    Remarks
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:50%">
+                                                    <field name="measurement"/>
+                                                </td>
+                                                <td style="width:50%">
+                                                    <field name="remark"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>                            
+                            </page>
+                            <page name="routes" string="Routes">
+                                <field name="route_ids"/>
+                            </page>
+                            <page name="services" string="Services">
+                                <field name="service_ids"/>
+                            </page>
+                            <page string="Agent">
+                                <group>
+                                    <field name="agent_id" widget="res_partner_many2one" context="{'show_address': 0, 'show_vat': 0}" options='{"no_quick_create": True}' required="0" id="agent_id_form"/>
+                                    <field name="agent_contact_id" required="0" invisible="not agent_id" widget="res_partner_many2one" domain="[('parent_id', '=', agent_id)]" options="{'no_quick_create': True}" context="{'default_parent_id': agent_id, 'default_is_company': 0}"/>
+                                    <span class="o_form_label" invisible="not agent_contact_id"></span>
+                                    <div class="o_form_field" invisible="not agent_contact_id">
+                                        <field name="agent_country" invisible="not agent_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                        <field name="agent_email" invisible="not agent_email"/>
+                                        <field name="agent_phone" invisible="not agent_phone"/>
+                                        <field name="agent_mobile" invisible="not agent_mobile"/>
+                                </div>
+                                </group>
+                            </page>
+                            <page string="Insurance &amp; Policy" invisible="not is_freight_insurance">
+                                <group>
+                                    <group string="Policy Details">
+                                        <field name="policy_no" required="is_freight_insurance"/>
+                                        <field name="policy_name"  required="is_freight_insurance"/>
+                                        <field name="policy_partner_id"/>
+                                        <field name="policy_holder_id" string="Policy Holder"/>
+                                    </group>
+                                    <group string="Issue Details">
+                                        <field name="date"  required="is_freight_insurance"/>
+                                        <field name="issue_by"/>
+                                    </group>
+                                </group>
+                                <group string="Risk Covered">
+                                    <field name="risk_ids" />
+                                </group>
+                                <group string="Policy Term &amp; Condition">
+                                    <field name="term"/>
+                                </group>
+                            </page>
+                            <page string="Other Info">
+                                <group name="users" string="Users &amp; Units">
+                                    <field name="order_user_id" widget="many2one_avatar_user"/>
+                                    <field name="order_ou_id"/>
+                                    <field name="assigned_user_id" widget="many2one_avatar_user"/>
+                                    <field name="assigned_ou_id"/>
+                                    <field name="sales_user_id" widget="many2one_avatar_user"/>
+                                    <field name="sales_ou_id"/>
+                                    <field name="company_id" invisible="1"/>
+                                </group>
+                                <group name="other" string="Dates">
+                                    <field name="create_datetime"/>
+                                </group>
+                            </page>
+                            <page string="Package Details">
+                                <field name="freight_package_ids" nolabel="1" widget="one2many_list"/>
+                            </page>
+                            <page string="Services Rendered">
+                                <div style="line-height: 25px !important; font-weight: 900;">Quotations</div>
+                                <hr/>
+                                        <field name="qol_ids" nolabel="1"
+                                            options="{'no_open': True, 'no_quick_create': True, 'no_create': True}">
+                                            <tree create="0" edit="0" delete="0">
+                                                <field name="product_template_id" string="Product"/>
+                                                <field name="name"/>
+                                                <field name="product_uom_qty"/>
+                                                <field name="product_uom" string="Unit"/>
+                                                <field name="price_unit"/>
+                                                <field name="tax_id" widget="many2many_tags" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <field name="discount"/>
+                                                <field name="price_total"/>
+                                                <field name="order_id" string="Reference"/>
+                                                <field name="state" string="Status"/>
+                                            </tree>
+                                        </field>
+                              <div style="line-height: 25px !important; font-weight: 900;">Sale Orders</div>
+                              <hr/>
+                                        <field name="sol_ids" nolabel="1"
+                                            options="{'no_open': True, 'no_quick_create': True, 'no_create': True}">
+                                            <tree create="0" edit="0" delete="0">
+                                                <field name="product_template_id" string="Product"/>
+                                                <field name="name"/>
+                                                <field name="product_uom_qty"/>
+                                                <field name="product_uom" string="Unit"/>
+                                                <field name="price_unit"/>
+                                                <field name="tax_id" widget="many2many_tags"
+                                                    options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <field name="discount"/>
+                                                <field name="price_total"/>
+                                                <field name="order_id" string="Reference"/>
+                                                <field name="state" string="Status"/>
+                                            </tree>
+                                        </field>
+                                    <div style="line-height: 25px !important; font-weight: 900;">Invoiced</div>
+                                    <hr/>
+                                    <field name="iol_ids" nolabel="1"
+                                        options="{'no_open': True, 'no_quick_create': True, 'no_create': True}">
+                                        <tree create="0" edit="0" delete="0">
+                                            <field name="product_id" string="Product"/>
+                                            <field name="name" string="Description"/>
+                                            <field name="quantity"/>
+                                            <field name="product_uom_id" string="Unit"/>
+                                            <field name="price_unit"/>
+                                            <field name="tax_ids" widget="many2many_tags"
+                                                options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            <field name="discount"/>
+                                            <field name="price_total"/>
+                                            <field name="move_id" string="Reference"/>
+                                            <field name="move_type"/>
+                                        </tree>
+                                    </field>
+                                
+                            </page>
+                            <page string="Services Received">
+                                <div style="line-height: 25px !important; font-weight: 900;">RFQs</div>
+                                <hr/>
+                                    <field name="rfqol_ids" nolabel="1"
+                                        options="{'no_open': True, 'no_quick_create': True, 'no_create': True}">
+                                        <tree create="0" edit="0" delete="0">
+                                            <field name="product_id" string="Product"/>
+                                            <field name="name"/>
+                                            <field name="product_qty"/>
+                                            <field name="product_uom" string="Unit"/>
+                                            <field name="price_unit"/>
+                                            <field name="taxes_id" widget="many2many_tags"
+                                                options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            <field name="price_total"/>
+                                            <field name="order_id" string="Reference"/>
+                                            <field name="state" string="Status"/>
+                                        </tree>
+                                    </field>
+                                <div style="line-height: 25px !important; font-weight: 900;">Purchase Orders</div>
+                                <hr/>
+                                    <field name="pol_ids" nolabel="1"
+                                        options="{'no_open': True, 'no_quick_create': True, 'no_create': True}">
+                                        <tree create="0" edit="0" delete="0">
+                                            <field name="product_id" string="Product"/>
+                                            <field name="name"/>
+                                            <field name="product_qty"/>
+                                            <field name="product_uom" string="Unit"/>
+                                            <field name="price_unit"/>
+                                            <field name="taxes_id" widget="many2many_tags"
+                                                options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            <field name="price_total"/>
+                                            <field name="order_id" string="Reference"/>
+                                            <field name="state" string="Status"/>
+                                        </tree>
+                                    </field>
+                                <div style="line-height: 25px !important; font-weight: 900;">Billed</div>
+                                <hr/>
+                                    <field name="bol_ids" nolabel="1"
+                                        options="{'no_open': True, 'no_quick_create': True, 'no_create': True}">
+                                        <tree create="0" edit="0" delete="0">
+                                            <field name="product_id" string="Product"/>
+                                            <field name="name" string="Description"/>
+                                            <field name="quantity"/>
+                                            <field name="product_uom_id" string="Unit"/>
+                                            <field name="price_unit"/>
+                                            <field name="tax_ids" widget="many2many_tags"
+                                                options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            <field name="discount"/>
+                                            <field name="price_total"/>
+                                            <field name="move_id" string="Reference"/>
+                                            <field name="move_type"/>
+                                        </tree>
+                                    </field>
+                               
+                            </page>
+
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

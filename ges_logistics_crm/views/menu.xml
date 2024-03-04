@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+        <record id="gescrm_root_menu" model="ir.ui.menu">
+            <field name="name">GESCRM</field>
+            <field name="sequence">251</field>
+            <field name="web_icon">ges_logistics_crm,static/description/icon.png</field>
+        </record>
+        -->
+
+        <record id="gescrm_lead_menu" model="ir.ui.menu">
+            <field name="name">Leads</field>
+            <field name="sequence">5</field>
+            <field name="parent_id" ref="crm.crm_menu_root"/>
+            <field name="action" ref="gescrm_lead_act_window"/>
+        </record>
+        <!--
+        <record id="gescrm_menu_config" model="ir.ui.menu">
+            <field name="name">Configuration</field>
+            <field name="sequence">80</field>
+            <field name="parent_id" ref="gescrm_root_menu"/>
+        </record>
+        -->
+
+        <record id="gescrm_menu_config_stages" model="ir.ui.menu">
+            <field name="name">Lead Stages</field>
+            <field name="sequence">0</field>
+            <field name="parent_id" ref="crm.menu_crm_config_lead"/>
+            <field name="action" ref="gescrm_lead_stage_action"/>
+        </record>
+
+        
+
+
+    </data>
+</odoo>

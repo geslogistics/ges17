@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="logistics_transport_order_create_view_form" model="ir.ui.view">
+        <field name="name">logistics.transport.order.create.form</field>
+        <field name="model">logistics.transport.order.create</field>
+        <field name="arch" type="xml">
+            <form string="Transportation Orders Creation">
+                <group>
+                    <field name="shipment_id" invisible="1"/>
+                    <field name="number_of_orders" placeholder="Enter the number of transportation orders you need to create!"/>
+                </group>
+                <footer>
+                    <button name="action_create_transport_orders" string="Create Transportation Orders" type="object" class="btn-primary"
+                            data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="logistics_transport_order_create_action" model="ir.actions.act_window">
+        <field name="name">Create Transportation Orders</field>
+        <field name="res_model">logistics.transport.order.create</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="logistics_transport_order_create_view_form"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_logistics_shipment_order"/>
+        <field name="context">{'default_shipment_id': active_ids,}</field>
+    </record>
+
+    <data>
+        <!--Actions-->
+        <record id="logistics_shipment_order_act_window" model="ir.actions.act_window">
+            <field name="name">Shipment Orders</field>
+            <field name="res_model">logistics.shipment.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+
+        <!--Views-->
+        <record id="logistics_shipment_order_list_view" model="ir.ui.view">
+            <field name="name">logistics.shipment.order.list.view</field>
+            <field name="model">logistics.shipment.order</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="direction"/>
+                    <field name="transport"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="logistics_shipment_order_form_view" model="ir.ui.view">
+            <field name="name">logistics.shipment.order.form.view</field>
+            <field name="model">logistics.shipment.order</field>
+            <field name="arch" type="xml">
+                <form duplicate="0">
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="new,inprogress,confirmed,intransit,delivered" on_change="1" readonly="1"/>
+                        <button name="%(ges_logistics.logistics_transport_order_create_action)d" string="Create Transportation Orders" data-hotkey="l"
+                                title="Create Transportation Orders" type="action"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_transportation_orders" type="object" class="oe_stat_button"
+                                    icon="fa-envelope">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="to_ids_count"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Transportation Orders
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_quotations" type="object" class="oe_stat_button"
+                                    icon="fa-envelope" invisible="quotation_ids_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="quotation_ids_amount_total" widget="monetary"
+                                               readonly="1"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="quotation_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Quotes
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_so" type="object" class="oe_stat_button" icon="fa-shopping-cart"
+                                    invisible="so_ids_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="so_ids_amount_total" widget="monetary"
+                                               readonly="1" options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="so_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Sales
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_invoices" type="object" class="oe_stat_button"
+                                    icon="fa-file-text-o" invisible="invoice_ids_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="invoice_ids_amount_total" widget="monetary"
+                                               readonly="1"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="invoice_ids_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Invoiced
+                                    </span>
+                                </div>
+                            </button>
+                            <button name="action_view_invoices_due" type="object" class="oe_stat_button" icon="fa-money"
+                                    invisible="invoice_ids_due_count == 0">
+                                <div class="o_field_widget o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="invoice_ids_due_amount_total" widget="monetary"
+                                               readonly="1"
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="invoice_ids_due_count" invisible="1"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Dues
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+                        <field name="active" invisible="1"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                                invisible="active" modifiers="{'invisible': [['active', '=', true]]}"/>
+                        <div class="oe_title mb12">
+                            <h1>
+                                <field class="text-break" name="name" default_focus="1" readonly="1"/>
+                            </h1>
+                        </div>
+                        <div class="row g-0">
+                            <div class="col-11 col-lg-11 col-md-11 col-12 g-0 pr-4">
+                                <div class="row p-4 g-0 " style="background-color: #f2f2f2; border: 1px solid #dee2e6;">
+                                    <div class="col">
+                                        <div>
+                                            <span style="color:gray">Shipper</span>
+                                        </div>
+                                        <div class="fa fa-industry" style="font-size: 20px;"/>
+                                        <div>
+                                            <span>
+                                                <field name="shipper_id" id="shipper_id_infographic" readonly="1"
+                                                       nolabel="1" style="white-space: nowrap; font-size: small"
+                                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div>
+                                            <span style="color:gray">From</span>
+                                        </div>
+                                        <div>
+                                            <span>
+                                                <field name="origin_main_carriage_country_id"
+                                                       style="white-space: nowrap; font-size: small"
+                                                       invisible="origin_main_carriage_port_id"
+                                                       readonly="1" nolabel="1"
+                                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <field name="origin_main_carriage_port_id"
+                                                       style="white-space: nowrap; font-size: small"
+                                                       invisible="not origin_main_carriage_port_id"
+                                                       readonly="1" nolabel="1"
+                                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="text-align: center !important">
+                                        <div>
+                                            <span style="color:gray">Via</span>
+                                        </div>
+                                        <div class="fa fa-ship" style="font-size: 20px;" invisible="transport not in 'ocean'"/>
+                                        <div class="fa fa-plane" style="font-size: 20px;" invisible="transport not in 'air'"/>
+                                        <div class="fa fa-train" style="font-size: 20px;" invisible="transport not in 'rail'"/>
+                                        <div class="fa fa-truck" style="font-size: 20px;" invisible="transport not in 'road'"/>
+                                        <div>
+                                            <span>
+                                                <field name="transport" readonly="1" nolabel="1"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="text-align: right !important">
+                                        <div>
+                                            <span style="color:gray">To</span>
+                                        </div>
+                                        <div>
+                                            <span>
+                                                <field name="destination_main_carriage_country_id"
+                                                       style="white-space: nowrap; font-size: small"
+                                                       invisible="destination_main_carriage_port_id"
+                                                       readonly="1" nolabel="1"
+                                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                                <field name="destination_main_carriage_port_id"
+                                                       style="white-space: nowrap; font-size: small"
+                                                       invisible="not destination_main_carriage_port_id"
+                                                       readonly="1" nolabel="1"
+                                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="text-align: right !important">
+                                        <div class="text-right">
+                                            <span style="color:gray">Consignee</span>
+                                        </div>
+                                        <div class="fa fa-flip-horizontal fa-industry" style="font-size: 20px;"/>
+                                        <div>
+                                            <span>
+                                                <field name="consignee_id" id="consignee_id_infographic" readonly="1"
+                                                       nolabel="1" style=" white-space: nowrap; font-size: small"
+                                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-12">
+                                <div class="row g-0 h-100"
+                                     style="background-color: #f2f2f2; border: 1px solid #dee2e6;">
+                                    <div class="col" style="margin:auto; text-align:center">
+                                        <div>
+                                            <div class="fa fa-angle-double-up" style="font-size: 20px;" invisible="direction not in 'export'"/>
+                                            <br/>
+                                            <field name="direction" id="direction_infographic" readonly="1" nolabel="1" style="white-space: nowrap;"/>
+                                            <br/>
+                                            <div class="fa fa-angle-double-down" style="font-size: 20px;" invisible="direction not in 'import'"/>
+                                        </div>
+                                        <div style="font-weight: 900;">
+                                            <field name="incoterms_id" readonly="1" nolabel="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <group>
+                            <group string="Customer">
+                                <label for="partner_id"/>
+                                <div>
+                                    <field name="partner_id"/>
+                                    <field name="customer_email"/>
+                                    <field name="customer_phone"/>
+                                    <field name="customer_mobile"/>
+                                </div>
+                                <field name="is_customer_agent"/>
+                            </group>
+                            <group string="Transport Details">
+                                <field name="to_ids" widget="many2many_tags" invisible="1"/>
+                                <field name="direction" widget="radio" required="1" options="{'horizontal': true}"/>
+                                <field name="transport" widget="radio" required="1" options="{'horizontal': true}"/>
+                                <field name="ocean_shipment_mode" invisible="transport not in 'ocean'" required="transport == 'ocean'"/>
+                                <field name="air_shipment_mode" invisible="transport not in 'air'" required="transport == 'air'"/>
+                                <field name="road_shipment_mode" invisible="transport not in 'road'" required="transport == 'road'"/>
+                                <field name="rail_shipment_mode" invisible="transport not in 'rail'" required="transport == 'rail'"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Shipper">
+                                <label for="shipper_id"/>
+                                <div>
+                                    <field name="shipper_id"/>
+                                    <field name="shipper_email"/>
+                                    <field name="shipper_phone"/>
+                                    <field name="shipper_mobile"/>
+                                </div>
+                            </group>
+                            <group string="Consignee">
+                                <label for="consignee_id"/>
+                                <div>
+                                    <field name="consignee_id"/>
+                                    <field name="consignee_email"/>
+                                    <field name="consignee_phone"/>
+                                    <field name="consignee_mobile"/>
+                                </div>
+                            </group>
+                        </group>
+                        <group string="Main Carriage">
+                            <group string="Origin">
+                                <field name="origin_main_carriage_country_id"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <label for="origin_main_carriage_port_id_ocean_air_rail" string="Loading Port" invisible="transport not in 'ocean'"/>
+                                <label for="origin_main_carriage_port_id_ocean_air_rail" string="Gateway" invisible="transport not in 'air'"/>
+                                <label for="origin_main_carriage_port_id_ocean_air_rail" string="Loading Terminal"
+                                       invisible="transport not in 'rail'"/>
+                                <label for="origin_main_carriage_address_id_road" string="Loading Location" invisible="transport not in 'road'"/>
+                                <div invisible="transport not in ('ocean','air','rail')">
+                                    <field name="origin_main_carriage_port_id" id="origin_main_carriage_port_id_ocean_air_rail"
+                                           options="{'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <div invisible="transport not in 'road'">
+                                    <field name="origin_main_carriage_address_id" id="origin_main_carriage_address_id_road"
+                                           options="{'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <field name="origin_main_carriage_address_save_option"
+                                       invisible="transport not in ('ocean','air','rail') or transport not in ('ocean','air','rail') and origin_main_carriage_address_id"/>
+                                <field name="origin_main_carriage_address_name" invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and origin_main_carriage_address_id"
+                                       required="origin_main_carriage_address_save_option" force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_main_carriage_address_code"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and origin_main_carriage_address_id"
+                                       required="origin_main_carriage_address_save_option"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_main_carriage_address_country_id"
+                                       invisible="transport not in ('ocean','air','road','rail')" required="origin_main_carriage_address_save_option"
+                                       readonly="1" force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_main_carriage_address_state_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and origin_main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_main_carriage_address_city_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and origin_main_carriage_address_id"
+                                       required="origin_main_carriage_address_save_option"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_main_carriage_address_zip_code"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and origin_main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_main_carriage_address_street"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and origin_main_carriage_address_id"
+                                       required="origin_main_carriage_address_save_option"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_main_carriage_address_street2"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and origin_main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_main_carriage_address_street3"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and origin_main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </group>
+                            <group string="Destination">
+                                <field name="destination_main_carriage_country_id"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <label for="destination_main_carriage_port_id_ocean_air_rail" string="Discharge Port"
+                                       invisible="transport not in 'ocean'"/>
+                                <label for="destination_main_carriage_port_id_ocean_air_rail" string="Destination"
+                                       invisible="transport not in 'air'"/>
+                                <label for="destination_main_carriage_port_id_ocean_air_rail"
+                                       string="Discharge Terminal" invisible="transport not in 'rail'"/>
+                                <label for="destination_main_carriage_address_id_road" string="Discharge Location"
+                                       invisible="transport not in 'road'"/>
+                                <div invisible="transport not in ('ocean','air','rail')">
+                                    <field name="destination_main_carriage_port_id"
+                                           id="destination_main_carriage_port_id_ocean_air_rail"
+                                           options="{'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <div invisible="transport not in 'road'">
+                                    <field name="destination_main_carriage_address_id"
+                                           id="destination_main_carriage_address_id_road"
+                                           options="{'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <field name="destination_main_carriage_address_save_option"
+                                       invisible="transport in ('ocean','air','rail') or transport not in ('ocean','air','rail') and destination_main_carriage_address_id"/>
+                                <field name="destination_main_carriage_address_name"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and destination_main_carriage_address_id"
+                                       required="destination_main_carriage_address_save_option"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_main_carriage_address_code"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and destination_main_carriage_address_id"
+                                       required="destination_main_carriage_address_save_option"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_main_carriage_address_country_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       required="destination_main_carriage_address_save_option"
+                                       readonly="1" force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_main_carriage_address_state_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and destination_main_carriage_address_id"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_main_carriage_address_city_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and destination_main_carriage_address_id"
+                                       required="destination_main_carriage_address_save_option"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_main_carriage_address_zip_code"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and destination_main_carriage_address_id"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_main_carriage_address_street"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and destination_main_carriage_address_id"
+                                       required="destination_main_carriage_address_save_option"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_main_carriage_address_street2"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and destination_main_carriage_address_id"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_main_carriage_address_street3"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and destination_main_carriage_address_id"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </group>
+                        </group>
+                        <group string="Other Routes">
+                            <group string="Pre-Carriage">
+                                <field name="pickup_option"
+                                       invisible="transport not in ('ocean','air','rail')"/>
+                                <field name="origin_pickup_country_id" string="Pick-Up Country"
+                                       invisible="transport not in 'road' and not pickup_option"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_id" string="Named Address"
+                                       invisible="transport not in 'road' and not pickup_option"
+                                       options="{'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_save_option"
+                                       invisible="not pickup_option or origin_pickup_address_id"/>
+                                <field name="origin_pickup_address_name"
+                                       invisible="transport not in 'road' and not pickup_option" readonly="origin_pickup_address_id"
+                                       required="origin_pickup_address_save_option"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_code"
+                                       invisible="transport not in 'road' and not pickup_option" readonly="origin_pickup_address_id"
+                                       required="origin_pickup_address_save_option"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_country_id"
+                                       invisible="transport not in 'road' and not pickup_option" required="origin_pickup_address_save_option"
+                                       readonly="1" force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_state_id"
+                                       invisible="transport not in 'road' and not pickup_option" readonly="origin_pickup_address_id"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_city_id"
+                                       invisible="transport not in 'road' and not pickup_option" readonly="origin_pickup_address_id"
+                                       required="origin_pickup_address_save_option"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_zip_code"
+                                       invisible="transport not in 'road' and not pickup_option" readonly="origin_pickup_address_id"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_street"
+                                       invisible="transport not in 'road' and not pickup_option" readonly="origin_pickup_address_id"
+                                       required="origin_pickup_address_save_option"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_street2"
+                                       invisible="transport not in 'road' and not pickup_option" readonly="origin_pickup_address_id"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_pickup_address_street3"
+                                       invisible="transport not in 'road' and not pickup_option" readonly="origin_pickup_address_id"
+                                       force_save="1"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </group>
+                            <group string="On-Carriage">
+                                <field name="delivery_option"
+                                       invisible="transport not in ('ocean','air','rail')"/>
+                                <field name="destination_delivery_country_id" string="Delivery Country"
+                                       invisible="transport not in 'road' and not delivery_option"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_id" string="Named Address"
+                                       invisible="transport not in 'road' and not delivery_option"
+                                       options="{'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_save_option"
+                                       invisible="not delivery_option or destination_delivery_address_id"/>
+                                <field name="destination_delivery_address_name"
+                                       invisible="transport not in 'road' and not delivery_option" readonly="not destination_delivery_address_id"
+                                       required="destination_delivery_address_save_option"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_code"
+                                       invisible="transport not in 'road' and not delivery_option" readonly="not destination_delivery_address_id"
+                                       required="destination_delivery_address_save_option"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_country_id"
+                                       invisible="transport not in 'road' and not delivery_option" required="destination_delivery_address_save_option"
+                                       readonly="1" force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_state_id"
+                                       invisible="transport not in 'road' and not delivery_option" readonly="not destination_delivery_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_city_id"
+                                       invisible="transport not in 'road' and not delivery_option" readonly="not destination_delivery_address_id"
+                                       required="destination_delivery_address_save_option"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_zip_code"
+                                       invisible="transport not in 'road' and not delivery_option" readonly="not destination_delivery_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_street"
+                                       invisible="transport not in 'road' and not delivery_option" readonly="not destination_delivery_address_id"
+                                       required="destination_delivery_address_save_option"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_street2"
+                                       invisible="transport not in 'road' and not delivery_option" readonly="not destination_delivery_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_delivery_address_street3"
+                                       invisible="transport not in 'road' and not delivery_option" readonly="not destination_delivery_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="General Information">
+                                <group string="Tracking Details">
+                                    <field name="tracking_number"/>
+                                </group>
+                            </page>
+                            <page string="Agent">
+                                <group>
+                                    <field name="agent_id"/>
+                                    <field name="agent_email"/>
+                                    <field name="agent_phone"/>
+                                    <field name="agent_mobile"/>
+                                </group>
+                            </page>
+                            <page string="Services">
+                                <field name="sol_ids"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}">
+                                    <tree create="0" edit="0" delete="0">
+                                        <field name="product_template_id"/>
+                                        <field name="name"/>
+                                        <field name="product_uom_qty"/>
+                                        <field name="product_uom"/>
+                                        <field name="price_unit"/>
+                                        <field name="tax_id" widget="many2many_tags"
+                                               options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                        <field name="price_total"/>
+                                        <field name="order_id"/>
+                                        <field name="state"/>
+                                        <field name="invoice_status"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Other Info">
+                                <group>
+                                    <field name="create_datetime"/>
+                                    <field name="user_id"/>
+                                    <field name="agent_phone"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

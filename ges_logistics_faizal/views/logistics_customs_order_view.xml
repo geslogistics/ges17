@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Actions-->
+        <record id="logistics_customs_order_act_window" model="ir.actions.act_window">
+            <field name="name">Customs Orders</field>
+            <field name="res_model">logistics.customs.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+
+        <!--        Clearance Order Tree View-->
+        <record id="logistics_customs_order_list_view" model="ir.ui.view">
+            <field name="name">logistics.customs.order.list.view</field>
+            <field name="model">logistics.customs.order</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="create_date"/>
+                    <field name="partner_id"/>
+                    <field name="customer_reference"/>
+                    <field name="transport"/>
+                    <field name="direction"/>
+                    <field name="bl_number" optional="hide"/>
+                    <field name="awb_number" optional="hide"/>
+                    <field name="lwb_number" optional="hide"/>
+                    <field name="shipper_id" optional="hide"/>
+                    <field name="consignee_id" optional="hide"/>
+                    <field name="broker_id" optional="hide"/>
+                    <field name="main_carriage_port_id" optional="hide"/>
+                    <field name="ocean_status"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <!--        Clearance Order Form View-->
+        <record id="logistics_customs_order_form_view" model="ir.ui.view">
+            <field name="name">logistics.customs.order.form.view</field>
+            <field name="model">logistics.customs.order</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="cancel_order" type="object" string="Cancel Order" invisible="state == 'canceled'"
+                                confirm="Are you sure you want to cancel this clearance order?"
+                                class="btn-secondary" groups="base.group_system"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,docs_received,pre_clearance,clearance_fcd_issued,clearance_completed"/>
+                    </header>
+                    <sheet>
+                        <field name="active" invisible="1"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                                invisible="active"
+                                modifiers="{'invisible': [['active', '=', true]]}"/>
+                        <div class="oe_title mb12">
+                            <h1>
+                                <field class="text-break" name="name" default_focus="1" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="CUSTOMER">
+                                <field name="create_date" string="Date"/>
+                                <field name="partner_id" widget="res_partner_many2one"
+                                       context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}"
+                                       options='{"no_open": True, "no_create": True, "always_reload": True}' required="1"
+                                       readonly="state not in 'draft'"/>
+                                <field name="is_customer_agent" readonly="state not in 'draft'"/>
+                                <field name="customer_reference" readonly="state not in 'draft'"/>
+                                <field name="billing_type" readonly="state not in 'draft'"/>
+                                <field name="so_id" readonly="1" invisible="not so_id"/>
+                            </group>
+                            <group string="TRANSPORT DETAILS">
+                                <field name="direction" widget="radio" required="1" options="{'horizontal': true}"
+                                       readonly="state not in 'draft'"/>
+                                <field name="transport" widget="radio" required="1" options="{'horizontal': true}"
+                                       readonly="state not in 'draft'"/>
+                                <field name="ocean_shipment_mode" readonly="state not in 'draft'" invisible="transport not in 'ocean'"
+                                       required="transport == 'ocean'"/>
+                                <field name="air_shipment_mode" readonly="state not in 'draft'" invisible="transport not in 'air'"
+                                       required="transport == 'air'"/>
+                                <field name="road_shipment_mode" readonly="state not in 'draft'" invisible="transport not in 'road'"
+                                       required="transport == 'road'"/>
+                                <field name="rail_shipment_mode" readonly="state not in 'draft'" invisible="transport not in 'rail'"
+                                       required="transport == 'rail'"/>
+                                <field name="commodity_type" readonly="state not in 'draft'" required="1"/>
+                                <field name="bl_number" readonly="state not in 'draft'" invisible="transport not in 'ocean'"
+                                       required="transport == 'ocean'"/>
+                                <field name="awb_number" readonly="state not in 'draft'" invisible="transport not in 'air'"
+                                       required="transport == 'air'"/>
+                                <field name="lwb_number" readonly="state not in 'draft'" invisible="transport not in 'road'"
+                                       required="transport == 'road'"/>
+                            </group>
+                            <group string="SHIPPER">
+                                <field name="shipper_id" options='{"no_open": True, "no_create": True}' readonly="state not in 'draft'"/>
+                            </group>
+                            <group string="CONSIGNEE">
+                                <field name="consignee_id" options='{"no_open": True, "no_create": True}' readonly="state not in 'draft'"/>
+                            </group>
+                        </group>
+                        <group invisible="direction not in 'import'">
+                            <group string="Loading">
+                                <field name="main_carriage_country_id" string="Country" readonly="state not in 'draft'"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <label for="main_carriage_port_id_ocean_air_rail" string="Discharge Port" invisible="transport not in 'ocean'"/>
+                                <label for="main_carriage_port_id_ocean_air_rail" string="Gateway" invisible="transport not in 'air'"/>
+                                <label for="main_carriage_port_id_ocean_air_rail" string="Discharge Terminal" invisible="transport not in 'rail'"/>
+                                <label for="main_carriage_address_id_road" string="Discharge Location" invisible="transport not in 'road'"/>
+                                <div invisible="transport not in ('ocean','air','rail')">
+                                    <field name="main_carriage_port_id" readonly="state not in 'draft'" id="main_carriage_port_id_ocean_air_rail"
+                                           options="{'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <div invisible="transport not in 'road'">
+                                    <field name="main_carriage_address_id" id="main_carriage_address_id_road"
+                                           options="{'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <field name="main_carriage_address_name" invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_code" invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_country_id" invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="1" force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_state_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_city_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_zip_code"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_street"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_street2"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_street3"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </group>
+                            <group string="Shipment Information">
+                                <field name="si_country_id" readonly="state not in 'draft'" string="Origin Country"/>
+                                <field name="si_port_id" readonly="state not in 'draft'" string="Origin Port"/>
+                            </group>
+                        </group>
+                        <group invisible="direction not in 'export'">
+                            <group string="Destination">
+                                <field name="main_carriage_country_id" string="Country" readonly="state not in 'draft'"
+                                       options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <label for="main_carriage_port_id_ocean_air_rail" string="Loading Port"
+                                       invisible="transport not in 'ocean'"/>
+                                <label for="main_carriage_port_id_ocean_air_rail" string="Gateway"
+                                       invisible="transport not in 'air'"/>
+                                <label for="main_carriage_port_id_ocean_air_rail" string="Loading Terminal"
+                                       invisible="transport not in 'rail'"/>
+                                <label for="main_carriage_address_id_road" string="Loading Location"
+                                       invisible="transport not in 'road'"/>
+                                <div invisible="transport not in ('ocean','air','rail')">
+                                    <field name="main_carriage_port_id" readonly="state not in 'draft'"
+                                           id="main_carriage_port_id_ocean_air_rail"
+                                           options="{'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <div invisible="transport not in 'road'">
+                                    <field name="main_carriage_address_id"
+                                           id="main_carriage_address_id_road"
+                                           options="{'no_quick_create': True, 'no_create': True}"/>
+                                </div>
+                                <field name="main_carriage_address_name"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_code"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_country_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="1" force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_state_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_city_id"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_zip_code"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_street"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_street2"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="main_carriage_address_street3"
+                                       invisible="transport not in ('ocean','air','road','rail')"
+                                       readonly="transport in ('ocean','air','rail') or transport == 'road' and not main_carriage_address_id"
+                                       force_save="1" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </group>
+                            <group string="Shipment Information">
+                                <field name="si_country_id" readonly="state not in 'draft'" string="Destination Country"/>
+                                <field name="si_port_id" readonly="state not in 'draft'" string="Destination Port"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Clearance Details">
+                                <form>
+                                    <group>
+                                        <group string="Shipment Details">
+                                            <field name="shipment_doc_received_date"/>
+                                            <field name="broker_id" options='{"no_open": True, "no_create": True}'/>
+                                            <field name="number_of_containers" readonly="1"/>
+                                            <field name="number_of_packages" readonly="1"/>
+                                        </group>
+                                        <group string="Demurrage and Detention Details">
+                                            <field name="demurrage_date" invisible="direction not in 'import'"/>
+                                            <field name="free_time_days"/>
+                                            <field name="detention_date"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <group string="Clearance Stage">
+                                            <field name="pre_customs_dec_no"/>
+                                            <field name="pre_customs_dec_date"/>
+                                            <field name="pre_customs_dec_attachment" filename="pre_customs_dec_attachment_filename"/>
+                                            <field name="customs_duty_payment_notification_date"
+                                                   invisible="direction not in 'import'"/>
+                                            <field name="customs_duty_payment_reference_number"
+                                                   invisible="direction not in 'import'"/>
+                                            <field name="customs_duty_payment_amount"
+                                                   invisible="direction not in 'import'"/>
+                                            <field name="customs_duty_payment_date"
+                                                   invisible="direction not in 'import'"/>
+                                            <field name="final_customs_declaration_date"/>
+                                            <field name="final_customs_clearance_attachment"
+                                                   filename="final_customs_clearance_attachment_filename"/>
+                                            <field name="broker_transportation_order_date"/>
+                                        </group>
+                                        <group string="Post Clearance Stage">
+                                            <field name="do_number" invisible="direction not in 'import'"/>
+                                            <field name="do_collection_date" invisible="direction not in 'import'"/>
+                                            <field name="do_attachment" filename="do_attachment_file_name"
+                                                   invisible="direction not in 'import'"/>
+                                            <field name="loading_card_date" invisible="direction not in 'import'"/>
+                                            <field name="pd_ce_payment_date" invisible="direction not in 'import'"/>
+                                            <field name="shipment_in_port_date"
+                                                   invisible="direction not in 'export' and transport not in 'ocean'"/>
+                                            <field name="ok_to_load_date"
+                                                   invisible="direction not in 'export' and transport not in 'ocean'"/>
+                                            <field name="inspection_date"/>
+                                            <field name="gate_pass_date" invisible="transport == 'air' and direction == 'import'"/>
+                                        </group>
+                                    </group>
+
+                                    <group string="Additional Customs Information">
+                                        <field name="remarks"/>
+                                        <field name="clearance_time_taken"/>
+                                        <field name="clearance_delay_reason"/>
+                                    </group>
+                                </form>
+                            </page>
+                            <page invisible="transport not in 'ocean'" string="Vessel Information">
+                                <form>
+                                    <group>
+                                        <group invisible="transport not in 'ocean'">
+                                            <field name="vessel_name"/>
+                                            <field name="vessel_expected_arrival_date"/>
+                                            <field name="vessel_arrival_date"
+                                                   invisible="direction not in 'import'" required="direction == 'import' and transport == 'ocean'"/>
+
+                                        </group>
+                                        <group invisible="transport not in 'ocean'">
+                                            <field name="ocean_status" readonly="1"/>
+                                            <field name="manifest_date"/>
+                                            <field name="discharge_date" string="Vessel Discharge Date"
+                                                   invisible="direction not in 'import'" required="direction == 'import' and transport == 'ocean'"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </page>
+                            <page invisible="transport not in 'air'" string="Airline Information">
+                                <form>
+                                    <group>
+                                        <group invisible="transport not in 'air'">
+                                            <field name="airline_id" options='{"no_open": True, "no_create": True}'/>
+                                            <field name="flight_number"/>
+                                            <field name="flight_departure_date"/>
+                                            <field name="flight_arrival_date"/>
+                                        </group>
+                                        <group invisible="transport not in 'air'">
+                                            <field name="airline_operator_payment_date"/>
+                                            <field name="manifest_date"/>
+                                            <field name="discharge_date" string="Discharge Date"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </page>
+                            <page invisible="transport not in 'road'" string="Truck Information">
+                                <form>
+                                    <group>
+                                        <group invisible="transport not in 'road'">
+                                            <field name="internal_external" options="{'horizontal': true}"/>
+                                            <field name="fleet_id" options='{"no_open": True, "no_create": True}'
+                                                   invisible="internal_external not in 'internal'"/>
+                                            <field name="fleet_name" invisible="internal_external not in 'external'"/>
+                                        </group>
+                                        <group invisible="transport not in 'road'">
+                                            <field name="driver_id" options='{"no_open": True, "no_create": True}'
+                                                   invisible="internal_external not in 'internal'"/>
+                                            <field name="driver_name" invisible="internal_external not in 'external'"/>
+                                            <field name="driver_mobile_number"/>
+                                            <field name="truck_departure_time"/>
+                                            <field name="truck_arrival_time"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </page>
+                            <page string="Package Details">
+                                <field name="freight_package_ids" nolabel="1" widget="one2many_list">
+                                    <tree string="Package" create="1">
+                                        <field name="name"/>
+                                        <field name="seal_number"/>
+                                        <field name="package_type"/>
+                                        <field name="package"/>
+                                        <field name="container_type"/>
+                                        <field name="qty" sum="Total Qty."/>
+                                        <field name="volume" sum="Total Volume"/>
+                                        <field name="gross_weight" sum="Total Gross"/>
+                                        <field name="net_weight" sum="Total Net"/>
+                                    </tree>
+                                    <form string="Package">
+                                        <group>
+                                            <label for="package_type"/>
+                                            <div>
+                                                <field name="package_type" widget="radio"
+                                                       options="{'horizontal':True}"/>
+                                                <div class="font-italic text-muted"
+                                                     invisible="not package_type">
+                                                    When Package type is Box/Pallet that mean it is small size
+                                                    package(Box/Pallet /Cargo), it mainly used for Land or Air
+                                                    Shipment but if Package Type is Container/Box that mean
+                                                    it is big shipment, and you see a tab that's show what is inside
+                                                    that Container/Box
+                                                </div>
+                                            </div>
+                                        </group>
+                                        <group invisible="package_type not in 'container'">
+                                            <group string="Container / Box">
+                                                <field name="name" required="1"/>
+                                                <field name="seal_number" required="1"/>
+                                                <field name="package" required="1"/>
+                                                <field name="container_type" required="1"/>
+                                                <field name="qty"/>
+                                                <field name="charges"/>
+                                                <field name="type"/>
+                                            </group>
+                                            <group string="Measurement">
+                                                <field name="height"/>
+                                                <field name="width"/>
+                                                <field name="length"/>
+                                                <field name="volume"/>
+                                                <field name="gross_weight"/>
+                                                <field name="net_weight"/>
+                                            </group>
+                                        </group>
+                                        <group invisible="package_type not in 'item'">
+                                            <group string="Box / Pallet / Cargo">
+                                                <field name="name" required="1"/>
+                                                <field name="seal_number" required="1"/>
+                                                <field name="package"/>
+                                                <field name="container_type" required="1"/>
+                                                <field name="qty"/>
+                                                <field name="charges"/>
+                                                <field name="type"/>
+                                            </group>
+                                            <group string="Measurement">
+                                                <field name="height"/>
+                                                <field name="width"/>
+                                                <field name="length"/>
+                                                <field name="volume"/>
+                                                <field name="gross_weight"/>
+                                                <field name="net_weight"/>
+                                            </group>
+                                        </group>
+                                        <group string="Package Details" invisible="not package_type">
+                                            <group>
+                                                <field name="harmonize"/>
+                                                <field name="temperature"/>
+                                                <field name="ventilation"/>
+                                                <field name="vgm"/>
+                                            </group>
+                                            <group>
+                                                <field name="carrier_seal"/>
+                                                <field name="reference"/>
+                                                <field name="humidity"/>
+                                            </group>
+                                        </group>
+                                        <group invisible="not package_type">
+                                            <group>
+                                                <field name="dangerous_goods"/>
+                                            </group>
+                                        </group>
+                                        <group invisible="not dangerous_goods"
+                                               string="Goods Details">
+                                            <group>
+                                                <field name="class_number"/>
+                                                <label for="un_number"/>
+                                                <div>
+                                                    <field name="un_number"/>
+                                                    <div class="font-italic text-muted"
+                                                         invisible="not un_number">
+                                                        UN numbers are four-digit numbers that identify hazardous
+                                                        materials, and articles in the framework of international
+                                                        transport
+                                                    </div>
+                                                </div>
+                                                <field name="Package_group"/>
+                                            </group>
+                                            <group>
+                                                <field name="imdg_code"/>
+                                                <field name="flash_point"/>
+                                                <field name="material_description"/>
+                                            </group>
+                                        </group>
+                                        <notebook invisible="package_type not in 'container'">
+                                            <page string="Items">
+                                                <field name="freight_item_lines" nolabel="1" editable="top"
+                                                       widget="one2many_list">
+                                                    <tree string="Items">
+                                                        <field name="package"/>
+                                                        <field name="name"/>
+                                                        <field name="qty" sum="qty"/>
+                                                        <field name="volume" sum="Total Volume"/>
+                                                    </tree>
+                                                    <form string="Items">
+                                                        <group>
+                                                            <group string="Item Details">
+                                                                <field name="package" required="1"/>
+                                                                <field name="name" required="1"/>
+                                                                <field name="qty" required="1"/>
+                                                                <field name="type" string="Type"/>
+                                                            </group>
+                                                            <group string="Measurement">
+                                                                <field name="height"/>
+                                                                <field name="width"/>
+                                                                <field name="length"/>
+                                                                <field name="volume"/>
+                                                                <field name="gross_weight"/>
+                                                            </group>
+                                                        </group>
+                                                    </form>
+                                                </field>
+                                            </page>
+                                        </notebook>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Payment Requests">
+                                <field name="pr_ids">
+                                    <tree editable="bottom" delete="0">
+                                        <field name="pr_charges_id" required="1" readonly="status"/>
+                                        <field name="partner_id" column_invisible="True" readonly="status"/>
+                                        <field name="amount" sum="Total Amount" required="1" readonly="status"/>
+                                        <field name="company_currency_id" column_invisible="True"/>
+                                        <field name="reference" required="1" readonly="status"/>
+                                        <field name="attachment" filename="attachment_name" required="1"
+                                               readonly="status"/>
+                                        <field name="attachment_name" column_invisible="True" readonly="status"/>
+                                        <button name="make_request" string=" Send Request" type="object" class="btn-primary"
+                                                icon="fa-money" invisible="status"/>
+                                        <field name="status" readonly="1"/>
+                                        <field name="other_reference" column_invisible="True" readonly="status"/>
+                                        <field name="name" readonly="1" invisible="not name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+        <!--        Logistics Customs Search Order-->
+        <record id="logistics_customs_order_search_view" model="ir.ui.view">
+            <field name="name">logistics.customs.order.search.view</field>
+            <field name="model">logistics.customs.order</field>
+            <field name="arch" type="xml">
+                <search string="Customs">
+                    <field name="name" string="Name"/>
+                    <field name="partner_id" string="Customer" group="1" context="{'group_by': 'partner_id'}"/>
+                    <field name="customer_reference"/>
+                    <field name="bl_number"/>
+                    <field name="awb_number"/>
+                    <field name="lwb_number"/>
+                    <field name="pre_customs_dec_no"/>
+                    <field name="customs_duty_payment_reference_number"/>
+                    <field name="do_number"/>
+                    <field name="shipper_id"/>
+                    <field name="consignee_id"/>
+                    <field name="broker_id"/>
+                    <field name="main_carriage_port_id"/>
+                    <field name="remarks"/>
+                    <group expand="0" string="Group By">
+                        <filter name="partner_id" string="Customer" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Creation Date" name="creation_month" domain="[]" context="{'group_by':'create_date'}"/>
+                        <filter string="Transport Via" name="transport" domain="[]" context="{'group_by':'transport'}"/>
+                        <filter string="Direction" name="direction" domain="[]" context="{'group_by':'direction'}"/>
+                        <filter string="Commodity Type" name="commodity_type" domain="[]" context="{'group_by':'commodity_type'}"/>
+                        <filter string="Ocean Shipment Type" name="ocean_shipment_mode" domain="[]" context="{'group_by':'ocean_shipment_mode'}"/>
+                        <filter string="Air Shipment Type" name="air_shipment_mode" domain="[]" context="{'group_by':'air_shipment_mode'}"/>
+                        <filter string="Road Shipment Type" name="road_shipment_mode" domain="[]" context="{'group_by':'road_shipment_mode'}"/>
+                        <filter string="Rail Shipment Type" name="rail_shipment_mode" domain="[]" context="{'group_by':'rail_shipment_mode'}"/>
+                        <filter string="Ocean Status" name="status" domain="[]" context="{'group_by':'ocean_status'}"/>
+                        <filter string="State" name="state" domain="[]" context="{'group_by':'state'}"/>
+                    </group>
+                    <separator/>
+                    <group expand="0" string="Group By Vessel Information">
+                        <filter string="Vessel Name" name="vessel_name" domain="[]" context="{'group_by':'vessel_name'}"/>
+                        <filter string="Vessel Expected Arrival Date" name="vessel_expected_arrival_date" domain="[]"
+                                context="{'group_by':'vessel_expected_arrival_date'}"/>
+                        <filter string="Vessel Arrival Date" name="vessel_arrival_date" domain="[]" context="{'group_by':'vessel_arrival_date'}"/>
+                        <filter string="Manifest Date" name="manifest_date" domain="[]" context="{'group_by':'manifest_date'}"/>
+                        <filter string="Vessel Discharge Date" name="discharge_date" domain="[]"
+                                context="{'group_by':'discharge_date'}"/>
+                    </group>
+                    <separator/>
+                    <filter name="Import" string="Import" domain="[('direction','=','import')]"/>
+                    <filter name="Export" string="Export" domain="[('direction','=','export')]"/>
+                    <separator/>
+                    <filter name="Air" string="Air" domain="[('transport','=','air')]"/>
+                    <filter name="Ocean" string="Ocean" domain="[('transport','=','ocean')]"/>
+                    <filter name="Road" string="Road" domain="[('transport','=','road')]"/>
+                    <filter name="Rail" string="Rail" domain="[('transport','=','rail')]"/>
+                    <separator/>
+                    <filter name="Inactive" string="Archived" domain="[('active','=',False)]"/>
+                </search>
+            </field>
+        </record>
+
+    </data>
+</odoo>

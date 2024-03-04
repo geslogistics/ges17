@@ -1,0 +1,9 @@
+.crm-checklist {
+    .checklist-checkpoint {
+        padding: 4px;
+        cursor: pointer;
+        overflow-wrap: anywhere;
+    }
+    .checklist-checkpoint-disabled { cursor: inherit !important }
+    .checklist-checkpoint:hover { background-color: #f8f9fa }
+}

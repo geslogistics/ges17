@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--Operations Root-->
+        <record id="operations_root_menu" model="ir.ui.menu">
+            <field name="name">Operations</field>
+            <field name="sequence">253</field>
+            <field name="web_icon">ges_operations,static/description/icon.png</field>
+        </record>
+
+
+        <!--Logistics--><!--Configuration-->
+        <record id="operations_configuration_top_menu" model="ir.ui.menu">
+            <field name="name">Configuration</field>
+            <field name="sequence">100</field>
+            <field name="parent_id" ref="operations_root_menu"/>
+        </record>
+
+        <!--Logistics--><!--Configuration--><!--Addresses-->
+        <menuitem id="operations_configuration_addresses_section_menu"
+                  name="Addresses"
+                  parent="operations_configuration_top_menu"
+                  sequence="20"/>
+
+        <menuitem name="Addresses"
+                  id="operations_configuration_addresses_menu"
+                  parent="operations_configuration_addresses_section_menu"
+                  action="freight_address_act_window"
+                  sequence="6"/>
+
+        <!--Logistics--><!--Configuration--><!--Ports-->
+        <menuitem id="operations_configuration_ports_section_menu"
+                  name="Ports"
+                  parent="operations_configuration_top_menu"
+                  sequence="30"/>
+
+        <menuitem name="Ports"
+                  id="operations_configuration_ports_ports_menu"
+                  parent="operations_configuration_ports_section_menu"
+                  action="freight_port_act_window"
+                  sequence="1"/>
+
+        <!--Logistics--><!--Configuration--><!--Incoterms-->
+        <menuitem id="operations_configuration_incoterms_section_menu"
+                  name="Incoterms"
+                  parent="operations_configuration_top_menu"
+                  sequence="40"/>
+
+        <menuitem name="Incoterms"
+                  id="operations_configuration_incoterms_incoterms_menu"
+                  parent="operations_configuration_incoterms_section_menu"
+                  action="freight_incoterms_act_window"
+                  sequence="1"/>
+
+        <!--Logistics--><!--Configuration--><!--Packages-->
+        <menuitem id="operations_configuration_packages_section_menu"
+                  name="Packages"
+                  parent="operations_configuration_top_menu"
+                  sequence="50"/>
+
+        <menuitem name="Packages"
+                  id="operations_configuration_packages_packages_menu"
+                  parent="operations_configuration_packages_section_menu"
+                  action="freight_package_act_window"
+                  sequence="1"/>
+
+        <!--Logistics--><!--Configuration--><!--Policy Risk-->
+        <menuitem id="operations_configuration_policy_risk_section_menu"
+                  name="Policy Risks"
+                  parent="operations_configuration_top_menu"
+                  sequence="60"/>
+
+        <menuitem name="Policy Risks"
+                  id="operations_configuration_policy_risk_menu"
+                  parent="operations_configuration_policy_risk_section_menu"
+                  action="freight_policy_risk_act_window"
+                  sequence="1"/>
+
+        <!--Logistics--><!--Configuration--><!--Transport-->
+        <menuitem id="operations_configuration_transport_section_menu"
+                  name="Transport"
+                  parent="operations_configuration_top_menu"
+                  sequence="70"/>
+
+        <menuitem name="Airlines"
+                  id="operations_configuration_transport_airlines_menu"
+                  parent="operations_configuration_transport_section_menu"
+                  action="freight_airline_act_window"
+                  sequence="1"/>
+
+        <menuitem name="Railways"
+                  id="operations_configuration_transport_railways_menu"
+                  parent="operations_configuration_transport_section_menu"
+                  action="freight_railway_act_window"
+                  sequence="2"/>
+
+        <menuitem name="Vessels"
+                  id="operations_configuration_transport_vessels_menu"
+                  parent="operations_configuration_transport_section_menu"
+                  action="freight_vessel_act_window"
+                  sequence="3"/>
+
+        <menuitem name="Vehicles"
+                  id="operations_configuration_transport_vehicles_menu"
+                  parent="operations_configuration_transport_section_menu"
+                  action="freight_vehicle_act_window"
+                  sequence="4"/>
+
+
+
+        <!--Logistics Orders-->
+        <record id="operations_order_top_menu" model="ir.ui.menu">
+            <field name="name">Orders</field>
+            <field name="sequence">10</field>
+            <field name="parent_id" ref="operations_root_menu"/>
+        </record>
+        
+        <record id="operations_shipment_order_shipments_order_top_menu" model="ir.ui.menu">
+            <field name="name">SHO - Shipment Orders</field>
+            <field name="sequence">10</field>
+            <field name="parent_id" ref="operations_order_top_menu"/>
+            <field name="action" ref="shipment_order_act_window"/>
+        </record>
+        
+    
+    </data>
+</odoo>
