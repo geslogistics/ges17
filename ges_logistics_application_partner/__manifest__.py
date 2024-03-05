@@ -14,7 +14,7 @@
     'company': 'GES Logistics',
     'maintainer': 'GES Logistics',
     'website': "https://www.geslogistics.com",
-    'depends': ['base','mail','l10n_sa','l10n_sa_edi','base_automation','sale','sale_management','crm','crm_checklist','purchase','account','ges_logistics_application_base','ges_logistics_ticket','ges_logistics','operating_unit_partner','operating_unit_product'],
+    'depends': ['base','mail','l10n_sa','l10n_sa_edi','base_automation','sale','sale_management','crm','crm_checklist','purchase','account','ges_logistics_application_base','ges_logistics_ticket','ges_operations','operating_unit_partner','operating_unit_product'],
     'assets': {
         'web.assets_backend': [
             'ges_logistics_application_partner/static/src/css/pa_styles.css',
