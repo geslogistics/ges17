@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Root Icon-->
+        <record id="ges_applications_root_menu" model="ir.ui.menu">
+            <field name="name">Applications</field>
+            <field name="sequence">251</field>
+            <field name="web_icon">ges_logistics_application_base,static/description/icon.png</field>
+        </record>
+
+
+        <!--Applications-->
+ 
+        <!--Applications-->
+        <record id="application_partners_top_menu" model="ir.ui.menu">
+            <field name="name">Applications</field>
+            <field name="sequence">10</field>
+            <field name="parent_id" ref="ges_applications_root_menu"/>
+        </record>
+
+
+        <!--Configuration-->
+        <record id="res_partner_configuration_top_menu" model="ir.ui.menu">
+            <field name="name">Configuration</field>
+            <field name="sequence">50</field>
+            <field name="parent_id" ref="ges_applications_root_menu"/>
+        </record>
+
+        <!--Configuration--><!--Attachment Types-->
+        <record id="application_partners_attachment_types_menu" model="ir.ui.menu">
+            <field name="name">Attachment Types</field>
+            <field name="sequence">10</field>
+            <field name="parent_id" ref="res_partner_configuration_top_menu"/>
+            <field name="action" ref="application_attachment_type_act_window"/>
+        </record>
+
+    </data>
+</odoo>

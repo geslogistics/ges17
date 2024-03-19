@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--Actions-->
+        <record id="freight_incoterms_act_window" model="ir.actions.act_window">
+            <field name="name">Incoterms</field>
+            <field name="res_model">freight.incoterms</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <!-- Views -->
+        <record id="freight_incoterms_list_view" model="ir.ui.view">
+            <field name="name">freight.incoterms.list.view</field>
+            <field name="model">freight.incoterms</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="freight_incoterms_form_view" model="ir.ui.view">
+            <field name="name">freight.incoterms.form.view</field>
+            <field name="model">freight.incoterms</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <separator/>
+                        <group string="Direction">
+                            <field name="option_import"/>
+                            <field name="option_export"/>
+                        </group>
+                        <separator/>
+                        <group string="Transport Mode">
+                            <field name="option_ocean"/>
+                            <field name="option_air"/>
+                            <field name="option_road"/>
+                            <field name="option_rail"/>
+                        </group>
+                        <separator/>
+                        <group string="Route Options">
+                            <field name="option_pickup"/>
+                            <field name="option_delivery"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

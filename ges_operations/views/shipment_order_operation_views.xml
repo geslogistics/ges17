@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Actions-->
+        <record id="shipment_order_operation_act_window" model="ir.actions.act_window">
+            <field name="name">Shipment Order</field>
+            <field name="res_model">shipment.order.operation</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+
+        <!--Views-->
+
+        <record id="shipment_order_operation_list_view" model="ir.ui.view">
+            <field name="name">shipment.order.operation.list.view</field>
+            <field name="model">shipment.order.operation</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="sequence" widget="handle"/>
+                    <field name="operation_type"/>
+                    <field name="route_type"/>
+                    <field name="transport"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="shipment_order_operation_form_view" model="ir.ui.view">
+            <field name="name">shipment.order.operation.form.view</field>
+            <field name="model">shipment.order.operation</field>
+            <field name="arch" type="xml">
+
+                <form>
+                    
+                    <sheet>
+                        
+                        
+                        <group>
+                            
+                            <field name="shipment_order_id" inisible="0"/>
+                            <field name="route_id" inisible="0"/>
+                            <field name="route_type" widget="radio" required="1" options="{'horizontal': true}"/>
+                            <field name="sequence"/>
+
+
+                            <field name="transport" widget="radio" required="1" options="{'horizontal': true}"/>
+                        </group>
+                        
+                        <group string="From">
+                            <field name="origin_address_type" widget="radio" options="{'horizontal':True}"/>
+                            <field name="origin_port_id" invisible="origin_address_type != 'port'" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            <field name="origin_address_id" invisible="origin_address_type != 'location'" options="{'no_open': True, 'no_quick_create': True}" />
+                            <field name="etd_datetime"/>
+                            <field name="atd_datetime"/>
+                            <label for="origin_address_id" string="Loading Address"/>
+                            <div name="origin_address">
+                                <field name="origin_code" nolabel="1" invisible="not origin_code"/>
+                                <field name="origin_street" nolabel="1" invisible="not origin_street"/>
+                                <field name="origin_street2" nolabel="1" invisible="not origin_street2"/>
+                                <field name="origin_zip_code" nolabel="1" invisible="not origin_zip_code"/>
+                                <field name="origin_city_id" nolabel="1" invisible="not origin_city_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_state_id" nolabel="1" invisible="not origin_state_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_country_id" nolabel="1" invisible="not origin_country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </div>
+                            
+                        </group>
+                        <group string="To">
+                            <field name="destination_address_type" widget="radio" options="{'horizontal':True}"/>
+                            <field name="destination_port_id" invisible="destination_address_type != 'port'" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            <field name="destination_address_id" invisible="destination_address_type != 'location'" options="{'no_open': True, 'no_quick_create': True}" />                    
+                            <field name="eta_datetime"/>
+                            <field name="ata_datetime"/>
+                            
+                            <label for="destination_address_id" string="Discharge Address"/>
+                            <div name="destination_address">
+                                <field name="destination_code" nolabel="1" invisible="not destination_code"/>
+                                <field name="destination_street" nolabel="1" invisible="not destination_street"/>
+                                <field name="destination_street2" nolabel="1" invisible="not destination_street2"/>
+                                <field name="destination_zip_code" nolabel="1" invisible="not destination_zip_code"/>
+                                <field name="destination_city_id" nolabel="1" invisible="not destination_city_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_state_id" nolabel="1" invisible="not destination_state_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_country_id" nolabel="1" invisible="not destination_country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </div>
+                            
+                        </group>
+                        
+                        
+                    </sheet>
+                    
+                </form>
+            </field>
+        </record>
+
+        
+        <record id="shipment_order_operation_kanban_view" model="ir.ui.view">
+            <field name="name">shipment.order.operation.kanban.view</field>
+            <field name="model">shipment.order.operation</field>
+            <field name="arch" type="xml">
+
+                <kanban class="ges_kanban_costing" create="0" edit="0" >
+                    <field name="sequence"/>
+                    <field name="transport"/>
+                    <field name="origin_address_type"/>                        
+                    <field name="origin_port_id"/>
+                    <field name="origin_address_id"/>
+                    <field name="origin_code"/>
+                    <field name="origin_city_id"/>
+                    <field name="origin_country_id"/>                    
+                    <field name="destination_address_type"/>
+                    <field name="destination_port_id"/>
+                    <field name="destination_address_id"/>
+                    <field name="destination_code"/>
+                    <field name="destination_city_id"/>
+                    <field name="destination_country_id"/>
+                    
+                    <field name="etd_datetime"/>
+                    <field name="atd_datetime"/>
+                    <field name="eta_datetime"/>
+                    <field name="ata_datetime"/>
+                    <field name="etd_date"/>
+                    <field name="atd_date"/>
+                    <field name="eta_date"/>
+                    <field name="ata_date"/>
+
+                    <templates>
+                        
+                        
+
+                        <t t-name="kanban-box">
+                            <button class="ges-kanban-button-open-route" name="open_record" type="object">
+                            <div t-attf-class="p-1" style="; background-color: #f8f9fa00 !important; border: 0"> 
+                                <div class="o_kanban_record_top" style="justify-content: space-between; align-items: center;">                                                                        
+                                    <div class="oe_kanban_top_left d-flex flex-row">                                        
+                                        <div class="flex-col" style="min-width: 50px; text-align: start">                                            
+                                            <span>Route </span>
+                                            <span t-esc="record.sequence.value"/>
+                                            <span>: </span>
+                                        </div>                                        
+                                        <div class="flex-col" style="min-width: 25px; text-align: center">
+                                            <span class="fa fa-ship fa-fw"  invisible="transport != 'ocean'"/>
+                                            <span class="fa fa-plane fa-fw"  invisible="transport != 'air'"/>
+                                            <span class="fa fa-train fa-fw"  invisible="transport != 'rail'"/>
+                                            <span class="fa fa-truck fa-fw"  invisible="transport != 'road'"/>
+                                        </div>
+                                        
+
+                                        <div class="flex-col">
+                                            <span class="fa fa-map-marker fa-fw"  invisible="origin_address_type != 'location'"/>
+                                            <span class="fa fa-anchor fa-fw"  invisible="origin_address_type != 'port'"/>
+
+                                            <span t-if="record.origin_address_type.raw_value == 'port'"><field name="origin_code"/></span>    
+                                            <span t-if="record.origin_address_type.raw_value == 'location'"><field name="origin_city_id"/></span>       
+                                            
+                                            <span class="fa fa-long-arrow-right mx-2"/>
+
+                                            <span class="fa fa-map-marker fa-fw"  invisible="destination_address_type != 'location'"/>
+                                            <span class="fa fa-anchor fa-fw" invisible="destination_address_type != 'port'"/>
+
+                                            <span t-if="record.destination_address_type.raw_value == 'port'"><field name="destination_code"/></span>    
+                                            <span t-if="record.destination_address_type.raw_value == 'location'"><field name="destination_city_id"/></span>       
+                                        </div>
+                                        <div name="dates" class="flex-col">
+                                            <span style="margin-left: 10px; " t-if="record.origin_address_type.raw_value == 'port' and record.etd_datetime.value">ETD: <span t-esc="record.etd_date.value" /></span>
+                                            <span style="margin-left: 10px; " t-if="record.origin_address_type.raw_value == 'location' and record.etd_datetime.value">ETD: <span t-esc="record.etd_datetime.value" options="{'widget':'date','hide_seconds':True}" /></span>
+                                            <span style="margin-left: 10px; " t-if="record.origin_address_type.raw_value == 'port' and record.atd_datetime.value">ATD: <span t-esc="record.atd_date.value"/></span>
+                                            <span style="margin-left: 10px; " t-if="record.origin_address_type.raw_value == 'location' and record.atd_datetime.value">ATD: <span t-esc="record.atd_datetime.value" /></span>
+
+                                            <span style="margin-left: 10px; " t-if="record.destination_address_type.raw_value == 'port' and record.eta_datetime.value">ETA: <span t-esc="record.eta_date.value"/></span>
+                                            <span style="margin-left: 10px; " t-if="record.destination_address_type.raw_value == 'location' and record.eta_datetime.value">ETA: <span t-esc="record.eta_datetime.value" /></span>
+                                            <span style="margin-left: 10px; " t-if="record.destination_address_type.raw_value == 'port' and record.ata_datetime.value">ATA: <span t-esc="record.ata_date.value"/></span>
+                                            <span style="margin-left: 10px; " t-if="record.destination_address_type.raw_value == 'location' and record.ata_datetime.value">ATA: <span t-esc="record.ata_datetime.value" /></span>
+
+                                        </div>
+                                    </div>                                                                
+                                </div>
+                            </div>
+                            </button>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

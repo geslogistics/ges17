@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            <record id="operating_unit_all" model="operating.unit">
+            <field name="name">All</field>
+            <field name="function">virtual</field>
+            <field name="code">All</field>
+            <field name="partner_id" ref="base.main_partner" />
+        </record>
+        -->
+    </data>
+</odoo>

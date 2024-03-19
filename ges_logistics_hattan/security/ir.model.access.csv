@@ -1,0 +1,27 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_model_logistics_product_product_group_base_group_user,GES Logistics / Product / Product Group,model_logistics_product_product_group,base.group_user,1,1,1,1
+access_model_logistics_product_freight_type_base_group_user,GES Logistics / Product / Freight Type,model_logistics_product_freight_type,base.group_user,1,1,1,1
+access_model_logistics_product_shipment_mode_base_group_user,GES Logistics / Product / Shipment Type,model_logistics_product_shipment_mode,base.group_user,1,1,1,1
+access_model_logistics_shipment_order_base_group_user,GES Logistics / Shipment / Order,model_logistics_shipment_order,base.group_user,1,1,1,1
+access_model_logistics_customs_order_base_group_user,GES Logistics / Customs / Order,model_logistics_customs_order,base.group_user,1,1,1,1
+access_model_logistics_service_order_base_group_user,GES Logistics / Service / Order,model_logistics_service_order,base.group_user,1,1,1,1
+access_model_logistics_storage_order_base_group_user,GES Logistics / Storage / Order,model_logistics_storage_order,base.group_user,1,1,1,1
+access_model_logistics_transport_order_base_group_user,GES Logistics / Transport / Order,model_logistics_transport_order,base.group_user,1,1,1,1
+
+access_model_logistics_freight_address_continent_base_group_user,GES Logistics / Freight / Address / Continent,model_logistics_freight_address_continent,base.group_user,1,1,1,1
+access_model_logistics_freight_address_region_base_group_user,GES Logistics / Freight / Address / Region,model_logistics_freight_address_region,base.group_user,1,1,1,1
+access_model_logistics_freight_address_country_base_group_user,GES Logistics / Freight / Address / Country,model_logistics_freight_address_country,base.group_user,1,1,1,1
+access_model_logistics_freight_address_state_base_group_user,GES Logistics / Freight / Address / State,model_logistics_freight_address_state,base.group_user,1,1,1,1
+access_model_logistics_freight_address_city_base_group_user,GES Logistics / Freight / Address /  City,model_logistics_freight_address_city,base.group_user,1,1,1,1
+
+access_model_logistics_freight_address_base_group_user,GES Logistics / Freight / Address,model_logistics_freight_address,base.group_user,1,1,1,1
+access_model_logistics_freight_port_base_group_user,GES Logistics / Freight / Port,model_logistics_freight_port,base.group_user,1,1,1,1
+access_model_logistics_freight_incoterms_base_group_user,GES Logistics / Freight / Incoterms,model_logistics_freight_incoterms,base.group_user,1,1,1,1
+access_model_logistics_freight_move_type_base_group_user,GES Logistics / Freight / Move Types,model_logistics_freight_move_type,base.group_user,1,1,1,1
+
+access_model_logistics_freight_package_base_group_user,GES Logistics / Freight / Packages,model_logistics_freight_package,base.group_user,1,1,1,1
+access_model_logistics_shipment_package_line_base_group_user,GES Logistics / Freight / Shipment Packages,model_logistics_shipment_package_line,base.group_user,1,1,1,1
+access_model_logistics_shipment_item_base_group_user,GES Logistics / Freight / Shipment Items,model_logistics_shipment_item,base.group_user,1,1,1,1
+
+access_model_logistics_popup_base_group_user,GES Logistics / Popup,model_logistics_popup,base.group_user,1,1,1,1
+access_model_logistics_wizard_doc_config_base_group_user,GES Logistics / Doc Config Wizard,model_logistics_wizard_doc_config,base.group_user,1,1,1,1

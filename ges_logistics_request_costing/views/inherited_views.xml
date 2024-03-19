@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_order_form_inherit_request_costing" model="ir.ui.view">
+            <field name="name">view.order.form.inherit.request.costing</field>
+            <field name="model">sale.order</field>
+            <field name="priority">9100</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//tree/field[@name='price_subtotal']" position="after">
+                    <field name="request_costing_id" force_save="1" readonly="1"/>
+                    <!--<button name="action_create_prt" type="object" icon="fa-ticket" string="" class="btn-primary" invisible="not id"/>-->
+                    <button name="action_request_request_costing_wizard" type="object" icon="fa-ticket" string="" class="btn-primary" invisible="not id or not request_costing_required"/>
+                    <field name="request_costing_required" column_invisible="1"/>
+                </xpath>
+                
+                <xpath expr="//t[@t-if='record.discount?.raw_value']" position="after">
+                    <div class="row" name="request_costing_order_line_div">
+                        <div class="col-12 text-muted">
+                            <field name="request_costing_required" invisible="1"/>
+                            <button name="action_request_request_costing_wizard" type="object" icon="fa-ticket" string="" class="btn-primary mb-2" invisible="not id or not request_costing_required"/>
+                            <span> Costing: </span>
+                            <t t-out="record.request_costing_id.value"/>
+                            <field name="request_costing_id" invisible="1"/>
+                        </div>
+                    </div>
+                </xpath>
+                
+
+            </field>
+        </record>
+
+        <!--
+        <record id="sale_margin_sale_order_line_form_inherit_request_costing" model="ir.ui.view">
+            <field name="name">sale.order.line.tree.margin.view.form.inherit.request.costing</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line_form"/>
+            <field name="priority">9999</field>
+            <field name="arch" type="xml">
+          
+                <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="after">
+                    <field name="price_subtotal" column_invisible="True"/>
+                    <field name="purchase_price" readonly="request_costing_id" optional="hide"/>
+                    <field name="margin" optional="hide"/>
+                    <field name="margin_percent" invisible="price_subtotal == 0" optional="hide" widget="percentage"/>
+                </xpath>
+                    
+
+            </field>
+        </record>
+        -->
+
+
+
+        <record id="product_template_form_view_inherit_request_costing" model="ir.ui.view">
+            <field name="name">product.template.form.view.inherit.request.costing</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+       
+
+                <xpath expr="//field[@name='sale_order_line_workflow']" position="after">
+                    <field name="request_costing_required"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        
+
+    </data>
+</odoo>

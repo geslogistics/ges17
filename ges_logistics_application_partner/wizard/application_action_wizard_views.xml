@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Views -->
+    
+
+
+    <record id="application_action_wizard_form_view" model="ir.ui.view">
+        <field name="name">Application User Action Wizard Form</field>
+        <field name="model">application.action.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" invisible="1"/>
+                        <field name="application_ids" widget="many2many_tags" invisible="1"/>
+                        <field name="note" default_focus="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="confirm_action" string="Confirm"
+                            type="object" 
+                            class="oe_highlight"
+                            data-hotkey="q"/>
+                    <button string="Cancel" class="btn btn-secondary"
+                            special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    
+    
+</odoo>

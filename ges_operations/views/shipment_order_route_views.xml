@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Actions-->
+        <record id="shipment_order_route_act_window" model="ir.actions.act_window">
+            <field name="name">Shipment Order</field>
+            <field name="res_model">shipment.order.route</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+
+        <!--Views-->
+
+        <record id="shipment_order_route_list_view" model="ir.ui.view">
+            <field name="name">shipment.order.route.list.view</field>
+            <field name="model">shipment.order.route</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="type_seq" column_invisible="1"/>
+                    <field name="route_type"/>
+                    <field name="transport"/>
+                    <field name="origin_code" string="From"/>
+                    <field name="destination_code" string="To"/>
+                    <field name="etd_datetime" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="shipment_order_route_form_view" model="ir.ui.view">
+            <field name="name">shipment.order.route.form.view</field>
+            <field name="model">shipment.order.route</field>
+            <field name="arch" type="xml">
+
+                <form>
+                    
+                    <sheet>
+                        
+                        <field name="active" invisible="1"/>
+                        <field name="partner_id" invisible="1"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active == True"/>
+                        
+                        <group>
+                            <field name="route_type" widget="radio" required="1" options="{'horizontal': true}"/>
+                            <field name="sequence"/>
+                            <field name="transport" widget="radio" required="1" options="{'horizontal': true}"/>
+                            <field name="ocean_shipment_mode" string="Shipment Mode"
+                                    invisible="transport != 'ocean'" required="transport == 'ocean'"/>
+                            <field name="air_shipment_mode" string="Shipment Mode"
+                                    invisible="transport != 'air'" required="transport == 'air'"/>
+                            <field name="road_shipment_mode" string="Shipment Mode"
+                                    invisible="transport != 'road'" required="transport == 'road'"/>
+                            <field name="rail_shipment_mode" string="Shipment Mode"
+                                    invisible="transport != 'rail'" required="transport =='rail'"/>
+                        </group>
+                        <group>
+                            <field name="is_dangerous"/>
+                            <field name="incoterms_id"/>
+                            <field name="is_freight_insurance"/>
+                        </group>
+                        
+                        <group string="From">
+                            <field name="origin_address_type" widget="radio" options="{'horizontal':True}" invisible="transport != 'road'"/>
+                            <field name="origin_port_id" invisible="origin_address_type != 'port'" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            <field name="origin_address_id" invisible="origin_address_type != 'location'" options="{'no_open': True, 'no_quick_create': True}" domain="['|',('partner_id','=',partner_id),('universal_address','=',1)]" context="{'default_partner_id': partner_id}"/>
+                            <field name="etd_datetime"/>                                        
+                            <label for="origin_address_id" string="Loading Address"/>
+                            <div name="origin_address">
+                                <field name="origin_code" nolabel="1" invisible="not origin_code"/>
+                                <field name="origin_street" nolabel="1" invisible="not origin_street"/>
+                                <field name="origin_street2" nolabel="1" invisible="not origin_street2"/>
+                                <field name="origin_zip_code" nolabel="1" invisible="not origin_zip_code"/>
+                                <field name="origin_city_id" nolabel="1" invisible="not origin_city_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_state_id" nolabel="1" invisible="not origin_state_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_country_id" nolabel="1" invisible="not origin_country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </div>
+                            <field name="origin_contact_id" required="0" invisible="not origin_address_id" widget="res_partner_many2one" options="{'no_quick_create': True}"/>
+                            <span class="o_form_label" invisible="not origin_contact_id"></span>
+                            <div class="o_form_field" invisible="not origin_contact_id">
+                                <field name="origin_contact_country" invisible="not origin_contact_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="origin_contact_email" invisible="not origin_contact_email"/>
+                                <field name="origin_contact_phone" invisible="not origin_contact_phone"/>
+                                <field name="origin_contact_mobile" invisible="not origin_contact_mobile"/>
+                            </div>
+                        </group>
+                        <group string="To">
+                            <field name="destination_address_type" widget="radio" options="{'horizontal':True}"  invisible="transport != 'road'"/>
+                            <field name="destination_port_id" invisible="destination_address_type != 'port'" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            <field name="destination_address_id" invisible="destination_address_type != 'location'" options="{'no_open': True, 'no_quick_create': True}" domain="['|',('partner_id','=',partner_id),('universal_address','=',1)]" context="{'default_partner_id': partner_id}"/>
+                            <field name="eta_datetime"/>
+                            <label for="destination_address_id" string="Discharge Address"/>
+                            <div name="destination_address">
+                                <field name="destination_code" nolabel="1" invisible="not destination_code"/>
+                                <field name="destination_street" nolabel="1" invisible="not destination_street"/>
+                                <field name="destination_street2" nolabel="1" invisible="not destination_street2"/>
+                                <field name="destination_zip_code" nolabel="1" invisible="not destination_zip_code"/>
+                                <field name="destination_city_id" nolabel="1" invisible="not destination_city_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_state_id" nolabel="1" invisible="not destination_state_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_country_id" nolabel="1" invisible="not destination_country_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                            </div>
+                            <field name="destination_contact_id" required="0" invisible="not destination_address_id" widget="res_partner_many2one" options="{'no_quick_create': True}"/>
+                            <span class="o_form_label" invisible="not destination_contact_id"></span>
+                            <div class="o_form_field" invisible="not destination_contact_id">
+                                <field name="destination_contact_country" invisible="not destination_contact_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                <field name="destination_contact_email" invisible="not destination_contact_email"/>
+                                <field name="destination_contact_phone" invisible="not destination_contact_phone"/>
+                                <field name="destination_contact_mobile" invisible="not destination_contact_mobile"/>
+                            </div>
+                        </group>
+                        
+                        <notebook>
+                            <page string="General Information">
+                                <group>
+                                    <group string="General Details">
+                                        <field name="bl_number"/>
+                                        <field name="delivery_terms"/>
+                                    </group>
+                                    <group string="Receipt Details">
+                                        <field name="contact_place_of_receipt"/>
+                                        <field name="contact_place_of_delivery"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Tracking Details">
+                                        <field name="tracking_number"/>
+                                        <field name="special_instructions"/>
+                                    </group>
+                                    <group string="Other Details">
+                                        
+                                        <field name="notes"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Carriage Details">
+                                <group>
+                                    <group name="air_details" invisible="transport != 'air'">
+                                        <field name="airline_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="0"/>
+                                        <field name="airline_id" options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="mawb_no"/>
+                                        <field name="flight_no"/>
+                                    </group>
+                                    <group name="ocean_details" invisible="transport != 'ocean'">
+                                        <field name="carrier_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="0"/>
+                                        <field name="vessel_id" options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="transhipment_port" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                        <field name="obl"/>
+                                        <field name="voyage_no"/>
+                                    </group>
+                                    <group name="rail_details" invisible="transport != 'rail'">
+                                        <field name="railway_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="0"/>
+                                        <field name="railway_id" options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="train_no"/>
+                                        <field name="car_no"/>
+                                    </group>
+                                    <group name="land_details" invisible="transport != 'land'">
+                                        <field name="vehicle_partner_id" widget="res_partner_many2one" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}" required="0"/>
+                                        <field name="vehicle_id" options="{'no_open': True, 'no_quick_create': True}"/>
+                                        <field name="truck_ref"/>
+                                    </group>                                    
+                                    <group name="other details">
+                                        <field name="distance"/>
+                                        <field name="bl_document_type"/>
+                                        <field name="freight_payable"/>
+                                        <field name="no_bill"/>                                        
+                                    </group>
+                                    <group name="other details2">
+                                        <field name="si_issue_date"/>                                      
+                                    </group>                                    
+                                </group>
+                                <div>
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:50%;text-align:center;">
+                                                    Mask and Numbers
+                                                </td>
+                                                <td style="width:50%;text-align:center;">
+                                                    Description and Packages &amp; Goods Particulars Furnished by
+                                                    Shipper
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:50%">
+                                                    <field name="mask_numbers"/>
+                                                </td>
+                                                <td style="width:50%">
+                                                    <field name="desc_pkg"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:50%;text-align:center;">
+                                                    Measurement
+                                                </td>
+                                                <td style="width:50%;text-align:center;">
+                                                    Remarks
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:50%">
+                                                    <field name="measurement"/>
+                                                </td>
+                                                <td style="width:50%">
+                                                    <field name="remark"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>                            
+                            </page>
+                            
+                            <page string="Agent">
+                                <group>
+                                    <field name="agent_id" widget="res_partner_many2one" context="{'show_address': 0, 'show_vat': 0}" options='{"no_quick_create": True}' required="0" id="agent_id_form"/>
+                                    <field name="agent_contact_id" required="0" invisible="not agent_id" widget="res_partner_many2one" domain="[('parent_id', '=', agent_id)]" options="{'no_quick_create': True}" context="{'default_parent_id': agent_id, 'default_is_company': 0}"/>
+                                    <span class="o_form_label" invisible="not agent_contact_id"></span>
+                                    <div class="o_form_field" invisible="not agent_contact_id">
+                                        <field name="agent_country" invisible="not agent_country" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                                        <field name="agent_email" invisible="not agent_email"/>
+                                        <field name="agent_phone" invisible="not agent_phone"/>
+                                        <field name="agent_mobile" invisible="not agent_mobile"/>
+                                </div>
+                                </group>
+                            </page>
+
+
+                            <page string="Insurance &amp; Policy" invisible="not is_freight_insurance">
+                                <group>
+                                    <group string="Policy Details">
+                                        <field name="policy_no" required="is_freight_insurance"/>
+                                        <field name="policy_name"  required="is_freight_insurance"/>
+                                        <field name="policy_partner_id"/>
+                                        <field name="policy_holder_id" string="Policy Holder"/>
+                                    </group>
+                                    <group string="Issue Details">
+                                        <field name="date"  required="is_freight_insurance"/>
+                                        <field name="issue_by"/>
+                                    </group>
+                                </group>
+                                <group string="Risk Covered">
+                                    <field name="risk_ids" />
+                                </group>
+                                <group string="Policy Term &amp; Condition">
+                                    <field name="term"/>
+                                </group>
+                            </page>
+                            <page string="Other Info">
+                                <group name="users" string="Users &amp; Units">
+                                    <field name="order_user_id" widget="many2one_avatar_user"/>
+                                    <field name="order_ou_id"/>
+                                    <field name="assigned_user_id" widget="many2one_avatar_user"/>
+                                    <field name="assigned_ou_id"/>
+                                    <field name="sales_user_id" widget="many2one_avatar_user"/>
+                                    <field name="sales_ou_id"/>
+                                    <field name="company_id" invisible="1"/>
+                                </group>
+                                <group name="other" string="Dates">
+                                    <field name="create_datetime"/>
+                                </group>
+                            </page>
+                            <page string="Package Details">
+                                <field name="freight_package_ids" nolabel="1" widget="one2many_list"/>
+                            </page>
+                            
+
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        
+        <record id="shipment_order_route_kanban_view" model="ir.ui.view">
+            <field name="name">shipment.order.route.kanban.view</field>
+            <field name="model">shipment.order.route</field>
+            <field name="arch" type="xml">
+
+                <kanban class="ges_kanban_costing" >
+                    <field name="sequence" widget="handle"/>
+                    <templates>
+                        
+                        <field name="transport"/>
+                        <field name="origin_address_type"/>                        
+                        <field name="origin_port_id"/>
+                        <field name="origin_address_id"/>
+                        <field name="origin_code"/>
+                        <field name="origin_city_id"/>
+                        <field name="origin_country_id"/>                    
+                        <field name="destination_address_type"/>
+                        <field name="destination_port_id"/>
+                        <field name="destination_address_id"/>
+                        <field name="destination_code"/>
+                        <field name="destination_city_id"/>
+                        <field name="destination_country_id"/>
+
+                        <t t-name="kanban-box">
+                            <div t-attf-class="p-3 oe_kanban_global_click" style="; background-color: #f8f9fa !important"> 
+                                <div class="o_kanban_record_top" style="justify-content: space-between; align-items: center;">                                                                        
+                                    <div class="oe_kanban_top_left">
+                                        <span class="fa fa-ship" style="font-size: 20px; margin-right: 5px !important; border: 1px solid lightgray; border-radius: 50px; padding: 4px; text-align: center;" invisible="transport != 'ocean'"/>
+                                        <span class="fa fa-plane" style="font-size: 20px; margin-right: 5px !important; border: 1px solid lightgray; border-radius: 50px; padding: 4px; text-align: center;" invisible="transport != 'air'"/>
+                                        <span class="fa fa-train" style="font-size: 20px; margin-right: 5px !important; border: 1px solid lightgray; border-radius: 50px; padding: 4px; text-align: center;" invisible="transport != 'rail'"/>
+                                        <span class="fa fa-truck" style="font-size: 20px; margin-right: 5px !important; border: 1px solid lightgray; border-radius: 50px; padding: 4px; text-align: center;" invisible="transport != 'road'"/>
+                                        <span>
+                                            <field name="transport" readonly="1" nolabel="1"/>
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_top_right" style="flex-wrap: wrap;">
+                                        <span invisible="origin_address_type != 'location'">Door-to-</span>
+                                        <span invisible="origin_address_type != 'port'">Port-to-</span>
+                                        <span invisible="destination_address_type != 'location'">Door</span>
+                                        <span invisible="destination_address_type != 'port'">Port</span>
+                                    </div>
+                                </div>
+                                <hr style="margin-top: 7px; margin-bottom: 7px; height:0px;"/>
+                                <div class="oe_kanban_details d-flex flex-column justify-content-between">
+                                    <div class="d-flex flex-row" style="">
+                                        <div style="width: 100%">   
+                                            <table>
+                                                <tr>
+                                                    <td style="padding-right:10px;">
+                                                        <span>From</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fa fa-map-marker fa-fw" style="font-size: 20px; margin-right: 5px !important;" invisible="origin_address_type != 'location'"/>
+                                                        <span class="fa fa-anchor fa-fw" style="font-size: 20px; margin-right: 5px !important;" invisible="origin_address_type != 'port'"/>
+                                                        <span t-if="record.origin_address_type.raw_value == 'port'">[<field name="origin_code"/>] <field name="origin_port_id"/>, <field name="origin_city_id"/>, <field name="origin_country_id"/></span>
+                                                        <span t-if="record.origin_address_type.raw_value == 'location'">[<field name="origin_code"/>] <field name="origin_address_id"/>, <field name="origin_city_id"/>, <field name="origin_country_id"/></span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-right:10px;">
+                                                        <span>To</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fa fa-map-marker fa-fw" style="font-size: 20px; margin-right: 5px !important;" invisible="destination_address_type != 'location'"/>
+                                                        <span class="fa fa-anchor fa-fw" style="font-size: 20px; margin-right: 5px !important;" invisible="destination_address_type != 'port'"/>
+                                                        <span t-if="record.destination_address_type.raw_value == 'port'">[<field name="destination_code"/>] <field name="destination_port_id"/>, <field name="destination_city_id"/>, <field name="destination_country_id"/></span>
+                                                        <span t-if="record.destination_address_type.raw_value == 'location'">[<field name="destination_code"/>] <field name="destination_address_id"/>, <field name="destination_city_id"/>, <field name="destination_country_id"/></span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>                          
+                                    </div>
+                                    <!--
+                                    <hr style="margin-top: 7px; margin-bottom: 7px; height:0px;"/>
+                                    <div class="o_kanban_record_bottom mt-2" style="align-items: flex-end;">
+                                        <div class="d-none d-sm-block" style="width:100px"/>
+                                        <div class="oe_kanban_bottom_left" style="flex-wrap: wrap;">
+                                            <t t-if="record.assigned_user_id.value">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <field name="assigned_user_id" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
+                                                    <span t-esc="record.assigned_user_id.value"/>
+                                                </div>
+                                            </t>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <span>bottom right</span>
+                                        </div>
+                                    </div>
+                                    -->
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

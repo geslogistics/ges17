@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_filter_inherit_partner_application" model="ir.ui.view">
+        <field name="name">request.quotation.select.inherit.partner.application</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="procurement_ou_id" optional="show" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            <field name="user_id" position="replace">
+                <field name="procurement_user_id" optional="show" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            <filter name="my_purchases" position="replace">
+                <filter name="my_purchases" string="My Purchases" domain="[('procurement_user_id', '=', uid)]"/>
+            </filter>
+            <filter name="representative" position="replace">
+                <filter string="Purchase User" name="representative" domain="[]" context="{'group_by': 'procurement_user_id'}"/>
+                <filter string="Purchase Unit" name="unit" domain="[]" context="{'group_by': 'procurement_ou_id'}"/>
+            </filter>
+            
+        </field>
+    </record>
+
+    <record id="purchase_order_view_search_inherit_partner_application" model="ir.ui.view">
+        <field name="name">purchase.order.select.inherit.partner.application</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_search"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="procurement_ou_id" optional="show" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            <field name="user_id" position="replace">
+                <field name="procurement_user_id" optional="show" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            <filter name="my_Orders" position="replace">
+                <filter name="my_Orders" string="My Orders" domain="[('procurement_user_id', '=', uid)]"/>
+            </filter>
+        </field>
+    </record>
+    
+    <record id="purchase_order_tree_inherit_partner_application" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit.partner.application</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="procurement_ou_id" optional="show" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            <field name="user_id" position="replace">
+                <field name="procurement_user_id" optional="show" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="purchase_order_kpis_tree_inherit_partner_application" model="ir.ui.view">
+        <field name="name">purchase.order.inherit.purchase.order.tree.inherit.partner.application</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="procurement_ou_id" optional="show" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            <field name="user_id" position="replace">
+                <field name="procurement_user_id" optional="show" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="purchase_order_view_tree_inherit_partner_application" model="ir.ui.view">
+        <field name="name">purchase.order.view.tree.inherit.partner.application</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="procurement_ou_id" optional="show" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+            <field name="user_id" position="replace">
+                <field name="procurement_user_id" optional="show" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_purchase_order_form_inherit_partner_application" model="ir.ui.view">
+        <field name="name">
+            purchase.order.inherit.partner.application
+        </field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="priority">9999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="options">{'no_open': True, 'no_quick_create': True, 'no_create': True}</attribute>
+            </xpath>   
+            <xpath expr="//field[@name='currency_id']" position="attributes">
+                <attribute name="domain">pa_domain_currency_id</attribute>
+                <attribute name="options">{'no_open': True, 'no_quick_create': True, 'no_create': True}</attribute>
+            </xpath>                   
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="pa_domain_currency_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="attributes">
+                <attribute name="domain">pa_domain_payment_term_id</attribute>
+            </xpath>                   
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="pa_domain_payment_term_id" invisible="1"/>
+            </xpath>
+
+            <field name="user_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+
+            <field name="user_id" position="after">
+                <field name="procurement_user_id" widget="many2one_avatar_user" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                <field name="procurement_ou_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+</odoo>
