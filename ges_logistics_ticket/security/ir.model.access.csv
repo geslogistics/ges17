@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_ticket_admin,access.ticket.admin,model_ticket,group_ticket_admin,1,1,1,1
-access_ticket_user_all_docs,access.ticket.user,model_ticket,group_ticket_user_all_docs,1,1,1,0
-access_ticket_user_team_docs,access.ticket.user,model_ticket,group_ticket_user_team_docs,1,1,1,0
-access_ticket_user_own_docs,access.ticket.user,model_ticket,group_ticket_user_own_docs,1,1,1,0
